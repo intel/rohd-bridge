@@ -7,7 +7,7 @@
       "pattern":"^https://github.com"
     },
     {
-      "pattern":"^https://intel.github.io/rohd_bridge/"
+      "pattern":"^https://intel.github.io/rohd-bridge/"
     }
   ]
 }
