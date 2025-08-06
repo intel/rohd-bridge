@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the addInterfacesFromJson method from the BridgeModuleFromJson extension, for the Dart programming language.">
+  <title>addInterfacesFromJson method - BridgeModuleFromJson extension - rohd_bridge library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">rohd_bridge</a></li>
+    <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
+    <li><a href="../../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a></li>
+    <li class="self-crumb">addInterfacesFromJson method</li>
+  </ol>
+  <div class="self-name">addInterfacesFromJson</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="rohd_bridge&#47;BridgeModuleFromJson-extension-sidebar.html"
+    data-below-sidebar="">
+    <div>
+<h1><span class="kind-method">addInterfacesFromJson</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+<span class="returntype">void</span>
+<span class="name ">addInterfacesFromJson</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="addInterfacesFromJson-param-instanceName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">instanceName</span>, </span></li>
+<li><span class="parameter" id="addInterfacesFromJson-param-busInterfaces"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">busInterfaces</span>, </span></li>
+<li><span class="parameter" id="addInterfacesFromJson-param-parameters"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">parameters</span></span></li>
+</ol>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Creates interfaces based on a JSON input.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">void addInterfacesFromJson(String instanceName,
+    Map&lt;String, dynamic&gt; busInterfaces, Map&lt;String, String&gt; parameters) {
+  busInterfaces.forEach((intfInstName, intfInfo) {
+    intfInfo as Map&lt;String, dynamic&gt;;
+
+    final busInstanceParamOverride = &lt;String, int&gt;{};
+    &#47;&#47; If this interface instance is not going to be used,
+    &#47;&#47; theres no need to spend time parsing the rest of the data
+
+    (intfInfo[&#39;configurableElementValues&#39;] as Map&lt;String, dynamic&gt;)
+        .forEach((param, value) {
+      final newValue =
+          getInt(value.toString(), asIsIfUnparsed: true).toString();
+      &#47;&#47; check if it&#39;s a string parameter and ignore override
+      &#47;&#47; Assumption: String parameters are generally not used in
+      &#47;&#47; module definitions
+      final val =
+          int.tryParse(newValue); &#47;&#47; evaluateExpression(newValue, parameters);
+      if (val is int) {
+        busInstanceParamOverride[param] = val;
+      }
+    });
+
+    final role = _getPairRole(intfInfo[&#39;mode&#39;] as String);
+
+    final portMapList = intfInfo[&#39;portMaps&#39;] != null
+        ? intfInfo[&#39;portMaps&#39;] as List&lt;Map&lt;String, dynamic&gt;&gt;
+        : &lt;Map&lt;String, dynamic&gt;&gt;[];
+    final allUsedPorts = _getUsedPorts(portMapList);
+    final thisIntf =
+        BridgeInterface.ofJson(_getBridgeIntfJson(intfMap: intfInfo));
+
+    _checkReqPortUsage(thisIntf, allUsedPorts);
+
+    final thisIntfRef = addInterface(
+      thisIntf,
+      name: intfInstName,
+      role: role,
+      connect: false,
+    );
+
+    final parameterNameValuesString = &lt;String&gt;[];
+    busInstanceParamOverride.forEach((key, value) {
+      parameterNameValuesString.add(&#39;$key : $value&#39;);
+    });
+
+    for (final portMap in portMapList) {
+      final rtlPortName = portMap[&#39;physicalPortName&#39;].toString();
+      final intfPortName = portMap[&#39;logicalPortName&#39;].toString();
+      final phyPs = portMap[&#39;physicalPartSelect&#39;].toString();
+      final logicalPs = portMap[&#39;logicalPartSelect&#39;].toString();
+
+      final logPortRef = logicalPs == &#39;&#39;
+          ? intfPortName
+          : &#39;$intfPortName$logicalPs&#39;.replaceAll(&#39; &#39;, &#39;&#39;);
+      final phyPortRef = phyPs == &#39;&#39;
+          ? rtlPortName
+          : &#39;$rtlPortName$phyPs&#39;.replaceAll(&#39; &#39;, &#39;&#39;);
+
+      if (thisIntfRef.interface.tryPort(intfPortName) == null) {
+        RohdBridgeLogger.logger.error(&#39;Port $intfPortName not in interface&#39;
+            &#39; ${thisIntfRef.interface}&#39;);
+      } else {
+        addPortMap(port(phyPortRef), thisIntfRef.port(logPortRef));
+      }
+    }
+  });
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../../index.html">rohd_bridge</a></li>
+    <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
+    <li><a href="../../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a></li>
+    <li class="self-crumb">addInterfacesFromJson method</li>
+</ol>
+
+    <h5>BridgeModuleFromJson extension on <a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    rohd_bridge
+      0.1.0
+  </span>
+  
+</footer>
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

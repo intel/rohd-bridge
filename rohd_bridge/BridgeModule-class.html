@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the BridgeModule class from the rohd_bridge library, for the Dart programming language.">
+  <title>BridgeModule class - rohd_bridge library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">rohd_bridge</a></li>
+    <li><a href="../rohd_bridge/">rohd_bridge.dart</a></li>
+    <li class="self-crumb">BridgeModule class</li>
+  </ol>
+  <div class="self-name">BridgeModule</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+<div
+    id="dartdoc-main-content"
+    class="main-content"
+    data-above-sidebar="rohd_bridge&#47;rohd_bridge-library-sidebar.html"
+    data-below-sidebar="rohd_bridge&#47;BridgeModule-class-sidebar.html">
+    <div>
+<h1><span class="kind-class">BridgeModule</span> class 
+ 
+</h1></div>
+
+    
+<section class="desc markdown">
+  <p>A specialized module class that extends ROHD's <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> with advanced
+connectivity and hierarchy management capabilities.</p>
+<p><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a> provides enhanced functionality for creating complex hardware
+designs, including:</p>
+<ul>
+<li>Interface-based connectivity with automatic port mapping</li>
+<li>Hierarchical port and interface punching operations</li>
+<li>JSON-based module definition support</li>
+<li>Parameter passing and management</li>
+<li>SystemVerilog leaf module integration</li>
+<li>Advanced connection routing between hierarchy levels</li>
+</ul>
+<p>This class serves as the foundation for building scalable, well-connected
+hardware IP modules in the ROHD Bridge framework.</p>
+</section>
+
+
+    <section>
+      <dl class="dl-horizontal">
+        
+  <dt>Inheritance</dt>
+  <dd>
+    <ul class="gt-separated dark clazz-relationships">
+      <li><a href="https://api.dart.dev/stable/3.8.3/dart-core/Object-class.html">Object</a></li>
+        <li><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></li>
+      <li>BridgeModule</li>
+    </ul>
+  </dd>
+
+        
+        
+  <dt>Mixed-in types</dt>
+  <dd>
+    <ul class="comma-separated clazz-relationships">
+        <li><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/SystemVerilog-mixin.html">SystemVerilog</a></li>
+    </ul>
+  </dd>
+
+
+        
+  <dt>Available extensions</dt>
+  <dd><ul class="comma-separated clazz-relationships">
+      <li><a href="../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a></li>
+      <li><a href="../rohd_bridge/RohdBridgeModuleExtensions.html">RohdBridgeModuleExtensions</a></li>
+  </ul></dd>
+        
+
+
+      </dl>
+    </section>
+
+    
+  <section class="summary offset-anchor" id="constructors">
+    <h2>Constructors</h2>
+    <dl class="constructor-summary-list">
+        <dt id="BridgeModule.new" class="callable">
+          <span class="name"><a href="../rohd_bridge/BridgeModule/BridgeModule.html">BridgeModule.new</a></span><span class="signature">(<span class="parameter" id="-param-definitionName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">definitionName</span>, {</span><span class="parameter" id="-param-definitionParameters"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/SystemVerilogParameterDefinition-class.html">SystemVerilogParameterDefinition</a></span>&gt;</span>?</span> <span class="parameter-name">definitionParameters</span>, </span><span class="parameter" id="-param-instantiationParameters"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">instantiationParameters</span>, </span><span class="parameter" id="-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">name</span>, </span><span class="parameter" id="-param-reserveDefinitionName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">reserveDefinitionName</span> = <span class="default-value">true</span>, </span><span class="parameter" id="-param-reserveName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">reserveName</span> = <span class="default-value">false</span>, </span><span class="parameter" id="-param-allowUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowUniquification</span> = <span class="default-value">true</span>, </span><span class="parameter" id="-param-isSystemVerilogLeaf"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isSystemVerilogLeaf</span> = <span class="default-value">false</span></span>})</span>
+        </dt>
+        <dd>
+          Creates a new <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a> with enhanced connectivity capabilities.
+        </dd>
+        <dt id="BridgeModule.fromJson" class="callable">
+          <span class="name"><a href="../rohd_bridge/BridgeModule/BridgeModule.fromJson.html">BridgeModule.fromJson</a></span><span class="signature">(<span class="parameter" id="fromJson-param-jsonContents"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">jsonContents</span>, {</span><span class="parameter" id="fromJson-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">name</span>, </span><span class="parameter" id="fromJson-param-reserveName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">reserveName</span> = <span class="default-value">false</span></span>})</span>
+        </dt>
+        <dd>
+          Creates a <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a> from a JSON module description.
+            <div class="constructor-modifier features">factory</div>
+        </dd>
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-properties">
+    <h2>Properties</h2>
+    <dl class="properties">
+        <dt id="allowUniquification" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/allowUniquification.html">allowUniquification</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  Controls whether port and interface names can be automatically uniquified.
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="definitionName" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/definitionName.html">definitionName</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  The definition name of this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> used when instantiating instances in
+generated code.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="definitionParameters" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/definitionParameters.html">definitionParameters</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/SystemVerilogParameterDefinition-class.html">SystemVerilogParameterDefinition</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  A collection of SystemVerilog <code>SystemVerilogParameterDefinition</code>s to be
+declared on the definition when generating SystemVerilog for this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>
+if <a href="../rohd_bridge/BridgeModule/generatedDefinitionType.html">generatedDefinitionType</a> is <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/DefinitionGenerationType.html">DefinitionGenerationType.standard</a>.
+  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="expressionlessInputs" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/SystemVerilog/expressionlessInputs.html">expressionlessInputs</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd class="inherited">
+  A list of names of <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a>s which should not have any SystemVerilog
+expressions (including constants) in-lined into them. Only signal names
+will be fed into these.
+  <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="generatedDefinitionType" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/generatedDefinitionType.html">generatedDefinitionType</a></span>
+  <span class="signature">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/DefinitionGenerationType.html">DefinitionGenerationType</a></span>
+  
+
+</dt>
+<dd>
+  What kind of SystemVerilog definition this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> generates, or whether
+it does at all.
+  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="hasBuilt" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/hasBuilt.html">hasBuilt</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  Indicates whether this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> has had the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/build.html">build</a> method called on it.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="hashCode" class="property inherited">
+  <span class="name"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Object/hashCode.html">hashCode</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  The hash code for this object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="hierarchicalName" class="property">
+  <span class="name"><a href="../rohd_bridge/RohdBridgeModuleExtensions/hierarchicalName.html">hierarchicalName</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>,
+        provided by the <a href="../rohd_bridge/RohdBridgeModuleExtensions.html">RohdBridgeModuleExtensions</a> extension</span>
+      </p>
+  Provides a full hierarchical name based on <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/hierarchy.html">hierarchy</a>.
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="inOuts" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOuts.html">inOuts</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd class="inherited">
+  A map from <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> port names to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> to corresponding <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>
+signals.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="inputs" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inputs.html">inputs</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd class="inherited">
+  A map from <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a> port names to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> to corresponding <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>
+signals.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="instantiationParameters" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/instantiationParameters.html">instantiationParameters</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  Pass-through parameters used when instantiating this module in
+SystemVerilog.
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="interfaces" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/interfaces.html">interfaces</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  Unmodifiable map of all interfaces added to this module.
+  <div class="features"><span class="feature">late</span><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="internalSignals" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/internalSignals.html">internalSignals</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd class="inherited">
+  An <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a> of all <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>s contained within this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> which are
+<em>not</em> an input or output port of this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="isSystemVerilogLeaf" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/isSystemVerilogLeaf.html">isSystemVerilogLeaf</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd>
+  Indicates whether this module represents an external SystemVerilog leaf.
+  <div class="features"><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="name" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/name.html">name</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  The name of this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+  <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="outputs" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/outputs.html">outputs</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd class="inherited">
+  A map from <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> port names to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> to corresponding <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>
+signals.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="parent" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/parent.html">parent</a></span>
+  <span class="signature">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>?</span>
+  
+
+</dt>
+<dd>
+  The parent <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> of this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="renamedPorts" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/renamedPorts.html">renamedPorts</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  Internal mapping of renamed ports for backwards compatibility.
+  <div class="features"><span class="feature">late</span><span class="feature">final</span></div>
+
+</dd>
+
+        <dt id="reserveDefinitionName" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/reserveDefinitionName.html">reserveDefinitionName</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  If true, guarantees <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/definitionName.html">definitionName</a> is maintained by a <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Synthesizer-class.html">Synthesizer</a>,
+or else it will fail.
+  <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="reserveName" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/reserveName.html">reserveName</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  If true, guarantees <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/uniqueInstanceName.html">uniqueInstanceName</a> matches <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/name.html">name</a> or else the
+<a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/build.html">build</a> will fail.
+  <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="runtimeType" class="property inherited">
+  <span class="name"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Object/runtimeType.html">runtimeType</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Type-class.html">Type</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  A representation of the runtime type of the object.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="signals" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/signals.html">signals</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd class="inherited">
+  An <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a> of all <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>s contained within this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>, including
+inputs, outputs, and internal signals of this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="structMap" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/structMap.html">structMap</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  Map of struct member names to their corresponding packed bit slice ranges.
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="subBridgeModules" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/subBridgeModules.html">subBridgeModules</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  All submodules that are instances of <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>.
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
+        <dt id="subModules" class="property">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/subModules.html">subModules</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span>&gt;</span></span>
+  
+
+</dt>
+<dd>
+  Provides access to submodules before and after the build process.
+  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="uniqueInstanceName" class="property inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/uniqueInstanceName.html">uniqueInstanceName</a></span>
+  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  
+
+</dt>
+<dd class="inherited">
+  If this module has a <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/parent.html">parent</a>, after <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/build.html">build</a> this will be a guaranteed
+unique name within its scope.
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+
+    
+  <section
+      class="summary offset-anchor"
+      id="instance-methods">
+    <h2>Methods</h2>
+    <dl class="callables">
+        <dt id="addFromJson" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModuleFromJson/addFromJson.html">addFromJson</a></span><span class="signature">(<wbr><span class="parameter" id="addFromJson-param-jsonContents"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">jsonContents</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>,
+        provided by the <a href="../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a> extension</span>
+      </p>
+  Populates ports, interfaces, and parameters from JSON representing the
+full module.
+  
+
+</dd>
+
+        <dt id="addInOut" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addInOut.html">addInOut</a></span><span class="signature">(<wbr><span class="parameter" id="addInOut-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addInOut-param-source"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>?</span> <span class="parameter-name">source</span>, {</span><span class="parameter" id="addInOut-param-width"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span> = <span class="default-value">1</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/LogicNet-class.html">LogicNet</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Adds an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> in the same way as the base <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> does.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="addInOutArray" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addInOutArray.html">addInOutArray</a></span><span class="signature">(<wbr><span class="parameter" id="addInOutArray-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addInOutArray-param-source"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>?</span> <span class="parameter-name">source</span>, {</span><span class="parameter" id="addInOutArray-param-dimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span>&gt;</span></span> <span class="parameter-name">dimensions</span> = <span class="default-value">const [1]</span>, </span><span class="parameter" id="addInOutArray-param-elementWidth"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">elementWidth</span> = <span class="default-value">1</span>, </span><span class="parameter" id="addInOutArray-param-numUnpackedDimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">numUnpackedDimensions</span> = <span class="default-value">0</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/LogicArray-class.html">LogicArray</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Adds an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> array in the same way as the base <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> does.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="addInput" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addInput.html">addInput</a></span><span class="signature">(<wbr><span class="parameter" id="addInput-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addInput-param-source"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>?</span> <span class="parameter-name">source</span>, {</span><span class="parameter" id="addInput-param-width"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span> = <span class="default-value">1</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Adds an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a> in the same way as the base <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> does.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="addInputArray" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addInputArray.html">addInputArray</a></span><span class="signature">(<wbr><span class="parameter" id="addInputArray-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addInputArray-param-source"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>?</span> <span class="parameter-name">source</span>, {</span><span class="parameter" id="addInputArray-param-dimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span>&gt;</span></span> <span class="parameter-name">dimensions</span> = <span class="default-value">const [1]</span>, </span><span class="parameter" id="addInputArray-param-elementWidth"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">elementWidth</span> = <span class="default-value">1</span>, </span><span class="parameter" id="addInputArray-param-numUnpackedDimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">numUnpackedDimensions</span> = <span class="default-value">0</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/LogicArray-class.html">LogicArray</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Adds an input array port with enhanced name management.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="addInterface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addInterface.html">addInterface</a></span><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType extends <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="addInterface-param-intf"><span class="type-annotation">InterfaceType</span> <span class="parameter-name">intf</span>, {</span><span class="parameter" id="addInterface-param-name"><span>required</span> <span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addInterface-param-role"><span>required</span> <span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairRole.html">PairRole</a></span> <span class="parameter-name">role</span>, </span><span class="parameter" id="addInterface-param-connect"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">connect</span> = <span class="default-value">true</span>, </span><span class="parameter" id="addInterface-param-allowNameUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowNameUniquification</span> = <span class="default-value">false</span>, </span><span class="parameter" id="addInterface-param-portUniquify"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">portUniquify</span>(<span class="parameter" id="param-logical"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">logical</span></span>)?</span>})
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Adds an interface to this module with comprehensive configuration options.
+  
+
+</dd>
+
+        <dt id="addInterfacePorts" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addInterfacePorts.html">addInterfacePorts</a></span><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType extends <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Interface-class.html">Interface</a><span class="signature">&lt;<wbr><span class="type-parameter">TagType</span>&gt;</span></span>, <span class="type-parameter">TagType extends <a href="https://api.dart.dev/stable/3.8.3/dart-core/Enum-class.html">Enum</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="addInterfacePorts-param-source"><span class="type-annotation">InterfaceType</span> <span class="parameter-name">source</span>, {</span><span class="parameter" id="addInterfacePorts-param-inputTags"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter">TagType</span>&gt;</span>?</span> <span class="parameter-name">inputTags</span>, </span><span class="parameter" id="addInterfacePorts-param-outputTags"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter">TagType</span>&gt;</span>?</span> <span class="parameter-name">outputTags</span>, </span><span class="parameter" id="addInterfacePorts-param-inOutTags"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter">TagType</span>&gt;</span>?</span> <span class="parameter-name">inOutTags</span>, </span><span class="parameter" id="addInterfacePorts-param-uniquify"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">uniquify</span>(<span class="parameter" id="param-original"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">original</span></span>)?</span>})
+    <span class="returntype parameter">&#8594; InterfaceType</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Connects the <code>source</code> to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> using <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Interface/connectIO.html">Interface.connectIO</a> and
+returns a copy of the <code>source</code> that can be used within this module.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="addInterfacesFromJson" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModuleFromJson/addInterfacesFromJson.html">addInterfacesFromJson</a></span><span class="signature">(<wbr><span class="parameter" id="addInterfacesFromJson-param-instanceName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">instanceName</span>, </span><span class="parameter" id="addInterfacesFromJson-param-busInterfaces"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">busInterfaces</span>, </span><span class="parameter" id="addInterfacesFromJson-param-parameters"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">parameters</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>,
+        provided by the <a href="../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a> extension</span>
+      </p>
+  Creates interfaces based on a JSON input.
+  
+
+</dd>
+
+        <dt id="addOutput" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addOutput.html">addOutput</a></span><span class="signature">(<wbr><span class="parameter" id="addOutput-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="addOutput-param-width"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span> = <span class="default-value">1</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Registers an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> and returns an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> port that
+can be driven by this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> or consumed outside of it.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="addOutputArray" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addOutputArray.html">addOutputArray</a></span><span class="signature">(<wbr><span class="parameter" id="addOutputArray-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, {</span><span class="parameter" id="addOutputArray-param-dimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span>&gt;</span></span> <span class="parameter-name">dimensions</span> = <span class="default-value">const [1]</span>, </span><span class="parameter" id="addOutputArray-param-elementWidth"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">elementWidth</span> = <span class="default-value">1</span>, </span><span class="parameter" id="addOutputArray-param-numUnpackedDimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">numUnpackedDimensions</span> = <span class="default-value">0</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/LogicArray-class.html">LogicArray</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Registers and returns an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/LogicArray-class.html">LogicArray</a> port to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> with
+the specified <code>dimensions</code>, <code>elementWidth</code>, and <code>numUnpackedDimensions</code>
+named <code>name</code>.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="addPairInterfacePorts" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addPairInterfacePorts.html">addPairInterfacePorts</a></span><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType extends <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="addPairInterfacePorts-param-source"><span class="type-annotation">InterfaceType</span> <span class="parameter-name">source</span>, </span><span class="parameter" id="addPairInterfacePorts-param-role"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairRole.html">PairRole</a></span> <span class="parameter-name">role</span>, {</span><span class="parameter" id="addPairInterfacePorts-param-uniquify"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">uniquify</span>(<span class="parameter" id="param-original"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">original</span></span>)?</span>})
+    <span class="returntype parameter">&#8594; InterfaceType</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Connects the <code>source</code> to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> using <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface/pairConnectIO.html">PairInterface.pairConnectIO</a>
+and returns a copy of the <code>source</code> that can be used within this module.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="addParametersFromJson" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModuleFromJson/addParametersFromJson.html">addParametersFromJson</a></span><span class="signature">(<wbr><span class="parameter" id="addParametersFromJson-param-parameterList"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">parameterList</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>,
+        provided by the <a href="../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a> extension</span>
+      </p>
+  Adds parameters to the module from the JSON <code>parameterList</code>.
+  
+
+</dd>
+
+        <dt id="addPortMap" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addPortMap.html">addPortMap</a></span><span class="signature">(<wbr><span class="parameter" id="addPortMap-param-port"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">port</span>, </span><span class="parameter" id="addPortMap-param-intfPort"><span class="type-annotation"><a href="../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></span> <span class="parameter-name">intfPort</span>, {</span><span class="parameter" id="addPortMap-param-connect"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">connect</span> = <span class="default-value">false</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortMap-class.html">PortMap</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a mapping between a module port and an interface port.
+  
+
+</dd>
+
+        <dt id="addPortsFromJson" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModuleFromJson/addPortsFromJson.html">addPortsFromJson</a></span><span class="signature">(<wbr><span class="parameter" id="addPortsFromJson-param-portInfo"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span>&gt;</span></span> <span class="parameter-name">portInfo</span>, </span><span class="parameter" id="addPortsFromJson-param-parameters"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">parameters</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>,
+        provided by the <a href="../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a> extension</span>
+      </p>
+  Create ports in the module based on the portInfo and parameters
+  
+
+</dd>
+
+        <dt id="addStructMap" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addStructMap.html">addStructMap</a></span><span class="signature">(<wbr><span class="parameter" id="addStructMap-param-structFieldFullName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">structFieldFullName</span>, </span><span class="parameter" id="addStructMap-param-reference"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">reference</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a mapping from <code>structFieldFullName</code> to a <a href="../rohd_bridge/PortReference-class.html">PortReference</a>, so that
+each time <a href="../rohd_bridge/BridgeModule/port.html">port</a> receives <code>structFieldFullName</code>, it will actually return
+the specified <code>reference</code>.
+  
+
+</dd>
+
+        <dt id="addSubModule" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/addSubModule.html">addSubModule</a></span><span class="signature">&lt;<wbr><span class="type-parameter">BridgeModuleType extends <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="addSubModule-param-subModule"><span class="type-annotation">BridgeModuleType</span> <span class="parameter-name">subModule</span></span>)
+    <span class="returntype parameter">&#8594; BridgeModuleType</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Adds a submodule to this module and establishes parent-child relationship.
+  
+
+</dd>
+
+        <dt id="addTypedInOut" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addTypedInOut.html">addTypedInOut</a></span><span class="signature">&lt;<wbr><span class="type-parameter">LogicType extends <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="addTypedInOut-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addTypedInOut-param-source"><span class="type-annotation">LogicType</span> <span class="parameter-name">source</span></span>)
+    <span class="returntype parameter">&#8594; LogicType</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Registers a signal as an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> and returns an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a>
+port that can be consumed inside this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>. The type of the port will
+be <code>LogicType</code> and constructed via <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic/clone.html">Logic.clone</a>, so it is required that
+the <code>source</code> implements clone functionality that matches the type and
+properly updates the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic/name.html">Logic.name</a> as well.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="addTypedInput" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addTypedInput.html">addTypedInput</a></span><span class="signature">&lt;<wbr><span class="type-parameter">LogicType extends <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="addTypedInput-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addTypedInput-param-source"><span class="type-annotation">LogicType</span> <span class="parameter-name">source</span></span>)
+    <span class="returntype parameter">&#8594; LogicType</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Registers a signal as an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a> to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> and returns an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a>
+port that can be consumed. The type of the port will be <code>LogicType</code> and
+constructed via <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic/clone.html">Logic.clone</a>, so it is required that the <code>source</code>
+implements clone functionality that matches the type and properly updates
+the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic/name.html">Logic.name</a> as well.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="addTypedOutput" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addTypedOutput.html">addTypedOutput</a></span><span class="signature">&lt;<wbr><span class="type-parameter">LogicType extends <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="addTypedOutput-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span>, </span><span class="parameter" id="addTypedOutput-param-logicGenerator"><span class="type-annotation">LogicType</span> <span class="parameter-name">logicGenerator</span>({<span class="parameter" id="param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>})</span>)
+    <span class="returntype parameter">&#8594; LogicType</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Registers an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> to this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> and returns an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> port that
+can be driven by this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> or consumed outside of it. The type of the
+port will be <code>LogicType</code> and constructed via <code>logicGenerator</code>, which must
+properly update the <code>name</code> of the generated <code>LogicType</code> as well.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="build" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/build.html">build</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Builds the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> and all <a href="../rohd_bridge/BridgeModule/subModules.html">subModules</a> within it.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="buildAndGenerateRTL" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/buildAndGenerateRTL.html">buildAndGenerateRTL</a></span><span class="signature">(<wbr>{<span class="parameter" id="buildAndGenerateRTL-param-logger"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.3.0/logging/Logger-class.html">Logger</a>?</span> <span class="parameter-name">logger</span>, </span><span class="parameter" id="buildAndGenerateRTL-param-outputPath"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">outputPath</span> = <span class="default-value">&#39;output&#39;</span></span>})
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Calls <a href="../rohd_bridge/BridgeModule/build.html">build</a> and generates SystemVerilog and a filelist into the
+<code>outputPath</code>, with optional logging sent to the <code>logger</code>.
+  
+
+</dd>
+
+        <dt id="createArrayPort" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/createArrayPort.html">createArrayPort</a></span><span class="signature">(<wbr><span class="parameter" id="createArrayPort-param-portName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">portName</span>, </span><span class="parameter" id="createArrayPort-param-direction"><span class="type-annotation"><a href="../rohd_bridge/PortDirection.html">PortDirection</a></span> <span class="parameter-name">direction</span>, {</span><span class="parameter" id="createArrayPort-param-dimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span>&gt;</span></span> <span class="parameter-name">dimensions</span> = <span class="default-value">const [1]</span>, </span><span class="parameter" id="createArrayPort-param-elementWidth"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">elementWidth</span> = <span class="default-value">1</span>, </span><span class="parameter" id="createArrayPort-param-numUnpackedDimensions"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">numUnpackedDimensions</span> = <span class="default-value">0</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Add array port with the given <code>portName</code>, <code>direction</code>, <code>dimensions</code> and
+<code>elementWidth</code>.
+  
+
+</dd>
+
+        <dt id="createParameter" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/createParameter.html">createParameter</a></span><span class="signature">(<wbr><span class="parameter" id="createParameter-param-paramName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">paramName</span>, </span><span class="parameter" id="createParameter-param-value"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">value</span>, {</span><span class="parameter" id="createParameter-param-type"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">type</span> = <span class="default-value">&#39;int&#39;</span>, </span><span class="parameter" id="createParameter-param-isMapped"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isMapped</span> = <span class="default-value">false</span>, </span><span class="parameter" id="createParameter-param-mergeIfExist"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">mergeIfExist</span> = <span class="default-value">false</span></span>})
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a parameter definition with configurable instantiation mapping.
+  
+
+</dd>
+
+        <dt id="createPort" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/createPort.html">createPort</a></span><span class="signature">(<wbr><span class="parameter" id="createPort-param-portName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">portName</span>, </span><span class="parameter" id="createPort-param-direction"><span class="type-annotation"><a href="../rohd_bridge/PortDirection.html">PortDirection</a></span> <span class="parameter-name">direction</span>, {</span><span class="parameter" id="createPort-param-width"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">width</span> = <span class="default-value">1</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a new port with the specified characteristics.
+  
+
+</dd>
+
+        <dt id="definitionVerilog" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/definitionVerilog.html">definitionVerilog</a></span><span class="signature">(<wbr><span class="parameter" id="definitionVerilog-param-definitionType"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">definitionType</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  A custom SystemVerilog definition to be produced for this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="findSubModule" class="callable">
+  <span class="name"><a href="../rohd_bridge/RohdBridgeModuleExtensions/findSubModule.html">findSubModule</a></span><span class="signature">(<wbr><span class="parameter" id="findSubModule-param-pattern"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Pattern-class.html">Pattern</a></span> <span class="parameter-name">pattern</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>,
+        provided by the <a href="../rohd_bridge/RohdBridgeModuleExtensions.html">RohdBridgeModuleExtensions</a> extension</span>
+      </p>
+  Searches for one sub-module matching <code>pattern</code> in the same way as
+<a href="../rohd_bridge/RohdBridgeModuleExtensions/findSubModules.html">findSubModules</a>. If more than one module is found, an exception is
+thrown.
+  
+
+</dd>
+
+        <dt id="findSubModules" class="callable">
+  <span class="name"><a href="../rohd_bridge/RohdBridgeModuleExtensions/findSubModules.html">findSubModules</a></span><span class="signature">(<wbr><span class="parameter" id="findSubModules-param-pattern"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Pattern-class.html">Pattern</a></span> <span class="parameter-name">pattern</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>,
+        provided by the <a href="../rohd_bridge/RohdBridgeModuleExtensions.html">RohdBridgeModuleExtensions</a> extension</span>
+      </p>
+  Searches for sub-modules by instance name <code>pattern</code> within this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+The <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a> representation being matched against uses <code>/</code> as a separator
+for hierarchy.
+  
+
+</dd>
+
+        <dt id="generateSynth" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/generateSynth.html">generateSynth</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Returns a synthesized version of this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="getHierarchyDownTo" class="callable">
+  <span class="name"><a href="../rohd_bridge/RohdBridgeModuleExtensions/getHierarchyDownTo.html">getHierarchyDownTo</a></span><span class="signature">(<wbr><span class="parameter" id="getHierarchyDownTo-param-instance"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span> <span class="parameter-name">instance</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span>&gt;</span>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+      <p class="from-extension">
+        <span>Available on <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>,
+        provided by the <a href="../rohd_bridge/RohdBridgeModuleExtensions.html">RohdBridgeModuleExtensions</a> extension</span>
+      </p>
+  Returns a list of instances between calling module <code>this</code> and the provided
+<code>instance</code>, where the first element is <code>this</code> and the last element is
+<code>instance</code>.
+  
+
+</dd>
+
+        <dt id="hierarchy" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/hierarchy.html">hierarchy</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Computes the same thing as <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/hierarchy.html">Module.hierarchy</a> after <a href="../rohd_bridge/BridgeModule/build.html">build</a>, but can also
+be run before <a href="../rohd_bridge/BridgeModule/build.html">build</a> with only context about ROHD Bridge-aware hierarchy.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="hierarchyString" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/hierarchyString.html">hierarchyString</a></span><span class="signature">(<wbr>[<span class="parameter" id="hierarchyString-param-indent"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/int-class.html">int</a></span> <span class="parameter-name">indent</span> = <span class="default-value">0</span></span>])
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Returns a pretty-print <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a> of the heirarchy of all <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>s within
+this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="inOut" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a></span><span class="signature">(<wbr><span class="parameter" id="inOut-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Accesses the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> associated with this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>s inOut port
+named <code>name</code>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="inOutSource" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOutSource.html">inOutSource</a></span><span class="signature">(<wbr><span class="parameter" id="inOutSource-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The original <code>source</code> provided to the creation of the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> port <code>name</code>
+via <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addInOut.html">addInOut</a> or <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addInOutArray.html">addInOutArray</a>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="input" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a></span><span class="signature">(<wbr><span class="parameter" id="input-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Accesses the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> associated with this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>s <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a> port
+named <code>name</code>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="inputSource" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inputSource.html">inputSource</a></span><span class="signature">(<wbr><span class="parameter" id="inputSource-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The original <code>source</code> provided to the creation of the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a> port <code>name</code>
+via <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addInput.html">addInput</a> or <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/addInputArray.html">addInputArray</a>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="instantiationVerilog" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/instantiationVerilog.html">instantiationVerilog</a></span><span class="signature">(<wbr><span class="parameter" id="instantiationVerilog-param-instanceType"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">instanceType</span>, </span><span class="parameter" id="instantiationVerilog-param-instanceName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">instanceName</span>, </span><span class="parameter" id="instantiationVerilog-param-ports"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">ports</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Generates custom SystemVerilog to be injected in place of a <code>module</code>
+instantiation.
+  <div class="features"><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="interface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/interface.html">interface</a></span><span class="signature">(<wbr><span class="parameter" id="interface-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Gets a reference to an interface by name.
+  
+
+</dd>
+
+        <dt id="isInOut" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/isInOut.html">isInOut</a></span><span class="signature">(<wbr><span class="parameter" id="isInOut-param-signal"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">signal</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Returns true iff <code>signal</code> is the same <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> as the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> port of this
+<a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> with the same name.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="isInput" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/isInput.html">isInput</a></span><span class="signature">(<wbr><span class="parameter" id="isInput-param-signal"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">signal</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Returns true iff <code>signal</code> is the same <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> as the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a> port of this
+<a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> with the same name.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="isOutput" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/isOutput.html">isOutput</a></span><span class="signature">(<wbr><span class="parameter" id="isOutput-param-signal"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">signal</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Returns true iff <code>signal</code> is the same <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> as the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> port of this
+<a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> with the same name.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="isPort" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/isPort.html">isPort</a></span><span class="signature">(<wbr><span class="parameter" id="isPort-param-signal"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">signal</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Returns true iff <code>signal</code> is the same <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> as an <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a>, <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a>, or
+<a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> port of this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a> with the same name.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="noSuchMethod" class="callable inherited">
+  <span class="name"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
+    <span class="returntype parameter">&#8594; dynamic</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Invoked when a nonexistent method or property is accessed.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="output" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a></span><span class="signature">(<wbr><span class="parameter" id="output-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Accesses the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> associated with this <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>s output port
+named <code>name</code>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="overrideParameter" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/overrideParameter.html">overrideParameter</a></span><span class="signature">(<wbr><span class="parameter" id="overrideParameter-param-paramName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">paramName</span>, </span><span class="parameter" id="overrideParameter-param-newValue"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">newValue</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Override the value of a parameter named <code>paramName</code> with <code>newValue</code>.
+  
+
+</dd>
+
+        <dt id="port" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/port.html">port</a></span><span class="signature">(<wbr><span class="parameter" id="port-param-portRefString"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">portRefString</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a port reference from a string representation with advanced
+parsing.
+  
+
+</dd>
+
+        <dt id="pullUpInterface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/pullUpInterface.html">pullUpInterface</a></span><span class="signature">(<wbr><span class="parameter" id="pullUpInterface-param-subModuleIntf"><span class="type-annotation"><a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">subModuleIntf</span>, {</span><span class="parameter" id="pullUpInterface-param-newIntfName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newIntfName</span>, </span><span class="parameter" id="pullUpInterface-param-allowIntfUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntfUniquification</span> = <span class="default-value">true</span>, </span><span class="parameter" id="pullUpInterface-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">exceptPorts</span>, </span><span class="parameter" id="pullUpInterface-param-portUniquify"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">portUniquify</span>(<span class="parameter" id="param-logical"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">logical</span>, </span><span class="parameter" id="param-physical"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">physical</span></span>)?</span>})
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a hierarchical connection by pulling an interface up from a
+submodule.
+  
+
+</dd>
+
+        <dt id="pullUpParameter" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/pullUpParameter.html">pullUpParameter</a></span><span class="signature">(<wbr><span class="parameter" id="pullUpParameter-param-srcInst"><span class="type-annotation"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span> <span class="parameter-name">srcInst</span>, </span><span class="parameter" id="pullUpParameter-param-srcParam"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">srcParam</span>, {</span><span class="parameter" id="pullUpParameter-param-newParamName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newParamName</span></span>})
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Pull up a passthrough parameter to this level
+  
+
+</dd>
+
+        <dt id="pullUpPort" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/pullUpPort.html">pullUpPort</a></span><span class="signature">(<wbr><span class="parameter" id="pullUpPort-param-subModulePort"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">subModulePort</span>, {</span><span class="parameter" id="pullUpPort-param-newPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newPortName</span>, </span><span class="parameter" id="pullUpPort-param-allowPortUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowPortUniquification</span> = <span class="default-value">true</span></span>})
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a hierarchical port connection by pulling a port up from a
+submodule.
+  
+
+</dd>
+
+        <dt id="renamePort" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/renamePort.html">renamePort</a></span><span class="signature">(<wbr><span class="parameter" id="renamePort-param-currentName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">currentName</span>, </span><span class="parameter" id="renamePort-param-newName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">newName</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a logical alias for an existing port without affecting RTL
+generation.
+  
+
+</dd>
+
+        <dt id="tieOffInterface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/tieOffInterface.html">tieOffInterface</a></span><span class="signature">(<wbr><span class="parameter" id="tieOffInterface-param-intfRef"><span class="type-annotation"><a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">intfRef</span>, </span><span class="parameter" id="tieOffInterface-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span></span>)
+    <span class="returntype parameter">&#8594; void</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Tie off input ports of <code>intfRef</code> from to <code>value</code>.
+  
+
+</dd>
+
+        <dt id="toString" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/toString.html">toString</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  A string representation of this object.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="tryInOut" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/tryInOut.html">tryInOut</a></span><span class="signature">(<wbr><span class="parameter" id="tryInOut-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>?</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Provides the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/inOut.html">inOut</a> named <code>name</code> if it exists, otherwise <code>null</code>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="tryInput" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/tryInput.html">tryInput</a></span><span class="signature">(<wbr><span class="parameter" id="tryInput-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>?</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Provides the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/input.html">input</a> named <code>name</code> if it exists, otherwise <code>null</code>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="tryOutput" class="callable inherited">
+  <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/tryOutput.html">tryOutput</a></span><span class="signature">(<wbr><span class="parameter" id="tryOutput-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a>?</span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  Provides the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module/output.html">output</a> named <code>name</code> if it exists, otherwise <code>null</code>.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+  <section
+      class="summary offset-anchor inherited"
+      id="operators">
+    <h2>Operators</h2>
+    <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+  <span class="name"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span>
+  </span>
+  
+
+</dt>
+<dd class="inherited">
+  The equality operator.
+  <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+    </dl>
+  </section>
+    
+    
+    
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">rohd_bridge</a></li>
+    <li><a href="../rohd_bridge/">rohd_bridge</a></li>
+    <li class="self-crumb">BridgeModule class</li>
+</ol>
+
+    <h5>rohd_bridge library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    rohd_bridge
+      0.1.0
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

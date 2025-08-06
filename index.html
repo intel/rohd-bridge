@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="rohd_bridge API docs, for the Dart programming language.">
+  <title>rohd_bridge - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="https://intel.github.io/rohd-website">rohd_bridge package</a></li>
+  </ol>
+  <div class="self-name">rohd_bridge</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <p><a href="https://github.com/codespaces/new?hide_repo_select=true&amp;ref=main&amp;repo=1021755478"><img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces"></a></p>
+<p><a href="https://github.com/intel/rohd-bridge/actions/workflows/general.yml"><img src="https://github.com/intel/rohd-bridge/actions/workflows/general.yml/badge.svg?event=push" alt="Tests"></a>
+<a href="https://intel.github.io/rohd-bridge/rohd_bridge/rohd_bridge-library.html"><img src="https://img.shields.io/badge/API%20Docs-generated-success" alt="API Docs"></a>
+<a href="https://discord.gg/jubxF84yGw"><img src="https://img.shields.io/discord/1001179329411166267?label=Chat" alt="Chat"></a>
+<a href="https://github.com/intel/rohd-bridge/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-BSD--3-blue" alt="License"></a>
+<a href="https://github.com/intel/rohd-bridge/blob/main/CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a></p>
+<h1 id="rohd-bridge">ROHD Bridge</h1>
+<p>ROHD Bridge is an extremely fast <a href="https://intel.github.io/rohd-website">ROHD</a>-based library that helps automate generation of hardware connectivity.  Some applications include:</p>
+<ul>
+<li>Replacing legacy tools for connectivity and assembly of large hardware designs.</li>
+<li>Generating connectivity and hierarchy between leaf level modules, blocks, partitions, or any other hierarchy in either SOC or IP contexts.</li>
+<li>Using the ROHD Bridge APIs to write custom programs in <a href="https://dart.dev/overview">Dart</a> with ROHD to dynamically generate connectivity.</li>
+<li>Build large, highly configurable designs that can be delivered in a portable, reusable way.</li>
+</ul>
+<p>It is built upon the <a href="https://intel.github.io/rohd-website">Rapid Open Hardware Development (ROHD) framework</a>, which is a fast, flexible, and extensible generator framework for hardware design and verification.  Because it is built on ROHD, it can instantiate SystemVerilog <code>module</code>s and generate SystemVerilog for the entire design.</p>
+<h2 id="why">Why?</h2>
+<h3 id="it-makes-connectivity-and-assembly-easy">It makes connectivity and assembly easy</h3>
+<p>Generating connectivity for large designs can be difficult and tedious. Many tools and methodologies exist to try to automate, but they can add their own complexity while limiting flexibility.  ROHD Bridge makes it easy to generate connectivity in a very flexible way with minimal overhead.</p>
+<h3 id="its-really-fast">It's REALLY FAST</h3>
+<p>If you are currently using a tool that takes a non-neglible amount of time to generate connectivity, you should seriously consider ROHD Bridge. For most designs, it's effectively instant. Even for extremely large and complex designs, ROHD Bridge can connect and assemble in a few minutes.</p>
+<h3 id="its-powerful-and-extensible">It's powerful and extensible</h3>
+<p>As a library, ROHD Bridge provides the ability to write custom programs using the ROHD Bridge API. Rather than using outdated languages, inventing some new language, or parsing a unique input specification format, ROHD Bridge leverages the open-source ROHD framework and is embedded into the Dart programming language.  Write any software you like to control the generation of your hardware in a modern ecosystem!</p>
+<h2 id="contributing--support">Contributing &amp; Support</h2>
+<p>ROHD Bridge is under active development.  If you're interested in contributing, have feedback or a question, or found a bug, please see <a href="https://github.com/intel/rohd-bridge/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+<h2 id="rohd-bridge-api-user-guide">ROHD Bridge API User Guide</h2>
+<p>ROHD Bridge is written in the Dart programming language, which is generally regarded as easy to learn for those familiar with other popular programming languages. The  and <a href="https://intel.github.io/rohd-website/get-started/setup/">ROHD website</a> have some good recommendations for getting set up.</p>
+<p>ROHD Bridge is built on top of the <a href="https://dart.dev/">Dart</a> language and <a href="https://intel.github.io/rohd-website">ROHD</a>, an open-source generator framework for front-end hardware development. The <a href="https://dart.dev/guides">Dart documentation</a>, <a href="https://intel.github.io/rohd-website/docs/sample-example/">ROHD User Guide</a>, and <a href="https://github.com/intel/rohd-bridge/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> are good references for getting started.</p>
+<p>The official and latest <a href="https://intel.github.io/rohd-bridge/rohd_bridge/rohd_bridge-library.html">API documents for ROHD Bridge are available here</a>. To learn more about any of the APIs in this guide, check there!</p>
+<p>A good starting point to get a feel for ROHD Bridge APIs is in the example at <a href="https://github.com/intel/rohd-bridge/blob/main/example/example.dart"><code>example/example.dart</code></a>, which builds a simple hierarchy and generates some RTL from it.</p>
+<h3 id="creating-modules-and-hierarchy">Creating Modules and Hierarchy</h3>
+<p>ROHD Bridge modules are just ROHD <code>Module</code>s with some extra added flavor to automate hierarchy and connectivity. Any hierarchical module which you want to use with ROHD Bridge should extend <code>BridgeModule</code>.</p>
+<p>You can create a generic module without defining a class</p>
+<pre class="language-dart"><code class="language-dart">final myMod = BridgeModule('my_mod');
+</code></pre>
+<p>You can also create a class which extends it to represent a specific thing</p>
+<pre class="language-dart"><code class="language-dart">/// A doc-string for [MyMod].
+class MyMod extends BridgeModule {
+    MyMod() : super('my_mod') {
+        // some MyMod specific behavior
+    }
+}
+</code></pre>
+<p>Hierarchy is created by calling <code>addSubModule</code>.</p>
+<pre class="language-dart"><code class="language-dart">final myParentMod = BridgeModule('my_parent');
+final mySubMod = MyMod();
+
+// put `mySubMod` as a sub-module of `myParentMod`
+myParentMod.addSubModule(mySubMod);
+</code></pre>
+<h4 id="adding-ports-and-interfaces">Adding Ports and Interfaces</h4>
+<p>Adding ports (including arrays) is easy:</p>
+<pre class="language-dart"><code class="language-dart">final myMod = BridgeModule('my_mod');
+
+// You can use the `createPort` and `createArrayPort` APIs, which accept an enum
+myMod.createPort('my_input', PortDirection.input); // default width is 1
+myMod.createPort('my_output', PortDirection.output, width: 8);
+myMod.createArrayPort('my_inout_array', PortDirection.inOut, dimensions: [3, 4]);
+
+// You can also use the base ROHD functions for adding ports, if you prefer
+myMod
+    ..addOutput('my_other_output', width: 5)
+    ..addOutput('yet_another_output');
+// note: here we used Dart's cascade notation to reduce repetition
+</code></pre>
+<p>Adding interfaces is easy as well:</p>
+<pre class="language-dart"><code class="language-dart">// assume we have defined somewhere a ROHD `PairInterface` called `MyIntf`
+myMod.addInterface(
+    MyIntf(),
+    name: 'my_intf_primary',
+    role: PairRole.consumer,
+);
+
+myMod.addInterface(
+    MyIntf(),
+    name: 'my_intf_sideband',
+    role: PairRole.consumer,
+
+    // for the sideband, let's modify all module ports to have a "_sideband" suffix
+    portUniquify: (original) =&gt; '${original}_sideband',
+);
+</code></pre>
+<p>Note that interfaces have a <code>role</code>, which represents which side of the interface it represents. This is different from inputs vs. outputs because an interface can have ports going in both directions (plus <code>inOut</code>s!) on both sides of the interface.</p>
+<p>Below is an example of using a pre-defined interface, but rather than letting ROHD Bridge both instantiate the interface <em>and</em> create the ports on the module boundary, we will manually map the ports.</p>
+<pre class="language-dart"><code class="language-dart">final stdInf = myMod.addInterface(
+    SomeStandardIntf(),
+    name: 'my_intf1',
+    role: PairRole.consumer,
+
+    // this time, let's do manual port mapping, so don't connect
+    connect: false,
+);
+
+final specialPort = myMod.createPort('special_name_for_std_port', PortDirection.input);
+
+// specify that our specially named (physical) port maps to 
+// a specific standard (logical) port from the standard interface
+myMod.addPortMap(specialPort, stdIntf.port('std_port'));
+</code></pre>
+<h4 id="module-references">Module References</h4>
+<p>A key concept in ROHD Bridge is "references" to ports, interfaces, and modules.</p>
+<p>To refer to an instance of a <code>BridgeModule</code>, you just use the Dart variable reference to that object. When you create a module, the returned value from the constructor is a reference to that module.</p>
+<pre class="language-dart"><code class="language-dart">// `myMod` is a variable that references a specific module
+final myMod = MyMod();
+</code></pre>
+<p>You can use references to modules to find out relative positions in the hierarchy.</p>
+<pre class="language-dart"><code class="language-dart">// get a full path of modules from the top down to a leaf
+final pathFromTopToLeaf = myTop.getHierarchyDownTo(myLeaf);
+
+// determine the lowest common parent between two modules
+final commonParent = findCommonParent(myLeaf, someOtherModule);
+</code></pre>
+<p>Module names in ROHD Bridge are <em>not</em> guaranteed to be globally unique. However, if you know information about their name and relative position, there are tools to help identify the right instance(s).</p>
+<pre class="language-dart"><code class="language-dart">// Real hierarchy:
+// myTop/myUpperMid/myLowerMid/myLeaf
+
+// Find all modules with the name "myLeaf"
+myTop.findSubModules('myLeaf');
+
+// Find modules named "myLowerMid" directly within "myUpperMid"
+myTop.findSubModules('myUpperMid/myLowerMid');
+
+// Find all modules underneath "myUpperMid" named "myLeaf"
+myTop.findSubModules(RegExp('myUpperMid/.*/?myLeaf$'));
+
+// Find one matching module, with an exception if more than 1 matches.
+myTop.findSubModule('myLeaf');
+</code></pre>
+<h4 id="port-and-interface-references">Port and Interface References</h4>
+<p>In ROHD, you can reference individual signals (<code>Logic</code>s) with variables just like you can with modules.  However, ROHD Bridge also introduces <code>PortReference</code>s and <code>InterfaceReference</code>s, which have added information and automation to help with connectivity.</p>
+<p><code>PortReference</code>s represent an entire or part of a port (in any direction, including arrays).</p>
+<pre class="language-dart"><code class="language-dart">// A reference to a port (in any direction) named 'port_a' on `myMod`
+myMod.port('port_a');
+
+// A reference to a slice of 'port_a'.
+myMod.port('port_a[4:2]');
+
+// A reference to a slice of an element of an array port 'arr_port_b'.
+myMod.port('arr_port_b[5][2:1]');
+</code></pre>
+<p><code>InterfaceReference</code>s represent an interface on a particular module and also offer ways to slice ports within that interface.</p>
+<pre class="language-dart"><code class="language-dart">// A reference to an interface on `myMod` named 'my_interface'.
+final myIntf = myMod.interface('my_interface');
+
+// A reference to a slice of a port of `myIntf`
+myIntf.port('intf_port_a[8:3]');
+</code></pre>
+<p>You can also do things like <code>slice</code> or index off a <code>PortReference</code>, similar to how you can in ROHD for normal <code>Logic</code>s.</p>
+<h4 id="making-connections">Making Connections</h4>
+<p>One of the key capabilities of ROHD Bridge is hierarchy-aware connection between endpoints.</p>
+<p>The <code>connectPorts</code> API takes two <code>PortReference</code>s and connects them through the hierarchy, punching ports as needed.</p>
+<p><img src="https://github.com/intel/rohd-bridge/raw/main/doc/connectPorts.png" alt="Connecting ports in different scenarios"></p>
+<pre class="language-dart"><code class="language-dart">// make a connection between port 'a' of `mod1` and 'b' of `mod2
+connectPorts(mod1.port('a'), mod2.port('b'));
+</code></pre>
+<p>You can also pull a port up through a hierarchy:</p>
+<pre class="language-dart"><code class="language-dart">// pull port 'a' of `leafMod` up through the hierarchy to expose it on `topMod`
+topMod.pullUpPort(leafMod.port('a'));
+</code></pre>
+<p>Similarly, you can use <code>connectInterfaces</code> and <code>pullUpInterface</code> to do the same with <code>InterfaceReference</code>s.</p>
+<pre class="language-dart"><code class="language-dart">// make a (role-aware) connection between interface 'i1' on `mod1` and 'i2' on `mod2`
+connectInterfaces(mod1.interface('i1'), mod2.interface('i2'));
+
+// pull up interface 'i1' up through the hierarchy to expose it on `topMod`
+topMod.pullUpInterface(leafMod.interface('i1'));
+</code></pre>
+<p>Note that these APIs can be called on references to modules and ports independent of their specific relative position. This provides an opportunity to <em>decouple hierarchy specifications and connectivity specifications</em>. A front-end development environment and a back-end aware partitioned environment could reuse the same connection code with different hierarchies.</p>
+<pre class="language-dart"><code class="language-dart">/// Build a simple hierarchy for the testbench.
+void buildHierarchyForTestbench(SubMod1 m1, SubMod2 m2) {
+    final tbTop = BridgeModule('tbTop')
+        ..addSubModule(m1)
+        ..addSubModule(m2);
+}
+
+/// Build a partitioned hierarchy for backend.
+void buildHierarchyForBackend(SubMod1 m1, SubMod2 m2) {
+    final par1 = BridgeModule('par1')
+        ..addSubModule(m1);
+    final par2 = BridgeModule('par2')
+        ..addSubModule(m2);
+
+    final soc = BridgeModule('soc')
+        ..addSubModule(par1)
+        ..addSubModule(par2);
+}
+
+/// Connect ports between [m1] and [m2], agnostic to hierarchy.
+void connectModules(SubMod1 m1, SubMod2 m2) {
+    connectPorts(m1.port('a'), m2.port('a'));
+}
+</code></pre>
+<h4 id="handling-parameters">Handling Parameters</h4>
+<p>Parameters in SystemVerilog can control generation of hardware and port widths, among other things. In ROHD (and thus ROHD Bridge), parameters cannot control port widths or generation, but can be <em>passed down</em> to leaf SystemVerilog modules. ROHD generates statically configured SystemVerilog, but can instantiate SystemVerilog with parameter values passed to it. The motivation for this restriction is so that you can use <em>unrestricted software</em> to generate your hardware, rather than be limited to only generating hardware that can be represented with overly-restrictive SystemVerilog parameter rules. This may mean you would run ROHD Bridge multiple times to create different "flavors" of your design in SystemVerilog where configuration within the hierarchy is different.</p>
+<p>For cases where you want to pass some parameter down into the leaf nodes of your SystemVerilog design, you can use the <code>createParameter</code> and <code>pullUpParameter</code> APIs.</p>
+<pre class="language-dart"><code class="language-dart">// register a parameter 'A' on `leaf1` with a default value of '10'
+leaf1.createParameter('A', '10')
+
+// pull up parameter 'A' from `leaf1 to `top`, exposing it at `top`
+top.pullUpParameter(leaf1, 'A')
+</code></pre>
+<h4 id="instantiating-systemverilog-leaves">Instantiating SystemVerilog Leaves</h4>
+<p>When you have a SystemVerilog leaf module and would like to instantiate it with ROHD Bridge, you have a couple of options:</p>
+<ol>
+<li>
+<p>Manually specify all the ports, interfaces, etc. using ROHD Bridge APIs.</p>
+<p>This option allows you to use ROHD Bridge APIs to generate a shell definition for your module programmatically.</p>
+</li>
+<li>
+<p>Process some existing representation of the module (e.g. RTL or IPXACT) to generate interface information automatically.</p>
+<p>This option allows you to specify ports in ways you may already use and just import that information into ROHD Bridge.</p>
+</li>
+</ol>
+<p>If you go with option #1, you can use APIs as described above in the user guide. For option #2, you can pass a JSON representation of the modules and interfaces into <code>BridgeModule.addFromJson</code>. <em>Stay tuned for additional utilities to assist in generating a schema-compliant JSON from standard languages like SystemVerilog and IPXACT.</em></p>
+<h4 id="generating-systemverilog-rtl">Generating SystemVerilog RTL</h4>
+<p>Because the model built is a ROHD model, you can follow the <a href="https://intel.github.io/rohd-website/docs/generation/">ROHD User Guide instructions for generating outputs</a>.</p>
+<p>Alternatively, ROHD Bridge offers some automation for generating SystemVerilog and dumping to an output folder with one module per file:</p>
+<pre class="language-dart"><code class="language-dart">await myMod.buildAndGenerateRTL();
+</code></pre>
+<hr>
+<p>Copyright (C) 2024-2025 Intel Corporation<br>
+SPDX-License-Identifier: BSD-3-Clause</p>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="rohd_bridge">
+  <span class="name"><a href="rohd_bridge/">rohd_bridge</a></span> 
+
+</dt>
+<dd>
+</dd>
+
+        </dl>
+      </section>
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="https://intel.github.io/rohd-website">rohd_bridge package</a></li>
+</ol>
+
+    <h5 class="hidden-xs"><span class="package-name">rohd_bridge</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="rohd_bridge/">rohd_bridge</a></li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+</main>
+<footer>
+  <span class="no-break">
+    rohd_bridge
+      0.1.0
+  </span>
+  
+</footer>
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

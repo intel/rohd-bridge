@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the connectInterfaces function from the rohd_bridge library, for the Dart programming language.">
+  <title>connectInterfaces function - rohd_bridge library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="../" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">rohd_bridge</a></li>
+    <li><a href="../rohd_bridge/">rohd_bridge.dart</a></li>
+    <li class="self-crumb">connectInterfaces function</li>
+  </ol>
+  <div class="self-name">connectInterfaces</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div
+      id="dartdoc-main-content"
+      class="main-content"
+      data-above-sidebar="rohd_bridge&#47;rohd_bridge-library-sidebar.html"
+      data-below-sidebar="">
+      <div>
+<h1><span class="kind-function">connectInterfaces</span> function 
+ 
+</h1></div>
+
+    <section class="multi-line-signature">
+        
+<span class="returntype">void</span>
+<span class="name ">connectInterfaces</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="connectInterfaces-param-intf1"><span class="type-annotation"><a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">intf1</span>, </span></li>
+<li><span class="parameter" id="connectInterfaces-param-intf2"><span class="type-annotation"><a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">intf2</span>, {</span></li>
+<li><span class="parameter" id="connectInterfaces-param-intf1PathNewName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intf1PathNewName</span>, </span></li>
+<li><span class="parameter" id="connectInterfaces-param-intf2PathNewName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intf2PathNewName</span>, </span></li>
+<li><span class="parameter" id="connectInterfaces-param-allowIntf1PathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntf1PathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectInterfaces-param-allowIntf2PathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntf2PathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectInterfaces-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">exceptPorts</span> = <span class="default-value">const {}</span>, </span></li>
+</ol>})
+
+        
+
+    </section>
+    
+<section class="desc markdown">
+  <p>Connects <code>intf1</code> to <code>intf2</code>, creating all necessary ports through the
+hierarchy.</p>
+<p>If <code>intf1PathNewName</code> or <code>intf2PathNewName</code> are provided, then it will
+prefer to name new interfaces with those names. If
+<code>allowIntf1PathUniquification</code> or <code>allowIntf2PathUniquification</code> are
+<code>false</code>, then the interface names will not be uniquified on those paths.
+Uniquification also respects <a href="../rohd_bridge/BridgeModule/allowUniquification.html">BridgeModule.allowUniquification</a> at each
+level. The <code>exceptPorts</code> parameter is an optional set of strings
+representing the logical port names to be excluded.</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">void connectInterfaces(
+  InterfaceReference intf1,
+  InterfaceReference intf2, {
+  String? intf1PathNewName,
+  String? intf2PathNewName,
+  bool allowIntf1PathUniquification = true,
+  bool allowIntf2PathUniquification = true,
+  Set&lt;String&gt; exceptPorts = const {},
+  &#47;&#47; TODO(mkorbel): finish these,
+  &#47;&#47;  possibly wont be needed for connectInterfaces
+  &#47;&#47;  String Function(String logical, String? physical)? portUniquify1,
+  &#47;&#47;  String Function(String logical, String? physical)? portUniquify2,
+}) {
+  if (intf1.module.hasBuilt || intf2.module.hasBuilt) {
+    throw RohdBridgeException(&#39;Cannot connect interfaces after build.&#39;);
+  }
+
+  final intf1Instance = intf1.module;
+  final intf2Instance = intf2.module;
+
+  if (intf1.role != intf2.role) {
+    &#47;&#47; up and down case
+    final commonParent = findCommonParent(intf1Instance, intf2Instance);
+
+    if (commonParent == null) {
+      throw RohdBridgeException(&#39;No common parent found between&#39;
+          &#39; $intf1Instance and $intf2Instance&#39;);
+    }
+    final unusedPortsOnDriver = intf1.getUnmappedInterfacePorts();
+    final unusedPortOnReceiver = intf2.getUnmappedInterfacePorts();
+    if (exceptPorts.isNotEmpty) {
+      unusedPortsOnDriver.removeWhere(exceptPorts.contains);
+      unusedPortOnReceiver.removeWhere(exceptPorts.contains);
+    }
+
+    if (unusedPortsOnDriver.isNotEmpty || unusedPortOnReceiver.isNotEmpty) {
+      var errorString = &#39;Cannot connect interface ${intf1.name} &#39;
+          &#39;at ${intf1Instance.name} to interface &#39;
+          &#39;${intf2.name} at ${intf2Instance.name} &#39;
+          &#39;because there are unmapped ports&#39;;
+      if (unusedPortsOnDriver.isNotEmpty) {
+        errorString += &#39; : $unusedPortsOnDriver on driver&#39;;
+      }
+      if (unusedPortOnReceiver.isNotEmpty) {
+        errorString += &#39; : $unusedPortOnReceiver on receiver&#39;;
+      }
+      throw RohdBridgeException(errorString);
+    }
+    final intf1Top =
+        (commonParent.getHierarchyDownTo(intf1Instance)![1] as BridgeModule)
+            .pullUpInterface(
+      intf1,
+      newIntfName: intf1PathNewName,
+      allowIntfUniquification: allowIntf1PathUniquification,
+      exceptPorts: exceptPorts,
+    );
+    final intf2Top =
+        (commonParent.getHierarchyDownTo(intf2Instance)![1] as BridgeModule)
+            .pullUpInterface(
+      intf2,
+      newIntfName: intf2PathNewName,
+      allowIntfUniquification: allowIntf2PathUniquification,
+      exceptPorts: exceptPorts,
+    );
+
+    intf1Top.connectTo(intf2Top, exceptPorts: exceptPorts);
+  } else if (intf1.role == intf2.role) {
+    final intf1ToIntf2Path = intf1Instance.getHierarchyDownTo(intf2Instance);
+    final intf2ToIntf1Path = intf2Instance.getHierarchyDownTo(intf1Instance);
+
+    final intf1ContainsIntf2 = intf1ToIntf2Path != null;
+    final intf2ContainsIntf1 = intf2ToIntf1Path != null;
+
+    if (intf1ContainsIntf2) {
+      (intf2ToIntf1Path![1] as BridgeModule)._pullUpInterfaceAndConnect(
+        intf2,
+        newIntfName: intf2PathNewName,
+        allowIntfUniquification: allowIntf2PathUniquification,
+        topToConnect: intf1,
+        exceptPorts: exceptPorts,
+      );
+    } else if (intf2ContainsIntf1) {
+      (intf1ToIntf2Path![1] as BridgeModule)._pullUpInterfaceAndConnect(
+        intf1,
+        newIntfName: intf1PathNewName,
+        allowIntfUniquification: allowIntf1PathUniquification,
+        topToConnect: intf2,
+        exceptPorts: exceptPorts,
+      );
+    } else {
+      &#47;&#47; e.g. feed-through
+      throw RohdBridgeException(
+          &#39;Unhandled directionality and hierarchy of driver and receiver.&#39;);
+    }
+  } else {
+    throw RohdBridgeException(
+        &#39;Unknown directionality and hierarchy of driver and receiver.&#39;);
+  }
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li><a href="../index.html">rohd_bridge</a></li>
+    <li><a href="../rohd_bridge/">rohd_bridge</a></li>
+    <li class="self-crumb">connectInterfaces function</li>
+</ol>
+
+    <h5>rohd_bridge library</h5>
+    <div id="dartdoc-sidebar-left-content"></div>
+  </div><!--/.sidebar-offcanvas-left-->
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+</main>
+<footer>
+  <span class="no-break">
+    rohd_bridge
+      0.1.0
+  </span>
+  
+</footer>
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
