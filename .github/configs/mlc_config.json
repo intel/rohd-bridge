@@ -8,6 +8,9 @@
     },
     {
       "pattern":"^https://intel.github.io/rohd-bridge/"
+    },
+    {
+      "pattern":"^https://www.intel.com/"
     }
   ]
 }
