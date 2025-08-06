@@ -1,0 +1,42 @@
+{
+    "complexPortMemberToRange": {},
+    "moduleParameters": {
+        "paramA": {
+            "dataType": "integer",
+            "packedRanges": "",
+            "resolve": "user",
+            "type": "int",
+            "unpackedRanges": "",
+            "value": "5"
+        },
+        "paramB": {
+            "dataType": "integer",
+            "packedRanges": "",
+            "resolve": "user",
+            "type": "int",
+            "unpackedRanges": "",
+            "value": "10"
+        }
+    },
+    "name": "myModule",
+    "portList": [
+        {
+            "direction": "input",
+            "fulltype": "logic[5:0]",
+            "name": "portA",
+            "packedRanges": "[5:0]",
+            "type": "logic[5:0]",
+            "unpackedRanges": "",
+            "width": "6"
+        },
+        {
+            "direction": "output",
+            "fulltype": "logic[10:0]",
+            "name": "portD",
+            "packedRanges": "[10:0]",
+            "type": "logic[10:0]",
+            "unpackedRanges": "",
+            "width": "11"
+        }
+    ]
+}

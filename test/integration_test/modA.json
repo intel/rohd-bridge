@@ -1,0 +1,132 @@
+{
+    "_fileset_rtl_parser_status": false,
+    "_ipxact_rtl_parser_status": true,
+    "complexPortMemberToRange": {},
+    "fileSet": {
+        "includeDirs": [
+            "test/integration_test/./rtl"
+        ],
+        "name": "",
+        "rtlFiles": [
+            {
+                "dependency": [
+                    "test/integration_test/./rtl"
+                ],
+                "fileSetName": "hidft_fs-RTLsource",
+                "fileType": "systemVerilogSource",
+                "isIncludeFile": false,
+                "name": "test/integration_test/./modA.sv.org"
+            }
+        ]
+    },
+    "library": "SomeLib",
+    "moduleParameters": {
+        "myLocalParam": {
+            "dataType": "integer",
+            "packed": "",
+            "resolve": "immediate",
+            "type": "int",
+            "unpacked": "",
+            "value": "2"
+        },
+        "myStringParam": {
+            "dataType": "string",
+            "packed": "",
+            "resolve": "user",
+            "type": "string",
+            "unpacked": "",
+            "value": "\"string_value_1\""
+        },
+        "paramA": {
+            "dataType": "integer",
+            "packed": "",
+            "resolve": "user",
+            "type": "int",
+            "unpacked": "",
+            "value": "1"
+        },
+        "paramB": {
+            "dataType": "integer",
+            "packed": "",
+            "resolve": "user",
+            "type": "int",
+            "unpacked": "",
+            "value": "2"
+        }
+    },
+    "name": "modA",
+    "portList": [
+        {
+            "direction": "in",
+            "name": "dataValid",
+            "packedRanges": "",
+            "type": "logic",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "in",
+            "name": "protid",
+            "packedRanges": "[1:0]",
+            "type": "logic[1:0]",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "in",
+            "name": "header",
+            "packedRanges": "[10:0]",
+            "type": "logic[10:0]",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "out",
+            "name": "valid",
+            "packedRanges": "",
+            "type": "logic",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "out",
+            "name": "protid2",
+            "packedRanges": "[1:0]",
+            "type": "logic[1:0]",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "out",
+            "name": "p",
+            "packedRanges": "",
+            "type": "logic",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "in",
+            "name": "clk",
+            "packedRanges": "",
+            "type": "logic",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "in",
+            "name": "data_in",
+            "packedRanges": "[1:0]",
+            "type": "logic[1:0]",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "out",
+            "name": "data_out",
+            "packedRanges": "[1:0]",
+            "type": "logic[1:0]",
+            "unpackedRanges": ""
+        },
+        {
+            "direction": "in",
+            "name": "pullPort",
+            "packedRanges": "[1:0]",
+            "type": "logic[1:0]",
+            "unpackedRanges": ""
+        }
+    ],
+    "vendor": "SomeVendor",
+    "version": "1.0"
+}

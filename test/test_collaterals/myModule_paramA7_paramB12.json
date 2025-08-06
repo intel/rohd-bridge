@@ -1,0 +1,78 @@
+{
+    "complexPortMemberToRange": {},
+    "moduleParameters": {
+        "paramA": {
+            "dataType": "integer",
+            "packedRanges": "",
+            "resolve": "user",
+            "type": "int",
+            "unpackedRanges": "",
+            "value": "7"
+        },
+        "paramB": {
+            "dataType": "integer",
+            "packedRanges": "",
+            "resolve": "user",
+            "type": "int",
+            "unpackedRanges": "",
+            "value": "12"
+        }
+    },
+    "name": "myModule",
+    "portList": [
+        {
+            "direction": "input",
+            "fulltype": "logic[7:0]",
+            "name": "portA",
+            "packedRanges": "[7:0]",
+            "type": "logic[7:0]",
+            "unpackedRanges": "",
+            "width": "8"
+        },
+        {
+            "direction": "input",
+            "fulltype": "logic[12:0]",
+            "name": "portB",
+            "packedRanges": "[12:0]",
+            "type": "logic[12:0]",
+            "unpackedRanges": "",
+            "width": "13"
+        },
+        {
+            "direction": "output",
+            "fulltype": "logic[7:0]",
+            "name": "portC",
+            "packedRanges": "[7:0]",
+            "type": "logic[7:0]",
+            "unpackedRanges": "",
+            "width": "8"
+        },
+        {
+            "direction": "input",
+            "fulltype": "logic[12:0]",
+            "name": "portE",
+            "packedRanges": "[12:0]",
+            "type": "logic[12:0]",
+            "unpackedRanges": "",
+            "width": "13"
+        },
+        {
+            "direction": "output",
+            "fulltype": "logic[7:0]",
+            "name": "portF",
+            "packedRanges": "[7:0]",
+            "type": "logic[7:0]",
+            "unpackedRanges": "",
+            "width": "8"
+        },
+        {
+            "direction": "output",
+            "fulltype": "logic[12:0]",
+            "name": "portD",
+            "packedRanges": "[12:0]",
+            "type": "logic[12:0]",
+            "unpackedRanges": "",
+            "width": "13"
+        }
+    ]
+}
