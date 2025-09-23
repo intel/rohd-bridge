@@ -71,7 +71,7 @@ class BridgeInterface extends PairInterface {
   }
 
   /// Creates a custom [BridgeInterface] from [json].
-  @Deprecated('Use `BridgeInterface` unnamed constructor instead.')
+  @Deprecated('Use `BridgeInterface` default constructor instead.')
   factory BridgeInterface.ofJson(Map<String, dynamic> json) {
     final portsFromConsumer =
         json['portsOnConsumer'] as Map<String, int>? ?? {};
