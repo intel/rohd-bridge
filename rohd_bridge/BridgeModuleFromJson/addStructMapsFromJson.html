@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the getInt method from the BridgeModuleFromJson extension, for the Dart programming language.">
-  <title>getInt method - BridgeModuleFromJson extension - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the addStructMapsFromJson method from the BridgeModuleFromJson extension, for the Dart programming language.">
+  <title>addStructMapsFromJson method - BridgeModuleFromJson extension - rohd_bridge library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
     <li><a href="../../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a></li>
-    <li class="self-crumb">getInt static method</li>
+    <li class="self-crumb">addStructMapsFromJson method</li>
   </ol>
-  <div class="self-name">getInt</div>
+  <div class="self-name">addStructMapsFromJson</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,46 +49,31 @@
     data-above-sidebar="rohd_bridge&#47;BridgeModuleFromJson-extension-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">getInt</span> static method 
+<h1><span class="kind-method">addStructMapsFromJson</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-  <div>
-    <ol class="annotation-list">
-        <li>@<a href="https://pub.dev/documentation/meta/1.17.0/meta/internal-constant.html">internal</a></li>
-        <li>@<a href="https://pub.dev/documentation/meta/1.17.0/meta/visibleForTesting-constant.html">visibleForTesting</a></li>
-    </ol>
-  </div>
-<span class="returntype">dynamic</span>
-<span class="name ">getInt</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="getInt-param-input"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">input</span>, {</span></li>
-<li><span class="parameter" id="getInt-param-asIsIfUnparsed"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">asIsIfUnparsed</span> = <span class="default-value">false</span>, </span></li>
-</ol>})
+<span class="returntype">void</span>
+<span class="name ">addStructMapsFromJson</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="addStructMapsFromJson-param-structInfo"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.9.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.9.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">structInfo</span></span></li>
+</ol>)
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>Returns a integer value for systemVerilog value.</p>
-<p>eg: 12'd4354 = 4354</p>
+  <p>Calls <a href="../../rohd_bridge/BridgeModule/addStructMap.html">addStructMap</a> for each entry in the <code>structInfo</code> map.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">@internal
-@visibleForTesting
-static dynamic getInt(String input, {bool asIsIfUnparsed = false}) {
-  try {
-    return LogicValue.ofRadixString(input).toBigInt();
-  } on LogicValueConstructionException catch (_) {
-    if (asIsIfUnparsed) {
-      return input;
-    } else {
-      rethrow;
-    }
+  <pre class="language-dart"><code class="language-dart">void addStructMapsFromJson(Map&lt;String, dynamic&gt; structInfo) {
+  final structInfoAdjusted = _getStructMap(structInfo);
+  for (final entry in structInfoAdjusted.entries) {
+    addStructMap(entry.key, port(entry.value));
   }
 }</code></pre>
 </section>
@@ -106,7 +91,7 @@ static dynamic getInt(String input, {bool asIsIfUnparsed = false}) {
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/BridgeModuleFromJson.html">BridgeModuleFromJson</a></li>
-    <li class="self-crumb">getInt static method</li>
+    <li class="self-crumb">addStructMapsFromJson method</li>
 </ol>
 
     <h5>BridgeModuleFromJson extension on <a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></h5>

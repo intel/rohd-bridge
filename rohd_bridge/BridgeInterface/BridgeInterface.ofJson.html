@@ -27,7 +27,7 @@
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
     <li><a href="../../rohd_bridge/BridgeInterface-class.html">BridgeInterface</a></li>
-    <li class="self-crumb">BridgeInterface.ofJson factory constructor</li>
+    <li class="self-crumb"><span class="deprecated">BridgeInterface.ofJson</span> factory constructor</li>
   </ol>
   <div class="self-name">BridgeInterface.ofJson</div>
   <form class="search navbar-right" role="search">
@@ -54,7 +54,12 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">BridgeInterface.ofJson</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="ofJson-param-json"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.8.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.8.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">json</span></span></li>
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/stable/3.9.3/dart-core/Deprecated-class.html">Deprecated</a>(&#39;Use `BridgeInterface` default constructor instead.&#39;)</li>
+    </ol>
+  </div>
+      <span class="name deprecated">BridgeInterface.ofJson</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="ofJson-param-json"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.9.3/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.9.3/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span> <span class="parameter-name">json</span></span></li>
 </ol>)
     </section>
     
@@ -66,17 +71,16 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">factory BridgeInterface.ofJson(Map&lt;String, dynamic&gt; json) {
-  final portsFromConsumer = json[&#39;portsOnConsumer&#39;] != null
-      ? json[&#39;portsOnConsumer&#39;] as Map&lt;String, int&gt;
-      : &lt;String, int&gt;{};
-  final portsFromProvider = json[&#39;portsOnProvider&#39;] != null
-      ? json[&#39;portsOnProvider&#39;] as Map&lt;String, int&gt;
-      : &lt;String, int&gt;{};
-  final portsSharedInouts = json[&#39;portsSharedInouts&#39;] != null
-      ? json[&#39;portsSharedInouts&#39;] as Map&lt;String, int&gt;
-      : &lt;String, int&gt;{};
-  return BridgeInterface._(
+  <pre class="language-dart"><code class="language-dart">@Deprecated(&#39;Use `BridgeInterface` default constructor instead.&#39;)
+factory BridgeInterface.ofJson(Map&lt;String, dynamic&gt; json) {
+  final portsFromConsumer =
+      json[&#39;portsOnConsumer&#39;] as Map&lt;String, int&gt;? ?? {};
+  final portsFromProvider =
+      json[&#39;portsOnProvider&#39;] as Map&lt;String, int&gt;? ?? {};
+  final portsSharedInouts =
+      json[&#39;portsSharedInouts&#39;] as Map&lt;String, int&gt;? ?? {};
+
+  return BridgeInterface(
       name: json[&#39;name&#39;] as String,
       vendor: json[&#39;vendor&#39;] as String,
       library: json[&#39;library&#39;] as String,
@@ -100,7 +104,7 @@
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/BridgeInterface-class.html">BridgeInterface</a></li>
-    <li class="self-crumb">BridgeInterface.ofJson factory constructor</li>
+    <li class="self-crumb"><span class="deprecated">BridgeInterface.ofJson</span> factory constructor</li>
 </ol>
 
     <h5>BridgeInterface class</h5>
