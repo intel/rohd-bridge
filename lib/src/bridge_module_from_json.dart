@@ -185,7 +185,8 @@ extension BridgeModuleFromJson on BridgeModule {
       final role = _getPairRole(intfInfo['mode'] as String);
 
       final portMapList = intfInfo['portMaps'] != null
-          ? intfInfo['portMaps'] as List<Map<String, dynamic>>
+          ? List<Map<String, dynamic>>.from(
+              intfInfo['portMaps']! as List<dynamic>)
           : <Map<String, dynamic>>[];
       final allUsedPorts = _getUsedPorts(portMapList);
       final thisIntf = getBridgeIntfFromJson(intfMap: intfInfo);
