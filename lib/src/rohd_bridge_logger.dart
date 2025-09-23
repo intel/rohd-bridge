@@ -72,8 +72,6 @@ abstract class RohdBridgeLogger {
     Logger.root.level = rootLevel;
     _printLevel = printLevel;
 
-    // final file = File(filePath)..writeAsStringSync('');
-
     fileSink = File(filePath).openWrite();
 
     Logger.root.onRecord.listen((record) {

@@ -71,8 +71,6 @@ void main() {
   });
 
   test('localparam test', () async {
-    // final mod1 = jsonDecode(await getModuleJson()) as Map<String, dynamic>;
-    // final leaf1 = JsonModule(mod1, name: 'leaf1');
     final leaf1 = BridgeModule('modA')
       ..addFromJson(
           jsonDecode(File('test/integration_test/modA.json').readAsStringSync())
