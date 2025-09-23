@@ -90,7 +90,8 @@ extension BridgeModuleFromJson on BridgeModule {
   }
 
   /// Returns a [BridgeInterface] based on the json [intfMap].
-  BridgeInterface _getBridgeIntfFromJson(
+  @internal
+  BridgeInterface getBridgeIntfFromJson(
       {required Map<String, dynamic> intfMap}) {
     final vendor = intfMap['vendor'] as String;
     final library = intfMap['library'] as String;
@@ -187,7 +188,7 @@ extension BridgeModuleFromJson on BridgeModule {
           ? intfInfo['portMaps'] as List<Map<String, dynamic>>
           : <Map<String, dynamic>>[];
       final allUsedPorts = _getUsedPorts(portMapList);
-      final thisIntf = _getBridgeIntfFromJson(intfMap: intfInfo);
+      final thisIntf = getBridgeIntfFromJson(intfMap: intfInfo);
 
       _checkReqPortUsage(thisIntf, allUsedPorts);
 
