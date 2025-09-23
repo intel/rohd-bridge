@@ -109,22 +109,24 @@ extension BridgeModuleFromJson on BridgeModule {
       final portMapJson = portMap as Map<String, dynamic>;
       final logicalPortName = portMapJson['logicalPortName']! as String;
       final physicalPortName = portMapJson['physicalPortName']! as String;
-      var logicalPortWidth = portMapJson['logicalPortWidth']! as String;
-      logicalPortWidth = logicalPortWidth == '<not constrained>'
-          ? portMapJson['physicalPortWidth']! as String
-          : logicalPortWidth;
+
+      // use physical port width if we can't tell from logical port width
+      final logicalPortWidth =
+          int.tryParse(portMapJson['logicalPortWidth']! as String) ??
+              int.parse(portMapJson['physicalPortWidth']! as String);
+
       final dir = _getPairDirection(physicalPortName, mode);
 
       switch (dir) {
         case PairDirection.fromConsumer:
-          portsOnConsumer[logicalPortName] = int.parse(logicalPortWidth);
+          portsOnConsumer[logicalPortName] = logicalPortWidth;
 
         case PairDirection.fromProvider:
-          portsOnProvider[logicalPortName] = int.parse(logicalPortWidth);
+          portsOnProvider[logicalPortName] = logicalPortWidth;
 
         case PairDirection.sharedInputs:
         case PairDirection.commonInOuts:
-          portsSharedInouts[logicalPortName] = int.parse(logicalPortWidth);
+          portsSharedInouts[logicalPortName] = logicalPortWidth;
       }
     }
 
