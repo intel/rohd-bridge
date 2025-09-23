@@ -89,9 +89,8 @@ extension BridgeModuleFromJson on BridgeModule {
     }
   }
 
-  /// Returns a json to pass to [BridgeInterface.ofJson]. This json is used to
-  /// create a [BridgeInterface] object.
-  Map<String, dynamic> _getBridgeIntfJson(
+  /// Returns a [BridgeInterface] based on the json [intfMap].
+  BridgeInterface _getBridgeIntfFromJson(
       {required Map<String, dynamic> intfMap}) {
     final vendor = intfMap['vendor'] as String;
     final library = intfMap['library'] as String;
@@ -128,15 +127,14 @@ extension BridgeModuleFromJson on BridgeModule {
       }
     }
 
-    return {
-      'vendor': vendor,
-      'library': library,
-      'name': name,
-      'version': version,
-      'portsOnConsumer': portsOnConsumer,
-      'portsOnProvider': portsOnProvider,
-      'portsSharedInouts': portsSharedInouts
-    };
+    return BridgeInterface(
+        name: name,
+        library: library,
+        vendor: vendor,
+        version: version,
+        portsFromConsumer: portsOnConsumer,
+        portsFromProvider: portsOnProvider,
+        portsSharedInouts: portsSharedInouts);
   }
 
   /// Returns the [PairDirection] based on the port name and the role.
@@ -189,8 +187,7 @@ extension BridgeModuleFromJson on BridgeModule {
           ? intfInfo['portMaps'] as List<Map<String, dynamic>>
           : <Map<String, dynamic>>[];
       final allUsedPorts = _getUsedPorts(portMapList);
-      final thisIntf =
-          BridgeInterface.ofJson(_getBridgeIntfJson(intfMap: intfInfo));
+      final thisIntf = _getBridgeIntfFromJson(intfMap: intfInfo);
 
       _checkReqPortUsage(thisIntf, allUsedPorts);
 
@@ -225,12 +222,12 @@ extension BridgeModuleFromJson on BridgeModule {
   }
 
   /// Returns pairrole from string
-  static PairRole _getPairRole(String role) {
-    final ret = role == 'master'
+  static PairRole _getPairRole(String mode) {
+    final ret = mode == 'master'
         ? PairRole.provider
-        : role == 'slave'
+        : mode == 'slave'
             ? PairRole.consumer
-            : role == 'mirroredmaster'
+            : mode == 'mirroredmaster'
                 ? PairRole.consumer
                 : PairRole.provider;
     return ret;

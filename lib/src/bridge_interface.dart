@@ -12,7 +12,7 @@
 
 import 'package:rohd/rohd.dart';
 
-/// A custom interface created dynamically from a provided JSON.
+/// A custom interface created dynamically from a provided specification.
 class BridgeInterface extends PairInterface {
   /// name of intf
   late String name;
@@ -35,37 +35,16 @@ class BridgeInterface extends PairInterface {
   /// Internal copy of `portsSharedInouts` map.
   final Map<String, int> _portsSharedInouts;
 
-  /// Creates a custom [BridgeInterface] from [json].
-  factory BridgeInterface.ofJson(Map<String, dynamic> json) {
-    final portsFromConsumer = json['portsOnConsumer'] != null
-        ? json['portsOnConsumer'] as Map<String, int>
-        : <String, int>{};
-    final portsFromProvider = json['portsOnProvider'] != null
-        ? json['portsOnProvider'] as Map<String, int>
-        : <String, int>{};
-    final portsSharedInouts = json['portsSharedInouts'] != null
-        ? json['portsSharedInouts'] as Map<String, int>
-        : <String, int>{};
-    return BridgeInterface._(
-        name: json['name'] as String,
-        vendor: json['vendor'] as String,
-        library: json['library'] as String,
-        version: json['version'] as String,
-        portsFromConsumer: portsFromConsumer,
-        portsFromProvider: portsFromProvider,
-        portsSharedInouts: portsSharedInouts);
-  }
-
   /// Reads [portsFromConsumer], [portsFromProvider] and [portsSharedInouts]
   /// then creates appropriate ports with appropriate tags.
-  BridgeInterface._({
+  BridgeInterface({
     required this.name,
     required this.library,
     required this.vendor,
     required this.version,
-    required Map<String, int> portsFromConsumer,
-    required Map<String, int> portsFromProvider,
-    required Map<String, int> portsSharedInouts,
+    Map<String, int> portsFromConsumer = const {},
+    Map<String, int> portsFromProvider = const {},
+    Map<String, int> portsSharedInouts = const {},
   })  : _portsFromConsumer = portsFromConsumer,
         _portsFromProvider = portsFromProvider,
         _portsSharedInouts = portsSharedInouts {
@@ -91,8 +70,28 @@ class BridgeInterface extends PairInterface {
     }
   }
 
+  /// Creates a custom [BridgeInterface] from [json].
+  @Deprecated('Use `BridgeInterface` unnamed constructor instead.')
+  factory BridgeInterface.ofJson(Map<String, dynamic> json) {
+    final portsFromConsumer =
+        json['portsOnConsumer'] as Map<String, int>? ?? {};
+    final portsFromProvider =
+        json['portsOnProvider'] as Map<String, int>? ?? {};
+    final portsSharedInouts =
+        json['portsSharedInouts'] as Map<String, int>? ?? {};
+
+    return BridgeInterface(
+        name: json['name'] as String,
+        vendor: json['vendor'] as String,
+        library: json['library'] as String,
+        version: json['version'] as String,
+        portsFromConsumer: portsFromConsumer,
+        portsFromProvider: portsFromProvider,
+        portsSharedInouts: portsSharedInouts);
+  }
+
   @override
-  BridgeInterface clone() => BridgeInterface._(
+  BridgeInterface clone() => BridgeInterface(
       name: name,
       library: library,
       vendor: vendor,
