@@ -255,34 +255,11 @@ class SlicePortReference extends PortReference {
   /// Utility for comparing dimension access lists for equality.
   static const ListEquality<int> _listEquality = ListEquality<int>();
 
-  /// Gets the receiver logic for this sliced port reference.
-  ///
-  /// Returns the appropriate source logic based on the port direction, which
-  /// will be used as the target for incoming connections.
-  @override
-  late final Logic _receiver = direction == PortDirection.input
-      ? module.inputSource(portName)
-      : direction == PortDirection.output
-          ? module.output(portName)
-          : module.inOutSource(portName);
-
-  @override
-  Logic get _internalPort => direction == PortDirection.input
-      ? module.input(portName)
-      : direction == PortDirection.output
-          ? module.output(portName)
-          : module.inOut(portName);
-
   @override
   void gets(PortReference other) {
-    Logic receiverPort;
-    var otherDriver = other.portSubset;
-    if (port.isInOut || other.port.isInOut) {
-      receiverPort = _inOutReceiverAndDriver(other).receiver;
-      otherDriver = _inOutReceiverAndDriverSubsets(other).driver;
-    } else {
-      receiverPort = _receiver;
-    }
+    var receiverPort = _relativeReceiverAndDriver(other).receiver;
+    final otherDriver = _relativeDriverSubset(other);
+
     int? leafIndex;
 
     if ((receiverPort is! LogicArray && port is! LogicArray) ||
@@ -375,6 +352,9 @@ class SlicePortReference extends PortReference {
 
   @override
   dynamic get _externalPortSubset => _getPortSubset(_externalPort);
+
+  @override
+  dynamic get _internalPortSubset => _getPortSubset(_internalPort);
 
   @override
   late final dynamic portSubset = _getPortSubset(port);
@@ -485,7 +465,7 @@ class SlicePortReference extends PortReference {
 
   @override
   void getsLogic(Logic other) {
-    var receiver = _receiver;
+    var receiver = _externalPort;
     // we must look at the *port* for dimension analysis
     int? leafIndex;
     var startIdx = 0;

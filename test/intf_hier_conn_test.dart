@@ -311,4 +311,27 @@ void main() {
               '.sv_myProviderPort(sv_myProviderPort));'));
     });
   });
+
+  //TODO: what if instead of port map, we make a connection between interface and port!?
+  // should that just be an error? probably? or maybe it should be external?
+
+  test('connect interface ports on the same module', () async {
+    final leaf = BridgeModule('leaf');
+    final intf1 =
+        leaf.addInterface(MyIntf(), name: 'intf1', role: PairRole.provider);
+    final intf2 =
+        leaf.addInterface(MyIntf(), name: 'intf2', role: PairRole.consumer);
+
+    final top = BridgeModule('top')
+      ..addSubModule(leaf)
+      ..pullUpPort(leaf.createPort('dummy', PortDirection.input));
+
+    connectInterfaces(intf1, intf2);
+
+    await top.build();
+
+    print(top.generateSynth());
+
+    //TODO: check that the connection happens *outside* the module
+  });
 }

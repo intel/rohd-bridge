@@ -43,38 +43,14 @@ class StandardPortReference extends PortReference {
       _standardPortAccessRegex.hasMatch(portAccessString);
 
   @override
-  Logic get _receiver => direction == PortDirection.input
-      ? module.inputSource(portName)
-      : direction == PortDirection.output
-          ? module.output(portName)
-          : module.inOutSource(portName);
-
-  @override
-  Logic get _internalPort => direction == PortDirection.input
-      ? module.input(portName)
-      : direction == PortDirection.output
-          ? module.output(portName)
-          : module.inOut(portName);
-
-  @override
   void gets(PortReference other) {
     if (other is StandardPortReference) {
-      if (port.isInOut || other.port.isInOut) {
-        final (receiver: receiver, driver: driver) =
-            _inOutReceiverAndDriver(other);
-
-        receiver <= driver;
-      } else {
-        _receiver <= other.portSubset;
-      }
+      final (receiver: receiver, driver: driver) =
+          _relativeReceiverAndDriver(other);
+      receiver <= driver;
     } else if (other is SlicePortReference) {
-      dynamic otherDriver = other.portSubset;
-      var receiver = _receiver;
-
-      if (port.isInOut || other.port.isInOut) {
-        otherDriver = _inOutReceiverAndDriverSubsets(other).driver;
-        receiver = _inOutReceiverAndDriver(other).receiver;
-      }
+      final otherDriver = _relativeDriverSubset(other);
+      final receiver = _relativeReceiverAndDriver(other).receiver;
 
       if (otherDriver is Logic) {
         receiver <= otherDriver;
@@ -100,6 +76,9 @@ class StandardPortReference extends PortReference {
   dynamic get _externalPortSubset => _externalPort;
 
   @override
+  Logic get _internalPortSubset => _internalPort;
+
+  @override
   PortReference replicateTo(BridgeModule newModule, PortDirection direction,
       {String? newPortName}) {
     newPortName ??= portName;
@@ -121,7 +100,7 @@ class StandardPortReference extends PortReference {
 
   @override
   void getsLogic(Logic other) {
-    _receiver <= other;
+    _externalPort <= other;
   }
 
   @override

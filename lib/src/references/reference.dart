@@ -10,7 +10,6 @@
 //   Suhas Virmani <suhas.virmani@intel.com>
 //   Max Korbel <max.korbel@intel.com>
 
-import 'package:meta/meta.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
 
 /// A generic reference to an element on a [BridgeModule] boundary.
@@ -18,7 +17,6 @@ import 'package:rohd_bridge/rohd_bridge.dart';
 /// This serves as the base class for all references to ports, interfaces, and
 /// other elements that exist on the boundary of a [BridgeModule]. It provides a
 /// common interface for accessing and manipulating these elements.
-@immutable
 class Reference {
   // TODO(mkorbel1): can this be normal `Module`?
   /// The [BridgeModule] that this reference belongs to.

@@ -85,11 +85,11 @@ mixin InterfacePortReference on PortReference {
       !_isFromProvider &&
       !_isFromConsumer;
 
-  /// The appropriate logic port for this interface port reference.
+  /// Provides a reference to a [Logic] on an interface in this reference.
   ///
-  /// Returns either the `internal interface` port or the external interface
-  /// port, depending on the resolved direction and whether an internal
-  /// interface exists.
+  /// For inputs and inOuts, this is the internal interface port if it exists.
+  /// Otherwise, if the port is directionless or an output, this is the external
+  /// interface port.
   @override
   Logic get port => (!isDirectionless &&
               (direction == PortDirection.input ||
@@ -100,14 +100,16 @@ mixin InterfacePortReference on PortReference {
       .port(portName);
 
   @override
-  // TODO(mkorbel1): remove lint waiver pending https://github.com/dart-lang/sdk/issues/56532
-  // ignore: unused_element
-  Logic get _receiver => !isDirectionless &&
-          (direction == PortDirection.input || direction == PortDirection.inOut)
-      ? interfaceReference.interface.port(portName)
-      : (interfaceReference.internalInterface ?? interfaceReference.interface)
+  Logic get _internalPort =>
+      (interfaceReference.internalInterface ?? interfaceReference.interface)
           .port(portName);
 
   @override
+  Logic get _externalPort => interfaceReference.interface.port(portName);
+
+  @override
   String toString() => '$interfaceReference.${super.toString()}';
+
+  @override
+  InterfacePortReference slice(int endIndex, int startIndex);
 }

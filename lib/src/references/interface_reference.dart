@@ -10,6 +10,10 @@
 //   Suhas Virmani <suhas.virmani@intel.com>
 //   Max Korbel <max.korbel@intel.com>
 
+// we ignore this because the `_internalInterface` can be populated late, but
+//  equality checks and hashCode are safe on the rest of it.
+// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
+
 part of 'references.dart';
 
 /// A [Reference] to an interface on a [BridgeModule].
@@ -19,7 +23,6 @@ part of 'references.dart';
 /// interface (visible from outside the module) and the optional internal
 /// interface (visible from inside the module), along with the port mappings
 /// between them.
-@immutable
 class InterfaceReference<InterfaceType extends PairInterface>
     extends Reference {
   /// The name of this interface within the [module].
@@ -36,7 +39,12 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// If `null`, then there is no internal interface representation — the
   /// interface is mapped directly to individual module ports or connected
   /// indirectly through other interfaces.
-  late final InterfaceType? internalInterface;
+  ///
+  /// If an interface is connected vertically (e.g. child up to parent) to an
+  /// interface that originally did not have an [internalInterface], one will
+  /// be created and connected for any [portMaps].
+  InterfaceType? get internalInterface => _internalInterface;
+  InterfaceType? _internalInterface;
 
   /// The role that this interface plays in interface connections.
   ///
@@ -87,7 +95,7 @@ class InterfaceReference<InterfaceType extends PairInterface>
       {required bool connect,
       required String Function(String logical)? portUniquify}) {
     if (connect) {
-      internalInterface =
+      _internalInterface =
           module.addPairInterfacePorts(interface, role, uniquify: portUniquify);
 
       for (final portName in internalInterface!.ports.keys) {
@@ -101,7 +109,27 @@ class InterfaceReference<InterfaceType extends PairInterface>
         );
       }
     } else {
-      internalInterface = null;
+      _internalInterface = null;
+    }
+  }
+
+  /// Creates an [internalInterface] on this [InterfaceReference], connecting
+  /// ports to existing [portMaps] when they exist, and creating new ports
+  /// otherwise.
+  ///
+  /// This should only be called when [internalInterface] is `null`.
+  void _introduceInternalInterface() {
+    assert(
+        internalInterface == null,
+        'Should only be called when no internal interface'
+        ' was created originally.');
+
+    _internalInterface = interface.clone() as InterfaceType;
+
+    for (final portMap in portMaps) {
+      if (portMap.isConnected) {
+        portMap.connectInternalIfPresent();
+      }
     }
   }
 
@@ -203,7 +231,11 @@ class InterfaceReference<InterfaceType extends PairInterface>
     Set<String>? exceptPorts,
     String Function(String logical)? portUniquify,
   }) {
-    // TODO(mkorbel1): remove restriction that it must be adjacent!
+    // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
+    if (module.parent != newModule) {
+      throw RohdBridgeException(
+          'The newModule must be the direct parent of this module.');
+    }
 
     _connectAllPortMaps(exceptPorts: exceptPorts);
 
@@ -279,10 +311,19 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// - For consumer interfaces: inputs flow up, outputs flow down
   /// - Shared and common ports follow interface-specific rules
   ///
-  /// Both interfaces must have their port mappings activated before connection.
-  ///
   /// The [other] must be on this reference's [module]'s parent.
   void connectUpTo(InterfaceReference other) {
+    // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
+    if (module.parent != other.module) {
+      throw RohdBridgeException(
+          "The other interface must be on the parent module of this interface's"
+          ' module.');
+    }
+
+    if (other.internalInterface == null) {
+      other._introduceInternalInterface();
+    }
+
     _connectAllPortMaps(exceptPorts: null);
     other._connectAllPortMaps(exceptPorts: null);
 
@@ -323,6 +364,12 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// Throws an exception if both interfaces have the same role.
   void connectTo(InterfaceReference other,
       {Set<String> exceptPorts = const {}}) {
+    // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
+    if (other.module.parent != module.parent) {
+      throw RohdBridgeException('Both interfaces must be on modules that share'
+          ' the same parent module.');
+    }
+
     if (other.role == role) {
       throw RohdBridgeException('Cannot connect interfaces of the same roles');
     }
@@ -378,7 +425,12 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// The [subModule] must be a child of this interface's [module].
   InterfaceReference punchDownTo(BridgeModule subModule,
       {String? newIntfName, bool allowNameUniquification = false}) {
-    // TODO(mkorbel1): remove restriction that it must be adjacent!
+    // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
+    if (subModule.parent != module) {
+      throw RohdBridgeException(
+          'The subModule must be a direct child of this module.');
+    }
+
     _connectAllPortMaps(exceptPorts: null);
 
     final newRef = subModule.addInterface(
@@ -399,35 +451,42 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// interface in a child module. This sets up the proper signal flow based on
   /// the interface role, with signals flowing from parent to child.
   ///
-  /// Both interfaces must have their port mappings activated before connection.
-  /// The child interface ([other]) must have an internal interface for the
-  /// connection to be established.
-  ///
   /// The [other] must be on a sub-module of this [module].
   void connectDownTo(InterfaceReference other) {
+    // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
+    if (other.module.parent != module) {
+      throw RohdBridgeException(
+          "The other interface must be on a child module of this interface's"
+          ' module.');
+    }
+
+    if (internalInterface == null) {
+      _introduceInternalInterface();
+    }
+
     _connectAllPortMaps(exceptPorts: null);
     other._connectAllPortMaps(exceptPorts: null);
 
     switch (role) {
       case (PairRole.provider):
-        interface
-          ..driveOther(other.internalInterface!, const [
-            PairDirection.fromProvider,
+        internalInterface!
+          ..driveOther(other.interface, const [
+            PairDirection.fromConsumer,
             PairDirection.sharedInputs,
             PairDirection.commonInOuts,
           ])
-          ..receiveOther(other.internalInterface!, const [
-            PairDirection.fromConsumer,
+          ..receiveOther(other.interface, const [
+            PairDirection.fromProvider,
           ]);
       case (PairRole.consumer):
-        interface
-          ..driveOther(other.internalInterface!, const [
-            PairDirection.fromConsumer,
+        internalInterface!
+          ..driveOther(other.interface, const [
+            PairDirection.fromProvider,
             PairDirection.sharedInputs,
             PairDirection.commonInOuts,
           ])
-          ..receiveOther(other.internalInterface!, const [
-            PairDirection.fromProvider,
+          ..receiveOther(other.interface, const [
+            PairDirection.fromConsumer,
           ]);
     }
   }
