@@ -116,6 +116,14 @@ level.</p>
     &#47;&#47; e.g. feed-through
     throw RohdBridgeException(
         &#39;Unhandled directionality and hierarchy of driver and receiver.&#39;);
+  } else if ((driverContainsReceiver || receiverContainsDriver) &amp;&amp;
+      (receiver.direction != driver.direction) &amp;&amp;
+      (receiver.direction != PortDirection.inOut &amp;&amp;
+          driver.direction != PortDirection.inOut)) {
+    throw RohdBridgeException(
+        &#39;Vertical connections should have the same direction, but one of&#39;
+        &#39; $driver and $receiver contains the other, but directions are&#39;
+        &#39; ${driver.direction} and ${receiver.direction}, respectively.&#39;);
   } else {
     commonParent =
         findCommonParent(driverInstance, receiverInstance) as BridgeModule?;
