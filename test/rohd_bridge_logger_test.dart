@@ -1,7 +1,5 @@
-
 // rohd_bridge_logger_test.dart
 // Tests for ROHD Bridge Logger functionality.
-
 
 import 'dart:io';
 import 'package:test/test.dart';
