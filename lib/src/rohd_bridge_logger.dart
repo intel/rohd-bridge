@@ -68,6 +68,11 @@ abstract class RohdBridgeLogger {
     bool continueOnError = false,
     bool enableDebugMesage = false,
   }) {
+    // Clean up existing logger subscriptions and file sink
+    Logger.root.clearListeners();
+    fileSink?.close();
+    fileSink = null;
+
     RohdBridgeLogger.continueOnError = continueOnError;
     Logger.root.level = rootLevel;
     _printLevel = printLevel;
