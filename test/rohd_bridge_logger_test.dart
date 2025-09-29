@@ -1,11 +1,7 @@
-// Copyright (C) 2024-2025 Intel Corporation
-// SPDX-License-Identifier: BSD-3-Clause
-//
+
 // rohd_bridge_logger_test.dart
 // Tests for ROHD Bridge Logger functionality.
-//
-// 2025
-// Author: Claude Code contribution
+
 
 import 'dart:io';
 import 'package:test/test.dart';
