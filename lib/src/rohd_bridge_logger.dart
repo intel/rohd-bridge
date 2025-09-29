@@ -12,6 +12,7 @@
 
 import 'dart:io';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
 
 /// Extension on [Logger] to throw an exception if an [error] is encountered.
@@ -70,7 +71,9 @@ abstract class RohdBridgeLogger {
   }) {
     // Clean up existing logger subscriptions and file sink
     Logger.root.clearListeners();
-    fileSink?.close();
+    if (fileSink != null) {
+      unawaited(fileSink!.close());
+    }
     fileSink = null;
 
     RohdBridgeLogger.continueOnError = continueOnError;
