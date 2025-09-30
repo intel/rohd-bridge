@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.dart.dev/stable/3.9.3/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span>&gt;</span>?</span>
+<span class="returntype"><a href="https://api.dart.dev/stable/3.9.4/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span>&gt;</span>?</span>
 <span class="name ">getHierarchyDownTo</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="getHierarchyDownTo-param-instance"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a></span> <span class="parameter-name">instance</span></span></li>
 </ol>)
 
@@ -66,7 +66,8 @@
   <p>Returns a list of instances between calling module <code>this</code> and the provided
 <code>instance</code>, where the first element is <code>this</code> and the last element is
 <code>instance</code>.</p>
-<p>If there is no path found, returns <code>null</code>.</p>
+<p>If there is no path found, returns <code>null</code>. If <code>instance</code> is the same as
+<code>this</code>, returns <code>null</code>.</p>
 </section>
 
 
@@ -74,6 +75,10 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">List&lt;Module&gt;? getHierarchyDownTo(Module instance) {
+  if (instance == this) {
+    return null;
+  }
+
   Module? parent = instance;
 
   final fullPath = &lt;Module&gt;[];

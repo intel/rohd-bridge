@@ -27,7 +27,7 @@
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
     <li><a href="../../rohd_bridge/PortReference-class.html">PortReference</a></li>
-    <li class="self-crumb">gets abstract method</li>
+    <li class="self-crumb">gets method</li>
   </ol>
   <div class="self-name">gets</div>
   <form class="search navbar-right" role="search">
@@ -49,7 +49,7 @@
     data-above-sidebar="rohd_bridge&#47;PortReference-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">gets</span> abstract method 
+<h1><span class="kind-method">gets</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
@@ -73,7 +73,73 @@ handles directionality of ports appropriately.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void gets(PortReference other);</code></pre>
+  <pre class="language-dart"><code class="language-dart">void gets(PortReference other) {
+  final relativeLocation = _relativeLocationOf(other);
+
+  if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
+      (other is InterfacePortReference || this is InterfacePortReference)) {
+    throw RohdBridgeException(
+        &#39;Connections involving interface ports on the same module&#39;
+        &#39; ${module.name} should be done using port maps.&#39;);
+  }
+
+  if (relativeLocation == _RelativePortLocation.sameLevel &amp;&amp;
+      direction == other.direction &amp;&amp;
+      (direction != PortDirection.inOut)) {
+    throw RohdBridgeException(
+        &#39;Cannot connect two ports with the same direction&#39;
+        &#39; on sibling modules.&#39;);
+  }
+
+  if (relativeLocation == _RelativePortLocation.thisAboveOther &amp;&amp;
+      direction == PortDirection.input &amp;&amp;
+      other.direction == PortDirection.input) {
+    throw RohdBridgeException(
+        &#39;A submodule (${other.module}) input ($other) cannot drive a parent &#39;
+        &#39;module ($module) input ($this).&#39;);
+  }
+
+  if (relativeLocation == _RelativePortLocation.otherAboveThis &amp;&amp;
+      direction == PortDirection.output &amp;&amp;
+      other.direction == PortDirection.output) {
+    throw RohdBridgeException(
+        &#39;A parent module (${other.module}) output ($other) cannot drive a &#39;
+        &#39;submodule ($module) output ($this).&#39;);
+  }
+
+  if (direction == PortDirection.output &amp;&amp;
+      other.direction == PortDirection.input &amp;&amp;
+      relativeLocation != _RelativePortLocation.sameModule) {
+    throw RohdBridgeException(
+        &#39;Cannot use an input $other from ${other.module}&#39;
+        &#39; to drive $this, an output of $module.&#39;);
+  }
+
+  if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
+      direction == PortDirection.input) {
+    throw RohdBridgeException(
+        &#39;An port $other on module ${other.module} cannot drive an&#39;
+        &#39; input $this on the same module&#39;);
+  }
+
+  if (relativeLocation == _RelativePortLocation.otherAboveThis &amp;&amp;
+      direction == PortDirection.input &amp;&amp;
+      other.direction == PortDirection.output) {
+    throw RohdBridgeException(
+        &#39;A parent module (${other.module}) output ($other) cannot drive a &#39;
+        &#39;submodule ($module) input ($this).&#39;);
+  }
+
+  if (relativeLocation == _RelativePortLocation.thisAboveOther &amp;&amp;
+      direction == PortDirection.input &amp;&amp;
+      other.direction == PortDirection.output) {
+    throw RohdBridgeException(
+        &#39;A submodule (${other.module}) output ($other) cannot drive a &#39;
+        &#39;parent module ($module) input ($this).&#39;);
+  }
+
+  getsInternal(other);
+}</code></pre>
 </section>
 
 
@@ -89,7 +155,7 @@ handles directionality of ports appropriately.</p>
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/PortReference-class.html">PortReference</a></li>
-    <li class="self-crumb">gets abstract method</li>
+    <li class="self-crumb">gets method</li>
 </ol>
 
     <h5>PortReference class</h5>

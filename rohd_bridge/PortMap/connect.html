@@ -54,7 +54,7 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="https://api.dart.dev/stable/3.9.3/dart-core/bool-class.html">bool</a></span>
+<span class="returntype"><a href="https://api.dart.dev/stable/3.9.4/dart-core/bool-class.html">bool</a></span>
 <span class="name ">connect</span>(<wbr>)
 
       
@@ -79,10 +79,14 @@ it was already connected.</p>
 
   switch (port.direction) {
     case PortDirection.input || PortDirection.inOut:
-      port.gets(interfacePort);
+      port.getsInternal(interfacePort);
     case PortDirection.output:
-      interfacePort.gets(port);
+      interfacePort.getsInternal(port);
   }
+
+  &#47;&#47; in case there has been an internal interface created
+  connectInternalIfPresent();
+
   _isConnected = true;
 
   return true;

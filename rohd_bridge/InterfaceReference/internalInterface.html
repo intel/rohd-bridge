@@ -53,29 +53,38 @@
 </h1></div>
 
     
-      <section class="multi-line-signature">
-        
-        InterfaceType?
-        <span class="name ">internalInterface</span>
-        <div class="features"><span class="feature">late</span><span class="feature">final</span></div>
 
-      </section>
+    
+        
+  <section id="getter">
+    <section class="multi-line-signature">
       
+      <span class="returntype">InterfaceType?</span>
+      get
+      <span class="name ">internalInterface</span>
+      
+
+    </section>
+    
 <section class="desc markdown">
   <p>The internal interface instance that exists "inside" the <code>module</code>.</p>
 <p>If <code>null</code>, then there is no internal interface representation — the
 interface is mapped directly to individual module ports or connected
 indirectly through other interfaces.</p>
+<p>If an interface is connected vertically (e.g. child up to parent) to an
+interface that originally did not have an <a href="../../rohd_bridge/InterfaceReference/internalInterface.html">internalInterface</a>, one will
+be created and connected for any <a href="../../rohd_bridge/InterfaceReference/portMaps.html">portMaps</a>.</p>
 </section>
-
-      
-<section class="summary source-code" id="source">
-  <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">late final InterfaceType? internalInterface;</code></pre>
-</section>
-
 
     
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">InterfaceType? get internalInterface =&gt; _internalInterface;</code></pre>
+</section>
+
+  </section>
+
+
 </div> <!-- /.main-content -->
 <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
   <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->

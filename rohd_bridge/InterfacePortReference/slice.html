@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the gets method from the StandardPortReference class, for the Dart programming language.">
-  <title>gets method - StandardPortReference class - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the slice method from the InterfacePortReference mixin, for the Dart programming language.">
+  <title>slice method - InterfacePortReference mixin - rohd_bridge library - Dart API</title>
 
 
   
@@ -26,10 +26,10 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
-    <li><a href="../../rohd_bridge/StandardPortReference-class.html">StandardPortReference</a></li>
-    <li class="self-crumb">gets method</li>
+    <li><a href="../../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></li>
+    <li class="self-crumb">slice abstract method</li>
   </ol>
-  <div class="self-name">gets</div>
+  <div class="self-name">slice</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,21 +46,22 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="rohd_bridge&#47;StandardPortReference-class-sidebar.html"
+    data-above-sidebar="rohd_bridge&#47;InterfacePortReference-mixin-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">gets</span> method 
+<h1><span class="kind-method">slice</span> abstract method 
 </h1></div>
 
     <section class="multi-line-signature">
       
   <div>
     <ol class="annotation-list">
-        <li>@<a href="https://api.dart.dev/stable/3.9.3/dart-core/override-constant.html">override</a></li>
+        <li>@<a href="https://api.dart.dev/stable/3.9.4/dart-core/override-constant.html">override</a></li>
     </ol>
   </div>
-<span class="returntype">void</span>
-<span class="name ">gets</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="gets-param-other"><span class="type-annotation"><a href="../../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">other</span></span></li>
+<span class="returntype"><a href="../../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></span>
+<span class="name ">slice</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="slice-param-endIndex"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.9.4/dart-core/int-class.html">int</a></span> <span class="parameter-name">endIndex</span>, </span></li>
+<li><span class="parameter" id="slice-param-startIndex"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.9.4/dart-core/int-class.html">int</a></span> <span class="parameter-name">startIndex</span></span></li>
 </ol>)
 
       <div class="features"><span class="feature">override</span></div>
@@ -68,10 +69,9 @@
     </section>
     
 <section class="desc markdown">
-  <p>Connects this port to be driven by <code>other</code>.</p>
-<p>This establishes a connection where the signal from <code>other</code> drives this
-port. The connection respects the hierarchical nature of the modules and
-handles directionality of ports appropriately.</p>
+  <p>Creates a slice of this port from <code>endIndex</code> down to <code>startIndex</code>.</p>
+<p>Both indices are inclusive. For example, <code>slice(7, 0)</code> would create a
+reference to bits 7 through 0 of the port.</p>
 </section>
 
 
@@ -79,41 +79,7 @@ handles directionality of ports appropriately.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-void gets(PortReference other) {
-  if (other is StandardPortReference) {
-    if (port.isInOut || other.port.isInOut) {
-      final (receiver: receiver, driver: driver) =
-          _inOutReceiverAndDriver(other);
-
-      receiver &lt;= driver;
-    } else {
-      _receiver &lt;= other.portSubset;
-    }
-  } else if (other is SlicePortReference) {
-    dynamic otherDriver = other.portSubset;
-    var receiver = _receiver;
-
-    if (port.isInOut || other.port.isInOut) {
-      otherDriver = _inOutReceiverAndDriverSubsets(other).driver;
-      receiver = _inOutReceiverAndDriver(other).receiver;
-    }
-
-    if (otherDriver is Logic) {
-      receiver &lt;= otherDriver;
-    } else if (otherDriver is List&lt;Logic&gt;) {
-      if (receiver is LogicArray &amp;&amp;
-          receiver.dimensions.first == otherDriver.length) {
-        receiver.assignSubset(otherDriver);
-      } else {
-        receiver &lt;= otherDriver.rswizzle();
-      }
-    } else {
-      throw RohdBridgeException(&#39;Invalid driver type $otherDriver&#39;);
-    }
-  } else {
-    throw RohdBridgeException(&#39;Invalid driver type $other&#39;);
-  }
-}</code></pre>
+InterfacePortReference slice(int endIndex, int startIndex);</code></pre>
 </section>
 
 
@@ -128,11 +94,11 @@ void gets(PortReference other) {
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
-    <li><a href="../../rohd_bridge/StandardPortReference-class.html">StandardPortReference</a></li>
-    <li class="self-crumb">gets method</li>
+    <li><a href="../../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></li>
+    <li class="self-crumb">slice abstract method</li>
 </ol>
 
-    <h5>StandardPortReference class</h5>
+    <h5>InterfacePortReference mixin</h5>
     <div id="dartdoc-sidebar-left-content"></div>
   </div><!--/.sidebar-offcanvas-->
   <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">

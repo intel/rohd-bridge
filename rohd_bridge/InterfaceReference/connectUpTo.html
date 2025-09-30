@@ -72,7 +72,6 @@ on the interface role:</p>
 <li>For consumer interfaces: inputs flow up, outputs flow down</li>
 <li>Shared and common ports follow interface-specific rules</li>
 </ul>
-<p>Both interfaces must have their port mappings activated before connection.</p>
 <p>The <code>other</code> must be on this reference's <code>module</code>'s parent.</p>
 </section>
 
@@ -81,6 +80,17 @@ on the interface role:</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void connectUpTo(InterfaceReference other) {
+  &#47;&#47; TODO(mkorbel1): remove restriction that it must be adjacent (https:&#47;&#47;github.com&#47;intel&#47;rohd-bridge&#47;issues&#47;13)
+  if (module.parent != other.module) {
+    throw RohdBridgeException(
+        &quot;The other interface must be on the parent module of this interface&#39;s&quot;
+        &#39; module.&#39;);
+  }
+
+  if (other.internalInterface == null) {
+    other._introduceInternalInterface();
+  }
+
   _connectAllPortMaps(exceptPorts: null);
   other._connectAllPortMaps(exceptPorts: null);
 

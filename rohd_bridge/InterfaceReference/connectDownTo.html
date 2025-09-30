@@ -67,9 +67,6 @@
 <p>Connects this interface to <code>other</code>, where <code>other</code> represents the same
 interface in a child module. This sets up the proper signal flow based on
 the interface role, with signals flowing from parent to child.</p>
-<p>Both interfaces must have their port mappings activated before connection.
-The child interface (<code>other</code>) must have an internal interface for the
-connection to be established.</p>
 <p>The <code>other</code> must be on a sub-module of this <code>module</code>.</p>
 </section>
 
@@ -78,29 +75,40 @@ connection to be established.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void connectDownTo(InterfaceReference other) {
+  &#47;&#47; TODO(mkorbel1): remove restriction that it must be adjacent (https:&#47;&#47;github.com&#47;intel&#47;rohd-bridge&#47;issues&#47;13)
+  if (other.module.parent != module) {
+    throw RohdBridgeException(
+        &quot;The other interface must be on a child module of this interface&#39;s&quot;
+        &#39; module.&#39;);
+  }
+
+  if (internalInterface == null) {
+    _introduceInternalInterface();
+  }
+
   _connectAllPortMaps(exceptPorts: null);
   other._connectAllPortMaps(exceptPorts: null);
 
   switch (role) {
     case (PairRole.provider):
-      interface
-        ..driveOther(other.internalInterface!, const [
-          PairDirection.fromProvider,
+      internalInterface!
+        ..driveOther(other.interface, const [
+          PairDirection.fromConsumer,
           PairDirection.sharedInputs,
           PairDirection.commonInOuts,
         ])
-        ..receiveOther(other.internalInterface!, const [
-          PairDirection.fromConsumer,
+        ..receiveOther(other.interface, const [
+          PairDirection.fromProvider,
         ]);
     case (PairRole.consumer):
-      interface
-        ..driveOther(other.internalInterface!, const [
-          PairDirection.fromConsumer,
+      internalInterface!
+        ..driveOther(other.interface, const [
+          PairDirection.fromProvider,
           PairDirection.sharedInputs,
           PairDirection.commonInOuts,
         ])
-        ..receiveOther(other.internalInterface!, const [
-          PairDirection.fromProvider,
+        ..receiveOther(other.interface, const [
+          PairDirection.fromConsumer,
         ]);
   }
 }</code></pre>
