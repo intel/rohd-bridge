@@ -61,8 +61,10 @@ void main() {
 
     test('configureLogger handles null fileSink gracefully', () {
       // This should not throw even when fileSink is initially null
-      expect(() => RohdBridgeLogger.configureLogger('${tempDir.path}/test.log'),
-             returnsNormally);
+      expect(
+        () => RohdBridgeLogger.configureLogger('${tempDir.path}/test.log'),
+        returnsNormally,
+      );
     });
 
     test('multiple reconfigurations work correctly', () async {
