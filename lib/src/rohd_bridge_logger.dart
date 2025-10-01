@@ -10,9 +10,9 @@
 //   Suhas Virmani <suhas.virmani@intel.com>
 //   Max Korbel <max.korbel@intel.com>
 
+import 'dart:async';
 import 'dart:io';
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
 
 /// Extension on [Logger] to throw an exception if an [error] is encountered.
@@ -83,7 +83,8 @@ abstract class RohdBridgeLogger {
     fileSink = File(filePath).openWrite();
 
     Logger.root.onRecord.listen((record) {
-      final message = '${record.time}: ${record.level.name}: '
+      final message =
+          '${record.time}: ${record.level.name}: '
           '${record.message}\n';
 
       _handleMessage(message, record.level);
