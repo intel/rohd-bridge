@@ -83,8 +83,7 @@ abstract class RohdBridgeLogger {
     fileSink = File(filePath).openWrite();
 
     Logger.root.onRecord.listen((record) {
-      final message =
-          '${record.time}: ${record.level.name}: '
+      final message = '${record.time}: ${record.level.name}: '
           '${record.message}\n';
 
       _handleMessage(message, record.level);
