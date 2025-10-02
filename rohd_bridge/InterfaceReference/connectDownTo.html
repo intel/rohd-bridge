@@ -55,8 +55,9 @@
     <section class="multi-line-signature">
       
 <span class="returntype">void</span>
-<span class="name ">connectDownTo</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="connectDownTo-param-other"><span class="type-annotation"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">other</span></span></li>
-</ol>)
+<span class="name ">connectDownTo</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="connectDownTo-param-other"><span class="type-annotation"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">other</span>, {</span></li>
+<li><span class="parameter" id="connectDownTo-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.9.4/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.9.4/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">exceptPorts</span>, </span></li>
+</ol>})
 
       
 
@@ -74,7 +75,7 @@ the interface role, with signals flowing from parent to child.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void connectDownTo(InterfaceReference other) {
+  <pre class="language-dart"><code class="language-dart">void connectDownTo(InterfaceReference other, {Set&lt;String&gt;? exceptPorts}) {
   &#47;&#47; TODO(mkorbel1): remove restriction that it must be adjacent (https:&#47;&#47;github.com&#47;intel&#47;rohd-bridge&#47;issues&#47;13)
   if (other.module.parent != module) {
     throw RohdBridgeException(
@@ -86,30 +87,42 @@ the interface role, with signals flowing from parent to child.</p>
     _introduceInternalInterface();
   }
 
-  _connectAllPortMaps(exceptPorts: null);
-  other._connectAllPortMaps(exceptPorts: null);
+  _connectAllPortMaps(exceptPorts: exceptPorts);
+  other._connectAllPortMaps(exceptPorts: exceptPorts);
 
   switch (role) {
     case (PairRole.provider):
       internalInterface!
-        ..driveOther(other.interface, const [
-          PairDirection.fromConsumer,
-          PairDirection.sharedInputs,
-          PairDirection.commonInOuts,
-        ])
-        ..receiveOther(other.interface, const [
-          PairDirection.fromProvider,
-        ]);
+        .._driveOtherExcept(
+            other.interface,
+            const [
+              PairDirection.fromConsumer,
+              PairDirection.sharedInputs,
+              PairDirection.commonInOuts,
+            ],
+            exceptPorts: exceptPorts)
+        .._receiveOtherExcept(
+            other.interface,
+            const [
+              PairDirection.fromProvider,
+            ],
+            exceptPorts: exceptPorts);
     case (PairRole.consumer):
       internalInterface!
-        ..driveOther(other.interface, const [
-          PairDirection.fromProvider,
-          PairDirection.sharedInputs,
-          PairDirection.commonInOuts,
-        ])
-        ..receiveOther(other.interface, const [
-          PairDirection.fromConsumer,
-        ]);
+        .._driveOtherExcept(
+            other.interface,
+            const [
+              PairDirection.fromProvider,
+              PairDirection.sharedInputs,
+              PairDirection.commonInOuts,
+            ],
+            exceptPorts: exceptPorts)
+        .._receiveOtherExcept(
+            other.interface,
+            const [
+              PairDirection.fromConsumer,
+            ],
+            exceptPorts: exceptPorts);
   }
 }</code></pre>
 </section>

@@ -82,7 +82,8 @@ uniquification</li>
 <li><code>portUniquify</code>: Function to generate unique port names</li>
 </ul>
 <p>If <code>exceptPorts</code> is provided, the resulting interface will exclude those
-ports. Otherwise, the new interface will be of the same type as this one.</p>
+ports (and thus not be of the same type). Otherwise, the new interface
+will be of the same type as this one.</p>
 </section>
 
 
@@ -105,14 +106,14 @@ ports. Otherwise, the new interface will be of the same type as this one.</p>
   _connectAllPortMaps(exceptPorts: exceptPorts);
 
   final newRef = newModule.addInterface(
-    _clonePairInterface(interface, exceptPorts: exceptPorts),
+    interface._cloneExcept(exceptPorts: exceptPorts),
     name: newIntfName ?? name,
     role: role,
     allowNameUniquification: allowNameUniquification,
     portUniquify: portUniquify,
   );
 
-  connectUpTo(newRef);
+  connectUpTo(newRef, exceptPorts: exceptPorts);
 
   return newRef;
 }</code></pre>

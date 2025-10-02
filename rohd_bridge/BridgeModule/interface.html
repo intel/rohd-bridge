@@ -76,7 +76,7 @@ connection methods.</p>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">InterfaceReference interface(String name) =&gt;
     interfaces[name] ??
-    (throw RohdBridgeException(&#39;Interface $name not found&#39;));</code></pre>
+    (throw RohdBridgeException(&#39;Interface $name not found on $this&#39;));</code></pre>
 </section>
 
 

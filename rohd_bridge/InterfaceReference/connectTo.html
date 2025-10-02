@@ -56,7 +56,7 @@
       
 <span class="returntype">void</span>
 <span class="name ">connectTo</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="connectTo-param-other"><span class="type-annotation"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.6/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">other</span>, {</span></li>
-<li><span class="parameter" id="connectTo-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.9.4/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.9.4/dart-core/String-class.html">String</a></span>&gt;</span></span> <span class="parameter-name">exceptPorts</span> = <span class="default-value">const {}</span>, </span></li>
+<li><span class="parameter" id="connectTo-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.9.4/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.9.4/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">exceptPorts</span>, </span></li>
 </ol>})
 
       
@@ -78,8 +78,7 @@ rather than using bulk interface connection methods.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void connectTo(InterfaceReference other,
-    {Set&lt;String&gt; exceptPorts = const {}}) {
+  <pre class="language-dart"><code class="language-dart">void connectTo(InterfaceReference other, {Set&lt;String&gt;? exceptPorts}) {
   &#47;&#47; TODO(mkorbel1): remove restriction that it must be adjacent (https:&#47;&#47;github.com&#47;intel&#47;rohd-bridge&#47;issues&#47;13)
   if (other.module.parent != module.parent) {
     throw RohdBridgeException(&#39;Both interfaces must be on modules that share&#39;
@@ -96,33 +95,20 @@ rather than using bulk interface connection methods.</p>
   final provider = role == PairRole.provider ? this : other;
   final consumer = role == PairRole.consumer ? this : other;
 
-  if (exceptPorts.isNotEmpty) {
-    provider.interface.getPorts([
-      PairDirection.fromProvider,
-      PairDirection.commonInOuts,
-    ]).forEach((portName, thisPort) {
-      if (!exceptPorts.contains(portName)) {
-        consumer.interface.port(portName) &lt;= thisPort;
-      }
-    });
+  provider.interface._driveOtherExcept(
+      consumer.interface,
+      [
+        PairDirection.fromProvider,
+        PairDirection.commonInOuts,
+      ],
+      exceptPorts: exceptPorts);
 
-    consumer.interface.getPorts([
-      PairDirection.fromConsumer,
-    ]).forEach((portName, thisPort) {
-      if (!exceptPorts.contains(portName)) {
-        provider.interface.port(portName) &lt;= thisPort;
-      }
-    });
-  } else {
-    provider.interface.driveOther(consumer.interface, [
-      PairDirection.fromProvider,
-      PairDirection.commonInOuts,
-    ]);
-
-    consumer.interface.driveOther(provider.interface, [
-      PairDirection.fromConsumer,
-    ]);
-  }
+  consumer.interface._driveOtherExcept(
+      provider.interface,
+      [
+        PairDirection.fromConsumer,
+      ],
+      exceptPorts: exceptPorts);
 }</code></pre>
 </section>
 
