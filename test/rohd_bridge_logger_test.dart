@@ -55,10 +55,12 @@ void main() {
       final secondLogContent = await File(logFile2).readAsString();
       expect(secondLogContent, contains(secondConfigurationMessage));
 
-      // Second log should not contain first message (proves no duplicate logging)
+      // Second log should not contain first message
+      // (proves no duplicate logging)
       expect(secondLogContent, isNot(contains(firstConfigurationMessage)));
 
-      // First log should not contain second message (proves cleanup worked)
+      // First log should not contain second message
+      // (proves cleanup worked)
       expect(firstLogContent, isNot(contains(secondConfigurationMessage)));
     });
 
