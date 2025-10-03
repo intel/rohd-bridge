@@ -91,7 +91,7 @@ original port name while preserving any range specification.</p>
       throw RohdBridgeException(
           &#39;Struct port $portRefString not found in $name&#39;);
     }
-    &#47;&#47; ignore: parameter_assignments
+
     return structMap[portRefString]!;
   } else {
     final portRefComponents =

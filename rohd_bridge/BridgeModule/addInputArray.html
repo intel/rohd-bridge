@@ -93,13 +93,13 @@ LogicArray addInputArray(
 }) {
   _handleNewPortName(name);
 
-  &#47;&#47; ignore: parameter_assignments
-  source ??= LogicArray(dimensions, elementWidth,
-      name: name,
-      numUnpackedDimensions: numUnpackedDimensions,
-      naming: Naming.mergeable);
-
-  final inArr = super.addInputArray(name, source,
+  final inArr = super.addInputArray(
+      name,
+      source ??
+          LogicArray(dimensions, elementWidth,
+              name: name,
+              numUnpackedDimensions: numUnpackedDimensions,
+              naming: Naming.mergeable),
       dimensions: dimensions,
       elementWidth: elementWidth,
       numUnpackedDimensions: numUnpackedDimensions);

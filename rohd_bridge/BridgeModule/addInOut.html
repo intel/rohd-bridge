@@ -82,10 +82,9 @@
 LogicNet addInOut(String name, Logic? source, {int width = 1}) {
   _handleNewPortName(name);
 
-  &#47;&#47; ignore: parameter_assignments
-  source ??= LogicNet(name: name, width: width, naming: Naming.mergeable);
-
-  return super.addInOut(name, source, width: width);
+  return super.addInOut(name,
+      source ?? LogicNet(name: name, width: width, naming: Naming.mergeable),
+      width: width);
 }</code></pre>
 </section>
 

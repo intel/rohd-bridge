@@ -82,10 +82,9 @@
 Logic addInput(String name, Logic? source, {int width = 1}) {
   _handleNewPortName(name);
 
-  &#47;&#47; ignore: parameter_assignments
-  source ??= Logic(name: name, width: width, naming: Naming.mergeable);
-
-  final retPort = super.addInput(name, source, width: width);
+  final retPort = super.addInput(name,
+      source ?? Logic(name: name, width: width, naming: Naming.mergeable),
+      width: width);
   return retPort;
 }</code></pre>
 </section>

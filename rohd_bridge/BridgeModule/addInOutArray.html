@@ -90,15 +90,13 @@ LogicArray addInOutArray(
 }) {
   _handleNewPortName(name);
 
-  &#47;&#47; ignore: parameter_assignments
-  source ??= LogicArray.net(dimensions, elementWidth,
-      name: name,
-      numUnpackedDimensions: numUnpackedDimensions,
-      naming: Naming.mergeable);
-
   return super.addInOutArray(
     name,
-    source,
+    source ??
+        LogicArray.net(dimensions, elementWidth,
+            name: name,
+            numUnpackedDimensions: numUnpackedDimensions,
+            naming: Naming.mergeable),
     dimensions: dimensions,
     elementWidth: elementWidth,
     numUnpackedDimensions: numUnpackedDimensions,
