@@ -10,6 +10,7 @@
 //   Suhas Virmani <suhas.virmani@intel.com>
 //   Max Korbel <max.korbel@intel.com>
 
+import 'dart:async';
 import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
@@ -68,6 +69,13 @@ abstract class RohdBridgeLogger {
     bool continueOnError = false,
     bool enableDebugMesage = false,
   }) {
+    // Clean up existing logger subscriptions and file sink
+    Logger.root.clearListeners();
+    if (fileSink != null) {
+      unawaited(fileSink!.close());
+    }
+    fileSink = null;
+
     RohdBridgeLogger.continueOnError = continueOnError;
     Logger.root.level = rootLevel;
     _printLevel = printLevel;
