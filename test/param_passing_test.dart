@@ -70,7 +70,7 @@ void main() {
     expect('leaf1 #(.A(A),.B(B),.C(C),.paramx(paramY)) leaf1(.x', sv.contains);
   });
 
-  test('localparam test', () async {
+  test('localparam test', () {
     final leaf1 = BridgeModule('modA')
       ..addFromJson(
           jsonDecode(File('test/integration_test/modA.json').readAsStringSync())

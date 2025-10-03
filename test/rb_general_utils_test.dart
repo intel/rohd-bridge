@@ -19,7 +19,7 @@ import 'package:test/test.dart';
 
 void main() {
   test('Get Int test', skip: 'Pending https://github.com/intel/rohd/issues/616',
-      () async {
+      () {
     const binVal = "12'b111010100011";
     const hexVal = "12'hABC";
     const intVal = "12'd3445";
@@ -36,7 +36,7 @@ void main() {
     expect(binVal2Int, equals(BigInt.from(3747)));
   });
 
-  test('Create and get params test', () async {
+  test('Create and get params test', () {
     const parameters = {
       'paramA': {
         'type': 'int',
@@ -53,7 +53,7 @@ void main() {
     expect(mod.instantiationParameters['paramA'], equals('5'));
   });
 
-  test('Create ports from json', () async {
+  test('Create ports from json', () {
     final json = [
       {'direction': 'input', 'packedRanges': '[5:0]', 'name': 'portA'},
       {'direction': 'output', 'packedRanges': '', 'name': 'portB'}
@@ -65,7 +65,7 @@ void main() {
     expect(mod.output('portB').width, equals(1));
   });
 
-  test('Create array ports from json', () async {
+  test('Create array ports from json', () {
     final json = [
       {
         'name': 'portA',
@@ -98,7 +98,7 @@ void main() {
     expect(portB.numUnpackedDimensions, 1);
   });
 
-  test('Create unpacked 1-bit elem ports from json', () async {
+  test('Create unpacked 1-bit elem ports from json', () {
     final json = [
       {
         'name': 'portA',
@@ -159,7 +159,7 @@ void main() {
     expect(sv, contains('output logic portB [5:0]'));
   });
 
-  test('Process input file test (json from xml)', () async {
+  test('Process input file test (json from xml)', () {
     final top = BridgeModule.fromJson(
         jsonDecode(File('test/integration_test/modA.json').readAsStringSync())
             as Map<String, dynamic>);
@@ -168,7 +168,7 @@ void main() {
     expect(top.outputs.length, equals(4));
   });
 
-  test('Process input file test (json from sv)', () async {
+  test('Process input file test (json from sv)', () {
     final myModule = BridgeModule.fromJson(jsonDecode(
             File('test/test_collaterals/myModule.json').readAsStringSync())
         as Map<String, dynamic>);
@@ -183,7 +183,7 @@ void main() {
 
   test(
       'Process input file test (json from sv) with param overrides and defines',
-      () async {
+      () {
     final myModule = BridgeModule.fromJson(jsonDecode(
         File('test/test_collaterals/myModule_paramA7_paramB12.json')
             .readAsStringSync()) as Map<String, dynamic>);

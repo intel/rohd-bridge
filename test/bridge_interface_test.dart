@@ -14,8 +14,8 @@ import 'package:rohd/rohd.dart';
 import 'package:rohd_bridge/src/bridge_interface.dart';
 import 'package:test/test.dart';
 
-void main() async {
-  test('Bridge Interface simple', () async {
+void main() {
+  test('Bridge Interface simple', () {
     final portsFromConsumer = {'a': 1, 'b': 2, 'c': 3};
     final portsFromProvider = {'d': 4, 'e': 5, 'f': 6};
     final intf = BridgeInterface(

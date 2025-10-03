@@ -16,10 +16,13 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
 import 'package:rohd/rohd.dart';
+// Use ROHD implementation imports for access to internal utilities.
 // ignore: implementation_imports
 import 'package:rohd/src/collections/traverseable_collection.dart';
+// Use ROHD implementation imports for access to internal utilities.
 // ignore: implementation_imports
 import 'package:rohd/src/utilities/sanitizer.dart';
+// Use ROHD implementation imports for access to internal utilities.
 // ignore: implementation_imports
 import 'package:rohd/src/utilities/uniquifier.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
@@ -342,13 +345,13 @@ class BridgeModule extends Module with SystemVerilog {
   }) {
     _handleNewPortName(name);
 
-    // ignore: parameter_assignments
-    source ??= LogicArray(dimensions, elementWidth,
-        name: name,
-        numUnpackedDimensions: numUnpackedDimensions,
-        naming: Naming.mergeable);
-
-    final inArr = super.addInputArray(name, source,
+    final inArr = super.addInputArray(
+        name,
+        source ??
+            LogicArray(dimensions, elementWidth,
+                name: name,
+                numUnpackedDimensions: numUnpackedDimensions,
+                naming: Naming.mergeable),
         dimensions: dimensions,
         elementWidth: elementWidth,
         numUnpackedDimensions: numUnpackedDimensions);
@@ -363,10 +366,9 @@ class BridgeModule extends Module with SystemVerilog {
   Logic addInput(String name, Logic? source, {int width = 1}) {
     _handleNewPortName(name);
 
-    // ignore: parameter_assignments
-    source ??= Logic(name: name, width: width, naming: Naming.mergeable);
-
-    final retPort = super.addInput(name, source, width: width);
+    final retPort = super.addInput(name,
+        source ?? Logic(name: name, width: width, naming: Naming.mergeable),
+        width: width);
     return retPort;
   }
 
@@ -402,10 +404,9 @@ class BridgeModule extends Module with SystemVerilog {
   LogicNet addInOut(String name, Logic? source, {int width = 1}) {
     _handleNewPortName(name);
 
-    // ignore: parameter_assignments
-    source ??= LogicNet(name: name, width: width, naming: Naming.mergeable);
-
-    return super.addInOut(name, source, width: width);
+    return super.addInOut(name,
+        source ?? LogicNet(name: name, width: width, naming: Naming.mergeable),
+        width: width);
   }
 
   /// Adds an [inOut] array in the same way as the base [Module] does.
@@ -421,15 +422,13 @@ class BridgeModule extends Module with SystemVerilog {
   }) {
     _handleNewPortName(name);
 
-    // ignore: parameter_assignments
-    source ??= LogicArray.net(dimensions, elementWidth,
-        name: name,
-        numUnpackedDimensions: numUnpackedDimensions,
-        naming: Naming.mergeable);
-
     return super.addInOutArray(
       name,
-      source,
+      source ??
+          LogicArray.net(dimensions, elementWidth,
+              name: name,
+              numUnpackedDimensions: numUnpackedDimensions,
+              naming: Naming.mergeable),
       dimensions: dimensions,
       elementWidth: elementWidth,
       numUnpackedDimensions: numUnpackedDimensions,
@@ -700,7 +699,7 @@ class BridgeModule extends Module with SystemVerilog {
         throw RohdBridgeException(
             'Struct port $portRefString not found in $name');
       }
-      // ignore: parameter_assignments
+
       return structMap[portRefString]!;
     } else {
       final portRefComponents =

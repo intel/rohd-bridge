@@ -85,6 +85,7 @@ abstract class RohdBridgeLogger {
   static void _handleMessage(String message, [Level? level]) {
     fileSink!.write(message);
     if (level != null && level >= _printLevel) {
+      // We actually want to print for logging purposes based on print level.
       // ignore: avoid_print
       print(message);
     }

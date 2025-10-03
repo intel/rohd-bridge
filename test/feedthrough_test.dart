@@ -14,7 +14,7 @@ import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('Feedthrough exception', () async {
+  test('Feedthrough exception', () {
     // This is to make sure that the feedthrough cases are caught
     // This test must fail
 

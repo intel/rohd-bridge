@@ -18,6 +18,7 @@ class _PortTestCase {
   final bool isIntfPort;
   final PortDirection direction;
 
+  // For testing purposes, it's ok positional here.
   // ignore: avoid_positional_boolean_parameters
   const _PortTestCase(this.isIntfPort, this.direction);
 
@@ -37,7 +38,6 @@ class _PortConnectionTestCase {
   final _PortTestCase dst;
   final _RelativePosition relativePosition;
 
-  // ignore: avoid_positional_boolean_parameters
   const _PortConnectionTestCase(this.src, this.dst, this.relativePosition);
 
   @override

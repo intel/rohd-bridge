@@ -204,6 +204,7 @@ void main() {
     test('through multiple levels with same name at leaf', () async {
       const commonPortName = defaultPortName1;
       await testPullUp(
+        // Be explicit on names here for clarity.
         // ignore: avoid_redundant_argument_values
         portName1: commonPortName,
         portName2: commonPortName,

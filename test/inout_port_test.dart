@@ -32,7 +32,7 @@ class LeafIP extends BridgeModule {
 }
 
 void main() {
-  test('Common parent test', () async {
+  test('Common parent test', () {
     final ip1 = BridgeModule('leafIP', name: 'ip1');
     final ip2 = BridgeModule('leafIP', name: 'ip2');
     final ip3 = BridgeModule('leafIP', name: 'ip3');

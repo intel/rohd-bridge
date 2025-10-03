@@ -259,7 +259,7 @@ void main() {
     });
   });
 
-  test('slice src to full dst port to port same hierarchy', () async {
+  test('slice src to full dst port to port same hierarchy', () {
     final sub1 = BridgeModule('sub1')
       ..createPort('mySrc', PortDirection.output, width: 16)
       ..createPort('clk', PortDirection.input);

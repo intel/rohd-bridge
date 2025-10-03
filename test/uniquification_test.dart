@@ -46,7 +46,7 @@ void main() {
       expect(top.outputs.length, 2);
     });
 
-    test('uniq disabled at module causes error', () async {
+    test('uniq disabled at module causes error', () {
       final leaf1 = BridgeModule('leaf')..addOutput('a');
       final leaf2 = BridgeModule('leaf')..addOutput('a');
       final mid = BridgeModule('mid', allowUniquification: false)
@@ -206,7 +206,7 @@ void main() {
       expect(top.tryOutput('intfA_portFromProvider'), isNotNull);
     });
 
-    test('uniq disabled at module causes error', () async {
+    test('uniq disabled at module causes error', () {
       final leaf1 = BridgeModule('leaf')
         ..addInterface(MyIntf(), name: 'myIntf', role: PairRole.provider);
       final leaf2 = BridgeModule('leaf')

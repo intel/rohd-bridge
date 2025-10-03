@@ -15,7 +15,7 @@ import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('simple port tie off to 0', () async {
+  test('simple port tie off to 0', () {
     final mod = BridgeModule('mod')
       ..addInput('apple', null)
       ..addOutput('banana');
