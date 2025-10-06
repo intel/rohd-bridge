@@ -102,11 +102,15 @@ level.</p>
 
   BridgeModule? commonParent;
 
+  final driverIsReceiver = driver.module == receiver.module;
+
   final driverContainsReceiver =
-      driver.module.getHierarchyDownTo(receiver.module) != null;
+      (driver.module.getHierarchyDownTo(receiver.module) != null) &amp;&amp;
+          !driverIsReceiver;
 
   final receiverContainsDriver =
-      receiver.module.getHierarchyDownTo(driver.module) != null;
+      (receiver.module.getHierarchyDownTo(driver.module) != null) &amp;&amp;
+          !driverIsReceiver;
 
   if (!driverContainsReceiver &amp;&amp;
       !receiverContainsDriver &amp;&amp;

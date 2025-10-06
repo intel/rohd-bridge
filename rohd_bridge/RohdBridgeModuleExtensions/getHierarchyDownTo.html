@@ -67,7 +67,7 @@
 <code>instance</code>, where the first element is <code>this</code> and the last element is
 <code>instance</code>.</p>
 <p>If there is no path found, returns <code>null</code>. If <code>instance</code> is the same as
-<code>this</code>, returns <code>null</code>.</p>
+<code>this</code>, returns a list with just the one module in it.</p>
 </section>
 
 
@@ -76,7 +76,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">List&lt;Module&gt;? getHierarchyDownTo(Module instance) {
   if (instance == this) {
-    return null;
+    return [this];
   }
 
   Module? parent = instance;
