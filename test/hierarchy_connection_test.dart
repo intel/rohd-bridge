@@ -254,8 +254,11 @@ void main() {
     expect(mod2.port('apple').port.value, LogicValue.of('z1zz'));
   });
 
-  test('hierarchy down to is null for same module', () {
+  test('hierarchy down to is itself for same module', () {
     final mod1 = BridgeModule('mod1');
-    expect(mod1.getHierarchyDownTo(mod1), isNull);
+    final hier = mod1.getHierarchyDownTo(mod1);
+    expect(hier, isNotNull);
+    expect(hier!.length, 1);
+    expect(hier, contains(mod1));
   });
 }

@@ -1121,11 +1121,15 @@ void connectPorts(
 
   BridgeModule? commonParent;
 
+  final driverIsReceiver = driver.module == receiver.module;
+
   final driverContainsReceiver =
-      driver.module.getHierarchyDownTo(receiver.module) != null;
+      (driver.module.getHierarchyDownTo(receiver.module) != null) &&
+          !driverIsReceiver;
 
   final receiverContainsDriver =
-      receiver.module.getHierarchyDownTo(driver.module) != null;
+      (receiver.module.getHierarchyDownTo(driver.module) != null) &&
+          !driverIsReceiver;
 
   if (!driverContainsReceiver &&
       !receiverContainsDriver &&

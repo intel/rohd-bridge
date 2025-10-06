@@ -101,10 +101,10 @@ extension RohdBridgeModuleExtensions on Module {
   /// [instance].
   ///
   /// If there is no path found, returns `null`. If [instance] is the same as
-  /// `this`, returns `null`.
+  /// `this`, returns a list with just the one module in it.
   List<Module>? getHierarchyDownTo(Module instance) {
     if (instance == this) {
-      return null;
+      return [this];
     }
 
     Module? parent = instance;
