@@ -116,9 +116,10 @@ handles directionality of ports appropriately.</p>
   }
 
   if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
-      direction == PortDirection.input) {
+      direction == PortDirection.input &amp;&amp;
+      other.direction == PortDirection.input) {
     throw RohdBridgeException(
-        &#39;An port $other on module ${other.module} cannot drive an&#39;
+        &#39;An input port $other on module ${other.module} cannot drive an&#39;
         &#39; input $this on the same module&#39;);
   }
 
