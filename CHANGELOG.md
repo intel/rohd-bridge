@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Fixed a limitation where loop-back from an output to an input on the same module was illegal (<https://github.com/intel/rohd-bridge/pull/21>).
+
 ## 0.1.2
 
 - Improved error messages and exceptions when illegal connections are made in ROHD Bridge, reducing how frequently you get a lower-level ROHD connection error.
