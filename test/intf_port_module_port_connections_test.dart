@@ -192,7 +192,8 @@ void main() {
 
                     if (testCase.relativePosition ==
                             _RelativePosition.sameModule &&
-                        testCase.dst.direction == PortDirection.input) {
+                        testCase.dst.direction == PortDirection.input &&
+                        testCase.src.direction == PortDirection.input) {
                       // port cant drive input on same module
                       expectFailure = true;
                     }

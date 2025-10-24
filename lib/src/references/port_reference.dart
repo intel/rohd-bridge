@@ -135,9 +135,10 @@ sealed class PortReference extends Reference {
     }
 
     if (relativeLocation == _RelativePortLocation.sameModule &&
-        direction == PortDirection.input) {
+        direction == PortDirection.input &&
+        other.direction == PortDirection.input) {
       throw RohdBridgeException(
-          'An port $other on module ${other.module} cannot drive an'
+          'An input port $other on module ${other.module} cannot drive an'
           ' input $this on the same module');
     }
 
@@ -275,7 +276,13 @@ sealed class PortReference extends Reference {
           }
         }
 
-        return (driver: other._internalPort, receiver: _internalPort);
+        if (direction == PortDirection.input &&
+            other.direction == PortDirection.output) {
+          // loop-back
+          return (driver: other._externalPort, receiver: _externalPort);
+        } else {
+          return (driver: other._internalPort, receiver: _internalPort);
+        }
 
       case _RelativePortLocation.sameLevel:
         return (driver: other._externalPort, receiver: _externalPort);
@@ -322,7 +329,13 @@ sealed class PortReference extends Reference {
           }
         }
 
-        return other._internalPortSubset;
+        if (direction == PortDirection.input &&
+            other.direction == PortDirection.output) {
+          // loop-back
+          return other._externalPortSubset;
+        } else {
+          return other._internalPortSubset;
+        }
 
       case _RelativePortLocation.sameLevel:
         return other._externalPortSubset;
