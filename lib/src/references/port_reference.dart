@@ -165,14 +165,18 @@ sealed class PortReference extends Reference {
   @internal
   void getsInternal(PortReference other);
 
-  /// Connects this port to be driven by a [Logic] signal.
+  /// Connects this port to be driven by a [Logic] [other].
   ///
-  /// This is a direct connection where the [Logic] signal drives this port.
+  /// This is a direct connection where the [Logic] signal drives this
+  /// reference. Prefer to use [gets] or other higher-level connection methods
+  /// when possible.
   void getsLogic(Logic other);
 
-  /// Drives a [Logic] signal with this port's value.
+  /// Drives a [Logic] [other] with this port.
   ///
-  /// This connects the [other] signal to be driven by this port.
+  /// This directly connects the [other] signal to be driven by this reference.
+  /// Prefer to use [gets] or other higher-level connection methods when
+  /// possible.
   void drivesLogic(Logic other);
 
   /// Creates a slice of this port from [endIndex] down to [startIndex].
