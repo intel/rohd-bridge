@@ -68,8 +68,10 @@
     </section>
     
 <section class="desc markdown">
-  <p>Connects this port to be driven by a <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> signal.</p>
-<p>This is a direct connection where the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> signal drives this port.</p>
+  <p>Connects this port to be driven by a <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> <code>other</code>.</p>
+<p>This is a direct connection where the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Logic-class.html">Logic</a> signal drives this
+reference. Prefer to use <a href="../../rohd_bridge/PortReference/gets.html">gets</a> or other higher-level connection methods
+when possible.</p>
 </section>
 
 
@@ -107,7 +109,7 @@ void getsLogic(Logic other) {
 <footer>
   <span class="no-break">
     rohd_bridge
-      0.1.3
+      0.1.4
   </span>
   
 </footer>
