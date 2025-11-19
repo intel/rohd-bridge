@@ -93,4 +93,18 @@ west  west(.myInput(myInput));'''));
             '})),.clk(clk));'));
     expect(sv, contains('leaf1  leaf1(.out_bit(merged_bits_subset[1]));'));
   });
+
+  test('unconnected ports left unconnected', () async {
+    final top = BridgeModule('top');
+    final modA = top.addSubModule(BridgeModule('modA')
+      ..addInput('in_port', null)
+      ..addOutput('out_port'));
+    top.pullUpPort(modA.port('in_port'));
+
+    await top.build();
+
+    final sv = top.generateSynth();
+
+    expect(sv, contains('modA(.in_port(modA_in_port),.out_port());'));
+  });
 }
