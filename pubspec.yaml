@@ -13,7 +13,11 @@ dependencies:
   collection: ^1.15.0
   logging: ^1.2.0
   meta: ^1.15.0
-  rohd: ^0.6.6
+  rohd: ^0.6.6 # TODO: need to update to ^0.6.7 when available
 
 dev_dependencies:
   test: ^1.16.0
+
+dependency_overrides: 
+  rohd:
+    path: ../rohd
