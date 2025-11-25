@@ -16,7 +16,7 @@ import 'package:rohd_bridge/src/references/reference.dart';
 class ConstReference extends Reference {
   final LogicValue value;
 
-  ConstReference(super.module, this.value);
+  ConstReference(this.value) : super(null);
 
   @override
   String toString() => 'Const($value)';
@@ -83,7 +83,7 @@ class TieOffConnection extends Connection<Reference> {
 
   @override
   String toString() => '$point1 x--> '
-      '${point2.module.name}.$point2';
+      '${point2.module!.name}.$point2';
 }
 
 /// A connection between two [PortReference]s or [ConstReference]s.
@@ -168,7 +168,7 @@ class _ConnectionSliceTracking {
 
   /// Converts the [src] to a [PortReference].
   Reference toSrcRef() => src is Const
-      ? ConstReference(src.parentModule! as BridgeModule, src.value)
+      ? ConstReference(src.value)
       : PortReference.fromPort(src).slice(srcHighIndex, srcLowIndex);
 
   /// Converts the [dst] to a [PortReference].
@@ -421,13 +421,14 @@ class ConnectionExtractor {
                   ));
 
           final otherModule = srcRef.module;
-          final otherModIsIntfConn = connections
-              .whereType<InterfaceConnection>()
-              .map((e) => e.pointForModule(otherModule))
-              .nonNulls
-              .any((intfRef) => intfRef.portMaps.any(
-                    (pm) => pm.port == srcRef,
-                  ));
+          final otherModIsIntfConn = otherModule != null &&
+              connections
+                  .whereType<InterfaceConnection>()
+                  .map((e) => e.pointForModule(otherModule))
+                  .nonNulls
+                  .any((intfRef) => intfRef.portMaps.any(
+                        (pm) => pm.port == srcRef,
+                      ));
 
           if (thisModIsIntfConn && otherModIsIntfConn) {
             // if both modules are already connected via an interface, skip

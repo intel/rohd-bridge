@@ -81,6 +81,9 @@ class InterfaceReference<InterfaceType extends PairInterface>
       map.isConnected &&
       map.interfacePort is! SlicePortReference));
 
+  @override
+  BridgeModule get module => super.module!;
+
   /// Creates a new interface reference.
   ///
   /// This constructor should only be called by [BridgeModule] when adding an
@@ -91,7 +94,8 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// [portUniquify] is provided, it will be used to generate unique port names
   /// for the internal interface.
   @internal
-  InterfaceReference(this.name, super.module, this.interface, this.role,
+  InterfaceReference(
+      this.name, BridgeModule super.module, this.interface, this.role,
       {required bool connect,
       required String Function(String logical)? portUniquify}) {
     if (connect) {

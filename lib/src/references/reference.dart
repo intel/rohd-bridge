@@ -20,7 +20,7 @@ import 'package:rohd_bridge/rohd_bridge.dart';
 class Reference {
   // TODO(mkorbel1): can this be normal `Module`?
   /// The [BridgeModule] that this reference belongs to.
-  final BridgeModule module;
+  final BridgeModule? module;
 
   /// Creates a new [Reference] for the given [module].
   const Reference(this.module);
