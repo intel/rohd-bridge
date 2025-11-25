@@ -13,6 +13,15 @@ import 'package:rohd/rohd.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:rohd_bridge/src/references/reference.dart';
 
+class ConstReference extends Reference {
+  final LogicValue value;
+
+  ConstReference(super.module, this.value);
+
+  @override
+  String toString() => 'Const($value)';
+}
+
 /// Represents a connection between two [Reference]s.
 @immutable
 abstract class Connection<RefType extends Reference> {
@@ -66,12 +75,43 @@ class InterfaceConnection extends Connection<InterfaceReference> {
       '${point2.module.name}.$point2';
 }
 
-/// A connection between two [PortReference]s.
+class TieOffConnection extends Connection<Reference> {
+  /// Creates a new [TieOffConnection] between a [PortReference] and a
+  /// [ConstReference].
+  const TieOffConnection(
+      ConstReference super.point1, PortReference super.point2);
+
+  @override
+  String toString() => '$point1 x--> '
+      '${point2.module.name}.$point2';
+}
+
+/// A connection between two [PortReference]s or [ConstReference]s.
 @immutable
 class AdHocConnection extends Connection<PortReference> {
   /// The source driver port of the connection.
-  PortReference get src =>
-      point1.direction == PortDirection.output ? point1 : point2;
+  PortReference get src {
+    final p1ContainsP2 =
+        point1.module.getHierarchyDownTo(point2.module) != null;
+    final p2ContainsP1 =
+        point2.module.getHierarchyDownTo(point1.module) != null;
+
+    if (p1ContainsP2) {
+      if (point1.direction == PortDirection.output) {
+        return point2;
+      } else {
+        return point1;
+      }
+    } else if (p2ContainsP1) {
+      if (point2.direction == PortDirection.output) {
+        return point1;
+      } else {
+        return point2;
+      }
+    }
+
+    return point1.direction == PortDirection.output ? point1 : point2;
+  }
 
   /// The destination load port of the connection.
   PortReference get dst => src == point1 ? point2 : point1;
@@ -127,8 +167,9 @@ class _ConnectionSliceTracking {
   BridgeModule get dstModule => dst.parentModule! as BridgeModule;
 
   /// Converts the [src] to a [PortReference].
-  PortReference toSrcRef() =>
-      PortReference.fromPort(src).slice(srcHighIndex, srcLowIndex);
+  Reference toSrcRef() => src is Const
+      ? ConstReference(src.parentModule! as BridgeModule, src.value)
+      : PortReference.fromPort(src).slice(srcHighIndex, srcLowIndex);
 
   /// Converts the [dst] to a [PortReference].
   PortReference toDstRef() =>
@@ -350,6 +391,7 @@ class ConnectionExtractor {
   /// Finds all [AdHocConnection]s between the [modules].
   void _findAdHocConnections() {
     final adHocConnections = <AdHocConnection>[];
+    final tieOffConnections = <TieOffConnection>[];
     for (final module in modules) {
       for (final port in [
         ...module.inputs.values,
@@ -384,14 +426,24 @@ class ConnectionExtractor {
             continue;
           }
 
-          adHocConnections.add(AdHocConnection(srcRef, dstRef));
+          switch (srcRef) {
+            case ConstReference():
+              tieOffConnections.add(TieOffConnection(srcRef, dstRef));
+            case PortReference():
+              adHocConnections.add(AdHocConnection(srcRef, dstRef));
+            default:
+              throw RohdBridgeException(
+                  'Invalid source reference type $srcRef');
+          }
         }
       }
     }
 
-    _connections.addAll(
-      AdHocConnection._simplify(adHocConnections),
-    );
+    _connections
+      ..addAll(
+        AdHocConnection._simplify(adHocConnections),
+      )
+      ..addAll(tieOffConnections);
   }
 
   /// Follows backwards from a [load], assumed to be an input or inOut port (or
@@ -573,6 +625,11 @@ class ConnectionExtractor {
   }) {
     final foundTrackings = <_ConnectionSliceTracking>[];
 
+    if (src is Const) {
+      foundTrackings.add(loadTracking.copyWith(src: src));
+      return foundTrackings;
+    }
+
     if (src.isPort) {
       final srcMod = src.parentModule!;
       if (modules.contains(srcMod)) {
@@ -709,8 +766,6 @@ class ConnectionExtractor {
             dstLowIndex: currNewDstLowIndex,
             dstHighIndex: currNewDstHighIndex,
           );
-
-          // assert(!newLoadTracking.toString().contains('DUMMY'));
 
           foundTrackings.add(newLoadTracking);
 
