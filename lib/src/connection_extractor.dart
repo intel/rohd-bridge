@@ -267,14 +267,22 @@ class ConnectionExtractor {
   /// The set of modules to analyze for connections.
   final Set<BridgeModule> modules;
 
+  /// If `true`, then the extracted [connections] will include
+  /// [InterfaceConnection]s. Set this to `false` if you want only ad-hoc
+  /// connections (and tie-offs).
+  final bool includeInterfaceConnections;
+
   /// Creates a new [ConnectionExtractor] for the given [modules] which will
   /// then identify [connections] between them.
-  ConnectionExtractor(Iterable<BridgeModule> modules)
+  ConnectionExtractor(Iterable<BridgeModule> modules,
+      {this.includeInterfaceConnections = true})
       : modules = Set.unmodifiable(modules) {
     // algorithm:
     //  - first, find all full interface-to-interface connections
     //  - then, the remainder can be ad-hoc
-    _findInterfaceConnections();
+    if (includeInterfaceConnections) {
+      _findInterfaceConnections();
+    }
     _findAdHocConnections();
   }
 
