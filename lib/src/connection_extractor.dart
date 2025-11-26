@@ -75,11 +75,18 @@ class InterfaceConnection extends Connection<InterfaceReference> {
       '${point2.module.name}.$point2';
 }
 
-class TieOffConnection extends Connection<Reference> {
+mixin PortDrivenConnection<ReferenceType extends Reference>
+    on Connection<ReferenceType> {
+  PortReference get dst;
+}
+
+class TieOffConnection extends Connection<Reference> with PortDrivenConnection {
   /// Creates a new [TieOffConnection] between a [PortReference] and a
   /// [ConstReference].
   const TieOffConnection(
       ConstReference super.point1, PortReference super.point2);
+
+  PortReference get dst => point2 as PortReference;
 
   @override
   String toString() => '$point1 x--> '
@@ -88,7 +95,8 @@ class TieOffConnection extends Connection<Reference> {
 
 /// A connection between two [PortReference]s or [ConstReference]s.
 @immutable
-class AdHocConnection extends Connection<PortReference> {
+class AdHocConnection extends Connection<PortReference>
+    with PortDrivenConnection {
   /// The source driver port of the connection.
   PortReference get src {
     final p1ContainsP2 =
