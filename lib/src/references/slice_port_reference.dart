@@ -545,15 +545,21 @@ class SlicePortReference extends PortReference {
     final receiverDriver = Logic(width: endIdx - startIdx + 1);
     receiverDriver <= other;
 
-    if (receiver is LogicArray && hasSlicing) {
-      final receivers = receiver.elements
-          .getRange(receiverStartIdx, receiverStartIdx + _sliceCount!);
-      var incrIndex = 0;
-      for (final r in receivers) {
-        r <= receiverDriver.getRange(incrIndex, incrIndex + r.width);
-        incrIndex += r.width;
+    if (receiver is LogicArray) {
+      if (hasSlicing) {
+        final receivers = receiver.elements
+            .getRange(receiverStartIdx, receiverStartIdx + _sliceCount!);
+        var incrIndex = 0;
+        for (final r in receivers) {
+          r <= receiverDriver.getRange(incrIndex, incrIndex + r.width);
+          incrIndex += r.width;
+        }
+      } else {
+        // this is a full sub-array
+        receiver <= receiverDriver;
       }
     } else {
+      //TODO BUG!  The total width will match here, but element count wont necessarily
       receiver.assignSubset(receiverDriver.elements, start: receiverStartIdx);
     }
   }
