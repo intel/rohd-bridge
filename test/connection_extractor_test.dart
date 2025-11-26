@@ -1079,4 +1079,21 @@ void main() {
           )));
     });
   });
+
+  test('const connection extraction', () async {
+    final top = BridgeModule('top');
+    final subMod = BridgeModule('subMod');
+    final myDst = subMod.createPort('myDst', PortDirection.input, width: 8);
+    top.addSubModule(subMod);
+
+    myDst.slice(4, 3).tieOff(3);
+    top.pullUpPort(myDst.slice(6, 5));
+
+    await top.build();
+    print(top.generateSynth());
+
+    final extractor = ConnectionExtractor([top, subMod]);
+
+    print(extractor.connections.toList().join('\n'));
+  });
 }

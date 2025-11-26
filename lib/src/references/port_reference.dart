@@ -42,7 +42,10 @@ sealed class PortReference extends Reference {
   /// The direction of the port (input, output, or inOut).
   late final PortDirection direction = PortDirection.ofPort(port);
 
-  PortReference._(super.module, this.portName);
+  @override
+  BridgeModule get module => super.module!;
+
+  PortReference._(BridgeModule super.module, this.portName);
 
   /// Creates a [PortReference] from a [BridgeModule] and a port reference
   /// string.
