@@ -595,4 +595,37 @@ class SlicePortReference extends PortReference {
       sliceUpperIndex: newUpperIndex,
     );
   }
+
+  /// The parent [PortReference] of this [SlicePortReference], with slicing or
+  /// the least significant dimension removed.
+  ///
+  /// For example, if this reference is `myPort[2][3:1]`, the parent reference
+  /// would be `myPort[2]`.  If the reference is `myPort[7:0]`, the parent
+  /// reference would be `myPort`. If the reference is `myPort[3][2][1]`, the
+  /// parent reference would be `myPort[3][2]`.
+  ///
+  /// If there are no slices or dimension accesses left, then `null` is
+  /// returned.
+  PortReference? get parentPortReference {
+    final List<int>? newDimensionAccess;
+
+    if (hasSlicing) {
+      newDimensionAccess = dimensionAccess;
+    } else if (dimensionAccess != null && dimensionAccess!.isNotEmpty) {
+      newDimensionAccess =
+          dimensionAccess!.sublist(0, dimensionAccess!.length - 1);
+    } else {
+      return null;
+    }
+
+    if (newDimensionAccess != null && newDimensionAccess.isNotEmpty) {
+      return SlicePortReference(
+        module,
+        portName,
+        dimensionAccess: newDimensionAccess,
+      );
+    } else {
+      return StandardPortReference(module, portName);
+    }
+  }
 }
