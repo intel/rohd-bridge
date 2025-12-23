@@ -46,8 +46,8 @@ void main() {
       ..addInput('apple', null, width: 4)
       ..addOutput('banana', width: 4);
 
-    mod.port('apple').tieOff('01xz');
-    mod.port('banana').tieOff('01xz');
+    mod.port('apple').tieOff(value: '01xz');
+    mod.port('banana').tieOff(value: '01xz');
 
     expect(mod.input('apple').value, LogicValue.of('01xz'));
     expect(mod.output('banana').value, LogicValue.of('01xz'));
@@ -56,7 +56,7 @@ void main() {
   test('tieOff an output and verify RTL', () async {
     final mod = BridgeModule('mod')..addOutput('banana', width: 4);
 
-    mod.port('banana').tieOff('10xz');
+    mod.port('banana').tieOff(value: '10xz');
 
     final top = BridgeModule('top')
       ..addSubModule(mod)

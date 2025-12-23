@@ -1086,7 +1086,7 @@ void main() {
     final myDst = subMod.createPort('myDst', PortDirection.input, width: 8);
     top.addSubModule(subMod);
 
-    myDst.slice(4, 3).tieOff(3);
+    myDst.slice(4, 3).tieOff(value: 3);
     top.pullUpPort(myDst.slice(6, 5));
 
     await top.build();

@@ -1,3 +1,7 @@
+## 0.2.0
+
+- Breaking: `PortReference.tieOff` and `BridgeModule.tieOffInterface` now accept `value` as a named argument instead of an optional positional argument to support additional arguments (e.g. `fill`).
+
 ## 0.1.4
 
 - Fixed a bug where unpacked array dimensions would be converted to packed dimensions when replicating or pulling up ports (<https://github.com/intel/rohd-bridge/pull/24>).

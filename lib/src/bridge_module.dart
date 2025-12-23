@@ -812,7 +812,8 @@ class BridgeModule extends Module with SystemVerilog {
       intfPort.interfaceReference.addPortMap(intfPort, port, connect: connect);
 
   /// Tie off input ports of [intfRef] from to [value].
-  void tieOffInterface(InterfaceReference intfRef, dynamic value) {
+  void tieOffInterface(InterfaceReference intfRef,
+      {dynamic value = 0, bool fill = false}) {
     final intf = intfRef.interface;
     final intfRole = intfRef.role;
 
@@ -823,7 +824,7 @@ class BridgeModule extends Module with SystemVerilog {
         .keys;
 
     for (final portName in portNames) {
-      intfRef.port(portName).tieOff(value);
+      intfRef.port(portName).tieOff(value: value);
     }
   }
 

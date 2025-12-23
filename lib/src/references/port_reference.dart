@@ -358,8 +358,9 @@ sealed class PortReference extends Reference {
   /// The [value] can be any type that can be used to construct a [Const], such
   /// as an integer, boolean, or [LogicValue]. If no value is provided, the port
   /// will be tied to 0.
-  void tieOff([dynamic value = 0]) {
-    getsLogic(Const(value, width: width));
+  void tieOff({dynamic value = 0, bool fill = false}) {
+    getsLogic(Const(value, width: width, fill: fill)
+        .named('tieoff_const$value', naming: Naming.mergeable));
   }
 
   /// The bit width of this port reference.
