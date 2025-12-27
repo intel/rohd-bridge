@@ -18,8 +18,7 @@ import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('Get Int test', skip: 'Pending https://github.com/intel/rohd/issues/616',
-      () {
+  test('Get Int test', () {
     const binVal = "12'b111010100011";
     const hexVal = "12'hABC";
     const intVal = "12'd3445";
