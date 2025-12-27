@@ -74,11 +74,11 @@
 instantiation.</p>
 <p>The <code>instanceType</code> and <code>instanceName</code> represent the type and name,
 respectively of the module that would have been instantiated had it not
-been overridden.  <code>ports</code> is a mapping from the <a href="https://pub.dev/documentation/rohd/0.6.6/rohd/Module-class.html">Module</a>'s port names to
+been overridden.  <code>ports</code> is a mapping from the <a href="https://pub.dev/documentation/rohd/0.6.7/rohd/Module-class.html">Module</a>'s port names to
 the names of the signals that are passed into those ports in the generated
 SystemVerilog.</p>
 <p>If a standard instantiation is desired, either return <code>null</code> or use
-<a href="https://pub.dev/documentation/rohd/0.6.6/rohd/SystemVerilogSynthesizer/instantiationVerilogFor.html">SystemVerilogSynthesizer.instantiationVerilogFor</a> with
+<a href="https://pub.dev/documentation/rohd/0.6.7/rohd/SystemVerilogSynthesizer/instantiationVerilogFor.html">SystemVerilogSynthesizer.instantiationVerilogFor</a> with
 <code>forceStandardInstantiation</code> set to <code>true</code>.  By default, <code>null</code> is
 returned and thus a standard instantiation is used.</p>
 </section>

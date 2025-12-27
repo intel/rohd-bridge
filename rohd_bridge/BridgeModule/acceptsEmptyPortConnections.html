@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the drivesLogic method from the InterfacePortReference mixin, for the Dart programming language.">
-  <title>drivesLogic method - InterfacePortReference mixin - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the acceptsEmptyPortConnections property from the BridgeModule class, for the Dart programming language.">
+  <title>acceptsEmptyPortConnections property - BridgeModule class - rohd_bridge library - Dart API</title>
 
 
   
@@ -26,10 +26,10 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
-    <li><a href="../../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></li>
-    <li class="self-crumb">drivesLogic abstract method</li>
+    <li><a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></li>
+    <li class="self-crumb">acceptsEmptyPortConnections property</li>
   </ol>
-  <div class="self-name">drivesLogic</div>
+  <div class="self-name">acceptsEmptyPortConnections</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,40 +46,54 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="rohd_bridge&#47;InterfacePortReference-mixin-sidebar.html"
+    data-above-sidebar="rohd_bridge&#47;BridgeModule-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">drivesLogic</span> abstract method 
+<h1><span class="kind-property">acceptsEmptyPortConnections</span> property 
 </h1></div>
 
+    
+
+    
+        
+  <section id="getter">
     <section class="multi-line-signature">
       
-<span class="returntype">void</span>
-<span class="name ">drivesLogic</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="drivesLogic-param-other"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.7/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">other</span></span></li>
-</ol>)
-
-      <div class="features"><span class="feature">inherited</span></div>
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/stable/3.10.7/dart-core/override-constant.html">override</a></li>
+    </ol>
+  </div>
+      <span class="returntype"><a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span>
+      get
+      <span class="name ">acceptsEmptyPortConnections</span>
+      <div class="features"><span class="feature">override</span></div>
 
     </section>
     
 <section class="desc markdown">
-  <p>Drives a <a href="https://pub.dev/documentation/rohd/0.6.7/rohd/Logic-class.html">Logic</a> <code>other</code> with this port.</p>
-<p>This directly connects the <code>other</code> signal to be driven by this reference.
-Prefer to use <a href="../../rohd_bridge/PortReference/gets.html">gets</a> or other higher-level connection methods when
-possible.</p>
+  <p>Indicates whether this module accepts empty port connections when being
+instantiated in SystemVerilog.</p>
+<p>This may be safely set to <code>true</code> in cases where the instantiation verilog
+can accept port connections like <code>.port_name()</code> where no signal is
+connected to that port.</p>
 </section>
-
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void drivesLogic(Logic other);</code></pre>
+  <pre class="language-dart"><code class="language-dart">@override
+&#47;&#47; since we have a &quot;normal&quot; `instantiationVerilog` that has module
+&#47;&#47; instantiation ports, we can accept empty port connections
+bool get acceptsEmptyPortConnections =&gt; true;</code></pre>
 </section>
 
+  </section>
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -88,14 +102,14 @@ possible.</p>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
-    <li><a href="../../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></li>
-    <li class="self-crumb">drivesLogic abstract method</li>
+    <li><a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></li>
+    <li class="self-crumb">acceptsEmptyPortConnections property</li>
 </ol>
 
-    <h5>InterfacePortReference mixin</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>BridgeModule class</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div><!--/.sidebar-offcanvas-->
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
 </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>
