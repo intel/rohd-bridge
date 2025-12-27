@@ -13,10 +13,15 @@ import 'package:rohd/rohd.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:rohd_bridge/src/references/reference.dart';
 
+/// A reference to a constant value.
 class ConstReference extends Reference {
+  /// The constant value.
   final LogicValue value;
 
-  ConstReference(this.value) : super(null);
+  /// Creates a new [ConstReference] with the given [value] and belonging to
+  /// the specified [module].
+  @internal
+  ConstReference(this.value, {required BridgeModule module}) : super(module);
 
   @override
   String toString() => 'Const($value)';
@@ -75,22 +80,30 @@ class InterfaceConnection extends Connection<InterfaceReference> {
       '${point2.module.name}.$point2';
 }
 
+/// A mixin for connections that are a single port driven by a signal (as
+/// opposed to an interface.)
 mixin PortDrivenConnection<ReferenceType extends Reference>
     on Connection<ReferenceType> {
+  /// The destination load port of the connection.
   PortReference get dst;
 }
 
+/// A connection that represents a tie-off with a constant value.
 class TieOffConnection extends Connection<Reference> with PortDrivenConnection {
   /// Creates a new [TieOffConnection] between a [PortReference] and a
   /// [ConstReference].
   const TieOffConnection(
       ConstReference super.point1, PortReference super.point2);
 
+  /// The source constant value of the connection.
+  ConstReference get src => point1 as ConstReference;
+
+  @override
   PortReference get dst => point2 as PortReference;
 
   @override
   String toString() => '$point1 x--> '
-      '${point2.module!.name}.$point2';
+      '${point2.module.name}.$point2';
 }
 
 /// A connection between two [PortReference]s or [ConstReference]s.
@@ -122,6 +135,7 @@ class AdHocConnection extends Connection<PortReference>
   }
 
   /// The destination load port of the connection.
+  @override
   PortReference get dst => src == point1 ? point2 : point1;
 
   /// Indicates whether this connection is a net connection (i.e., both
@@ -176,7 +190,7 @@ class _ConnectionSliceTracking {
 
   /// Converts the [src] to a [PortReference].
   Reference toSrcRef() => src is Const
-      ? ConstReference(src.value)
+      ? ConstReference(src.value, module: srcModule)
       : PortReference.fromPort(src).slice(srcHighIndex, srcLowIndex);
 
   /// Converts the [dst] to a [PortReference].
@@ -429,14 +443,13 @@ class ConnectionExtractor {
                   ));
 
           final otherModule = srcRef.module;
-          final otherModIsIntfConn = otherModule != null &&
-              connections
-                  .whereType<InterfaceConnection>()
-                  .map((e) => e.pointForModule(otherModule))
-                  .nonNulls
-                  .any((intfRef) => intfRef.portMaps.any(
-                        (pm) => pm.port == srcRef,
-                      ));
+          final otherModIsIntfConn = connections
+              .whereType<InterfaceConnection>()
+              .map((e) => e.pointForModule(otherModule))
+              .nonNulls
+              .any((intfRef) => intfRef.portMaps.any(
+                    (pm) => pm.port == srcRef,
+                  ));
 
           if (thisModIsIntfConn && otherModIsIntfConn) {
             // if both modules are already connected via an interface, skip

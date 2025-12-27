@@ -1090,10 +1090,25 @@ void main() {
     top.pullUpPort(myDst.slice(6, 5));
 
     await top.build();
-    print(top.generateSynth());
 
     final extractor = ConnectionExtractor([top, subMod]);
 
-    print(extractor.connections.toList().join('\n'));
+    final connections = extractor.connections;
+    expect(connections.whereType<TieOffConnection>().length, 2);
+
+    expect(
+        connections
+            .whereType<TieOffConnection>()
+            .firstWhere((e) => e.dst.toString().contains('myDst[3]'))
+            .src
+            .value,
+        LogicValue.ofString('11'));
+    expect(
+        connections
+            .whereType<TieOffConnection>()
+            .firstWhere((e) => e.dst.toString().contains('myDst[4]'))
+            .src
+            .value,
+        LogicValue.ofString('11'));
   });
 }

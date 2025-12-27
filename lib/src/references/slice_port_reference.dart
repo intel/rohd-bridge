@@ -78,9 +78,6 @@ class SlicePortReference extends PortReference {
   /// index like `[3]`.
   bool get hasSlicing => sliceUpperIndex != null && sliceLowerIndex != null;
 
-  @override
-  BridgeModule get module => super.module!;
-
   /// Creates a slice port reference with the specified parameters.
   ///
   /// The [dimensionAccess] list contains indices for multi-dimensional array
@@ -559,7 +556,6 @@ class SlicePortReference extends PortReference {
         receiver <= receiverDriver;
       }
     } else {
-      //TODO BUG!  The total width will match here, but element count wont necessarily
       receiver.assignSubset(receiverDriver.elements, start: receiverStartIdx);
     }
   }
