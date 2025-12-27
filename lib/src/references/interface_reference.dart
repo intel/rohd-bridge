@@ -559,6 +559,10 @@ extension _ExceptPairInterfaceExtensions on PairInterface {
       commonInOutPorts: _getMatchPortsExcept(PairDirection.commonInOuts,
               exceptPorts: exceptPorts)
           .toList(),
+
+      // since we're not actually cloning, just clone all we can, including
+      // deprecated APIs.
+      // ignore: deprecated_member_use
       modify: modify,
     );
   }

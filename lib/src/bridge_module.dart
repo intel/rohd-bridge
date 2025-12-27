@@ -66,6 +66,11 @@ class BridgeModule extends Module with SystemVerilog {
       : DefinitionGenerationType.standard;
 
   @override
+  // since we have a "normal" `instantiationVerilog` that has module
+  // instantiation ports, we can accept empty port connections
+  bool get acceptsEmptyPortConnections => true;
+
+  @override
   String instantiationVerilog(
     String instanceType,
     String instanceName,
