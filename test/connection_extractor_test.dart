@@ -1079,4 +1079,36 @@ void main() {
           )));
     });
   });
+
+  test('const connection extraction', () async {
+    final top = BridgeModule('top');
+    final subMod = BridgeModule('subMod');
+    final myDst = subMod.createPort('myDst', PortDirection.input, width: 8);
+    top.addSubModule(subMod);
+
+    myDst.slice(4, 3).tieOff(value: 3);
+    top.pullUpPort(myDst.slice(6, 5));
+
+    await top.build();
+
+    final extractor = ConnectionExtractor([top, subMod]);
+
+    final connections = extractor.connections;
+    expect(connections.whereType<TieOffConnection>().length, 2);
+
+    expect(
+        connections
+            .whereType<TieOffConnection>()
+            .firstWhere((e) => e.dst.toString().contains('myDst[3]'))
+            .src
+            .value,
+        LogicValue.ofString('11'));
+    expect(
+        connections
+            .whereType<TieOffConnection>()
+            .firstWhere((e) => e.dst.toString().contains('myDst[4]'))
+            .src
+            .value,
+        LogicValue.ofString('11'));
+  });
 }
