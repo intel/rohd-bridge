@@ -305,6 +305,22 @@ void main() {
       expect(mod.input('apple').value,
           LogicValue.of('${'z' * 4}${'0' * 4}${'0' * 4}${'z' * 4}'));
     });
+
+    test('array gets', () {
+      final mod = BridgeModule('mod')
+        ..addInputArray('apple', null, dimensions: [4], elementWidth: 4);
+
+      mod.port('apple').getsLogic(Const(0, width: 16));
+      expect(mod.input('apple').value, LogicValue.of('0' * 16));
+    });
+
+    test('sub-array gets', () {
+      final mod = BridgeModule('mod')
+        ..addInputArray('apple', null, dimensions: [2, 4], elementWidth: 4);
+
+      mod.port('apple[1]').getsLogic(Const(0, width: 16));
+      expect(mod.input('apple').value, LogicValue.of('${'0' * 16}${'z' * 16}'));
+    });
   });
 
   group('unprovided driver on input creation and registration', () {
