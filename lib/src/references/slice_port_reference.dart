@@ -556,7 +556,6 @@ class SlicePortReference extends PortReference {
         receiver <= receiverDriver;
       }
     } else {
-      //TODO BUG!  The total width will match here, but element count wont necessarily
       receiver.assignSubset(receiverDriver.elements, start: receiverStartIdx);
     }
   }
