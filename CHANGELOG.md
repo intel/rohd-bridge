@@ -1,6 +1,6 @@
 ## 0.2.0
 
-- Breaking: `PortReference.tieOff` and `BridgeModule.tieOffInterface` now accept `value` as a named argument instead of an optional positional argument to support additional arguments (e.g. `fill`).
+- Breaking: `PortReference.tieOff` and `BridgeModule.tieOffInterface` now accept `value` as a named argument instead of a positional argument to support additional arguments (e.g. `fill`).
 
 ## 0.1.4
 

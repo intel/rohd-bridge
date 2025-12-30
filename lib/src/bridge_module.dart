@@ -829,7 +829,7 @@ class BridgeModule extends Module with SystemVerilog {
         .keys;
 
     for (final portName in portNames) {
-      intfRef.port(portName).tieOff(value: value);
+      intfRef.port(portName).tieOff(value: value, fill: fill);
     }
   }
 
