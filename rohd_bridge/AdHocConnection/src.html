@@ -73,8 +73,28 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">PortReference get src =&gt;
-    point1.direction == PortDirection.output ? point1 : point2;</code></pre>
+  <pre class="language-dart"><code class="language-dart">PortReference get src {
+  final p1ContainsP2 =
+      point1.module.getHierarchyDownTo(point2.module) != null;
+  final p2ContainsP1 =
+      point2.module.getHierarchyDownTo(point1.module) != null;
+
+  if (p1ContainsP2) {
+    if (point1.direction == PortDirection.output) {
+      return point2;
+    } else {
+      return point1;
+    }
+  } else if (p2ContainsP1) {
+    if (point2.direction == PortDirection.output) {
+      return point1;
+    } else {
+      return point2;
+    }
+  }
+
+  return point1.direction == PortDirection.output ? point1 : point2;
+}</code></pre>
 </section>
 
   </section>

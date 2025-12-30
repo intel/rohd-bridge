@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the ConnectionExtractor class from the rohd_bridge library, for the Dart programming language.">
-  <title>ConnectionExtractor class - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the ConstReference class from the rohd_bridge library, for the Dart programming language.">
+  <title>ConstReference class - rohd_bridge library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge.dart</a></li>
-    <li class="self-crumb">ConnectionExtractor class</li>
+    <li class="self-crumb">ConstReference class</li>
   </ol>
-  <div class="self-name">ConnectionExtractor</div>
+  <div class="self-name">ConstReference</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,51 +46,26 @@
     id="dartdoc-main-content"
     class="main-content"
     data-above-sidebar="rohd_bridge&#47;rohd_bridge-library-sidebar.html"
-    data-below-sidebar="rohd_bridge&#47;ConnectionExtractor-class-sidebar.html">
+    data-below-sidebar="rohd_bridge&#47;ConstReference-class-sidebar.html">
     <div>
-<h1><span class="kind-class">ConnectionExtractor</span> class 
+<h1><span class="kind-class">ConstReference</span> class 
  
 </h1></div>
 
     
 <section class="desc markdown">
-  <p>Analyzes a set of modules and provides connection information between them.</p>
+  <p>A reference to a constant value.</p>
 </section>
 
 
 
     
-  <section class="summary offset-anchor" id="constructors">
-    <h2>Constructors</h2>
-    <dl class="constructor-summary-list">
-        <dt id="ConnectionExtractor.new" class="callable">
-          <span class="name"><a href="../rohd_bridge/ConnectionExtractor/ConnectionExtractor.html">ConnectionExtractor</a></span><span class="signature">(<span class="parameter" id="-param-modules"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span>&gt;</span></span> <span class="parameter-name">modules</span>, {</span><span class="parameter" id="-param-includeInterfaceConnections"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeInterfaceConnections</span> = <span class="default-value">true</span></span>})</span>
-        </dt>
-        <dd>
-          Creates a new <a href="../rohd_bridge/ConnectionExtractor-class.html">ConnectionExtractor</a> for the given <code>modules</code> which will
-then identify <a href="../rohd_bridge/ConnectionExtractor/connections.html">connections</a> between them.
-        </dd>
-    </dl>
-  </section>
     
   <section
       class="summary offset-anchor"
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
-        <dt id="connections" class="property">
-  <span class="name"><a href="../rohd_bridge/ConnectionExtractor/connections.html">connections</a></span>
-  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../rohd_bridge/Connection-class.html">Connection</a><span class="signature">&lt;<wbr><span class="type-parameter">Reference</span>&gt;</span></span>&gt;</span></span>
-  
-
-</dt>
-<dd>
-  All the connections between <a href="../rohd_bridge/ConnectionExtractor/modules.html">modules</a>, without tracing through any of the
-boundaries of <a href="../rohd_bridge/ConnectionExtractor/modules.html">modules</a>.
-  <div class="features"><span class="feature">no setter</span></div>
-
-</dd>
-
         <dt id="hashCode" class="property inherited">
   <span class="name"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Object/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/int-class.html">int</a></span>
@@ -103,29 +78,15 @@ boundaries of <a href="../rohd_bridge/ConnectionExtractor/modules.html">modules<
 
 </dd>
 
-        <dt id="includeInterfaceConnections" class="property">
-  <span class="name"><a href="../rohd_bridge/ConnectionExtractor/includeInterfaceConnections.html">includeInterfaceConnections</a></span>
-  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span>
+        <dt id="module" class="property inherited">
+  <span class="name"><a href="../rohd_bridge/ConstReference/module.html">module</a></span>
+  <span class="signature">&#8594; <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span>
   
 
 </dt>
-<dd>
-  If <code>true</code>, then the extracted <a href="../rohd_bridge/ConnectionExtractor/connections.html">connections</a> will include
-<a href="../rohd_bridge/InterfaceConnection-class.html">InterfaceConnection</a>s. Set this to <code>false</code> if you want only ad-hoc
-connections (and tie-offs).
-  <div class="features"><span class="feature">final</span></div>
-
-</dd>
-
-        <dt id="modules" class="property">
-  <span class="name"><a href="../rohd_bridge/ConnectionExtractor/modules.html">modules</a></span>
-  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span>&gt;</span></span>
-  
-
-</dt>
-<dd>
-  The set of modules to analyze for connections.
-  <div class="features"><span class="feature">final</span></div>
+<dd class="inherited">
+  The <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a> that this reference belongs to.
+  <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -138,6 +99,18 @@ connections (and tie-offs).
 <dd class="inherited">
   A representation of the runtime type of the object.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="value" class="property">
+  <span class="name"><a href="../rohd_bridge/ConstReference/value.html">value</a></span>
+  <span class="signature">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.7/rohd/LogicValue-class.html">LogicValue</a></span>
+  
+
+</dt>
+<dd>
+  The constant value.
+  <div class="features"><span class="feature">final</span></div>
 
 </dd>
 
@@ -163,16 +136,16 @@ connections (and tie-offs).
 
 </dd>
 
-        <dt id="toString" class="callable inherited">
-  <span class="name"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
+        <dt id="toString" class="callable">
+  <span class="name"><a href="../rohd_bridge/ConstReference/toString.html">toString</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/String-class.html">String</a></span>
   </span>
   
 
 </dt>
-<dd class="inherited">
+<dd>
   A string representation of this object.
-  <div class="features"><span class="feature">inherited</span></div>
+  <div class="features"><span class="feature">override</span></div>
 
 </dd>
 
@@ -214,7 +187,7 @@ connections (and tie-offs).
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge</a></li>
-    <li class="self-crumb">ConnectionExtractor class</li>
+    <li class="self-crumb">ConstReference class</li>
 </ol>
 
     <h5>rohd_bridge library</h5>

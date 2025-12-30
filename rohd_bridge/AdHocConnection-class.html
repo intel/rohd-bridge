@@ -54,7 +54,7 @@
 
     
 <section class="desc markdown">
-  <p>A connection between two <a href="../rohd_bridge/PortReference-class.html">PortReference</a>s.</p>
+  <p>A connection between two <a href="../rohd_bridge/PortReference-class.html">PortReference</a>s or <a href="../rohd_bridge/ConstReference-class.html">ConstReference</a>s.</p>
 </section>
 
 
@@ -72,6 +72,12 @@
 
         
         
+  <dt>Mixed-in types</dt>
+  <dd>
+    <ul class="comma-separated clazz-relationships">
+        <li><a href="../rohd_bridge/PortDrivenConnection-mixin.html">PortDrivenConnection</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>&gt;</span></li>
+    </ul>
+  </dd>
 
 
         
@@ -114,7 +120,7 @@
 </dt>
 <dd>
   The destination load port of the connection.
-  <div class="features"><span class="feature">no setter</span></div>
+  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
 
 </dd>
 

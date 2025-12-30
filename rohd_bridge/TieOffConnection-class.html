@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the Connection class from the rohd_bridge library, for the Dart programming language.">
-  <title>Connection class - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the TieOffConnection class from the rohd_bridge library, for the Dart programming language.">
+  <title>TieOffConnection class - rohd_bridge library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge.dart</a></li>
-    <li class="self-crumb">Connection<span class="signature">&lt;<wbr><span class="type-parameter">RefType extends Reference</span>&gt;</span> class</li>
+    <li class="self-crumb">TieOffConnection class</li>
   </ol>
-  <div class="self-name">Connection</div>
+  <div class="self-name">TieOffConnection</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,42 +46,42 @@
     id="dartdoc-main-content"
     class="main-content"
     data-above-sidebar="rohd_bridge&#47;rohd_bridge-library-sidebar.html"
-    data-below-sidebar="rohd_bridge&#47;Connection-class-sidebar.html">
+    data-below-sidebar="rohd_bridge&#47;TieOffConnection-class-sidebar.html">
     <div>
-<h1><span class="kind-class">Connection&lt;<wbr><span class="type-parameter">RefType extends Reference</span>&gt;</span> class 
-    <a href="https://dart.dev/language/class-modifiers#abstract" class="feature feature-abstract" title="This type can not be directly constructed.">abstract</a>
+<h1><span class="kind-class">TieOffConnection</span> class 
  
 </h1></div>
 
     
 <section class="desc markdown">
-  <p>Represents a connection between two <code>Reference</code>s.</p>
+  <p>A connection that represents a tie-off with a constant value.</p>
 </section>
 
 
     <section>
       <dl class="dl-horizontal">
         
-
-        
-        
-
-          <dt>Implementers</dt>
-          <dd><ul class="comma-separated clazz-relationships">
-              <li><a href="../rohd_bridge/AdHocConnection-class.html">AdHocConnection</a></li>
-              <li><a href="../rohd_bridge/InterfaceConnection-class.html">InterfaceConnection</a></li>
-              <li><a href="../rohd_bridge/PortDrivenConnection-mixin.html">PortDrivenConnection</a></li>
-              <li><a href="../rohd_bridge/TieOffConnection-class.html">TieOffConnection</a></li>
-          </ul></dd>
-
-        
-        
-  <dt>Annotations</dt>
+  <dt>Inheritance</dt>
   <dd>
-    <ul class="annotation-list clazz-relationships">
-        <li>@<a href="https://pub.dev/documentation/meta/1.17.0/meta/immutable-constant.html">immutable</a></li>
+    <ul class="gt-separated dark clazz-relationships">
+      <li><a href="https://api.dart.dev/stable/3.10.7/dart-core/Object-class.html">Object</a></li>
+        <li><a href="../rohd_bridge/Connection-class.html">Connection</a><span class="signature">&lt;<wbr><span class="type-parameter">Reference</span>&gt;</span></li>
+      <li>TieOffConnection</li>
     </ul>
   </dd>
+
+        
+        
+  <dt>Mixed-in types</dt>
+  <dd>
+    <ul class="comma-separated clazz-relationships">
+        <li><a href="../rohd_bridge/PortDrivenConnection-mixin.html">PortDrivenConnection</a><span class="signature">&lt;<wbr><span class="type-parameter">Reference</span>&gt;</span></li>
+    </ul>
+  </dd>
+
+
+        
+        
 
 
       </dl>
@@ -91,11 +91,12 @@
   <section class="summary offset-anchor" id="constructors">
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
-        <dt id="Connection.new" class="callable">
-          <span class="name"><a href="../rohd_bridge/Connection/Connection.html">Connection</a></span><span class="signature">(<span class="parameter" id="-param-point1"><span class="type-annotation">RefType</span> <span class="parameter-name">point1</span>, </span><span class="parameter" id="-param-point2"><span class="type-annotation">RefType</span> <span class="parameter-name">point2</span></span>)</span>
+        <dt id="TieOffConnection.new" class="callable">
+          <span class="name"><a href="../rohd_bridge/TieOffConnection/TieOffConnection.html">TieOffConnection</a></span><span class="signature">(<span class="parameter" id="-param-point1"><span class="type-annotation"><a href="../rohd_bridge/ConstReference-class.html">ConstReference</a></span> <span class="parameter-name">point1</span>, </span><span class="parameter" id="-param-point2"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">point2</span></span>)</span>
         </dt>
         <dd>
-          Creates a new <a href="../rohd_bridge/Connection-class.html">Connection</a> between two <code>RefType</code> points.
+          Creates a new <a href="../rohd_bridge/TieOffConnection-class.html">TieOffConnection</a> between a <a href="../rohd_bridge/PortReference-class.html">PortReference</a> and a
+<a href="../rohd_bridge/ConstReference-class.html">ConstReference</a>.
             <div class="constructor-modifier features">const</div>
         </dd>
     </dl>
@@ -106,39 +107,51 @@
       id="instance-properties">
     <h2>Properties</h2>
     <dl class="properties">
-        <dt id="hashCode" class="property">
+        <dt id="dst" class="property">
+  <span class="name"><a href="../rohd_bridge/TieOffConnection/dst.html">dst</a></span>
+  <span class="signature">&#8594; <a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>
+  
+
+</dt>
+<dd>
+  The destination load port of the connection.
+  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
+
+</dd>
+
+        <dt id="hashCode" class="property inherited">
   <span class="name"><a href="../rohd_bridge/Connection/hashCode.html">hashCode</a></span>
   <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/int-class.html">int</a></span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   The hash code for this object.
-  <div class="features"><span class="feature">no setter</span><span class="feature">override</span></div>
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
 
 </dd>
 
-        <dt id="point1" class="property">
+        <dt id="point1" class="property inherited">
   <span class="name"><a href="../rohd_bridge/Connection/point1.html">point1</a></span>
-  <span class="signature">&#8594; RefType</span>
+  <span class="signature">&#8594; Reference</span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   The first point of the connection.
-  <div class="features"><span class="feature">final</span></div>
+  <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
 
 </dd>
 
-        <dt id="point2" class="property">
+        <dt id="point2" class="property inherited">
   <span class="name"><a href="../rohd_bridge/Connection/point2.html">point2</a></span>
-  <span class="signature">&#8594; RefType</span>
+  <span class="signature">&#8594; Reference</span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   The second point of the connection.
-  <div class="features"><span class="feature">final</span></div>
+  <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -154,6 +167,18 @@
 
 </dd>
 
+        <dt id="src" class="property">
+  <span class="name"><a href="../rohd_bridge/TieOffConnection/src.html">src</a></span>
+  <span class="signature">&#8594; <a href="../rohd_bridge/ConstReference-class.html">ConstReference</a></span>
+  
+
+</dt>
+<dd>
+  The source constant value of the connection.
+  <div class="features"><span class="feature">no setter</span></div>
+
+</dd>
+
     </dl>
   </section>
 
@@ -163,30 +188,30 @@
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
-        <dt id="hasPoint" class="callable">
-  <span class="name"><a href="../rohd_bridge/Connection/hasPoint.html">hasPoint</a></span><span class="signature">(<wbr><span class="parameter" id="hasPoint-param-point"><span class="type-annotation">RefType</span> <span class="parameter-name">point</span></span>)
+        <dt id="hasPoint" class="callable inherited">
+  <span class="name"><a href="../rohd_bridge/Connection/hasPoint.html">hasPoint</a></span><span class="signature">(<wbr><span class="parameter" id="hasPoint-param-point"><span class="type-annotation">Reference</span> <span class="parameter-name">point</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span>
   </span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   Indicates whether <code>point</code> is one of the points in this connection.
-  
+  <div class="features"><span class="feature">inherited</span></div>
 
 </dd>
 
-        <dt id="involvesModule" class="callable">
+        <dt id="involvesModule" class="callable inherited">
   <span class="name"><a href="../rohd_bridge/Connection/involvesModule.html">involvesModule</a></span><span class="signature">(<wbr><span class="parameter" id="involvesModule-param-module"><span class="type-annotation"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span> <span class="parameter-name">module</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span>
   </span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   Indicates whether this connection involves the given <code>module</code> on either of
 its points.
-  
+  <div class="features"><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -203,30 +228,30 @@ its points.
 
 </dd>
 
-        <dt id="pointForModule" class="callable">
+        <dt id="pointForModule" class="callable inherited">
   <span class="name"><a href="../rohd_bridge/Connection/pointForModule.html">pointForModule</a></span><span class="signature">(<wbr><span class="parameter" id="pointForModule-param-module"><span class="type-annotation"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span> <span class="parameter-name">module</span></span>)
-    <span class="returntype parameter">&#8594; RefType?</span>
-  </span>
-  
-
-</dt>
-<dd>
-  Returns the point in this connection that corresponds to the given
-<code>module</code>, or <code>null</code> if this does not <a href="../rohd_bridge/Connection/involvesModule.html">involvesModule</a>.
-  
-
-</dd>
-
-        <dt id="toString" class="callable inherited">
-  <span class="name"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
-    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/String-class.html">String</a></span>
+    <span class="returntype parameter">&#8594; Reference?</span>
   </span>
   
 
 </dt>
 <dd class="inherited">
-  A string representation of this object.
+  Returns the point in this connection that corresponds to the given
+<code>module</code>, or <code>null</code> if this does not <a href="../rohd_bridge/Connection/involvesModule.html">involvesModule</a>.
   <div class="features"><span class="feature">inherited</span></div>
+
+</dd>
+
+        <dt id="toString" class="callable">
+  <span class="name"><a href="../rohd_bridge/TieOffConnection/toString.html">toString</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/String-class.html">String</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  A string representation of this object.
+  <div class="features"><span class="feature">override</span></div>
 
 </dd>
 
@@ -234,20 +259,20 @@ its points.
   </section>
     
   <section
-      class="summary offset-anchor"
+      class="summary offset-anchor inherited"
       id="operators">
     <h2>Operators</h2>
     <dl class="callables">
-        <dt id="operator ==" class="callable">
+        <dt id="operator ==" class="callable inherited">
   <span class="name"><a href="../rohd_bridge/Connection/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Object-class.html">Object</a></span> <span class="parameter-name">other</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span>
   </span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   The equality operator.
-  <div class="features"><span class="feature">override</span></div>
+  <div class="features"><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -268,7 +293,7 @@ its points.
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge</a></li>
-    <li class="self-crumb">Connection<span class="signature">&lt;<wbr><span class="type-parameter">RefType extends Reference</span>&gt;</span> class</li>
+    <li class="self-crumb">TieOffConnection class</li>
 </ol>
 
     <h5>rohd_bridge library</h5>

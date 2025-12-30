@@ -54,8 +54,9 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">ConnectionExtractor</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="-param-modules"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span>&gt;</span></span> <span class="parameter-name">modules</span></span></li>
-</ol>)
+      <span class="name ">ConnectionExtractor</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="-param-modules"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Iterable-class.html">Iterable</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span>&gt;</span></span> <span class="parameter-name">modules</span>, {</span></li>
+<li><span class="parameter" id="-param-includeInterfaceConnections"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">includeInterfaceConnections</span> = <span class="default-value">true</span>, </span></li>
+</ol>})
     </section>
     
 <section class="desc markdown">
@@ -67,12 +68,15 @@ then identify <a href="../../rohd_bridge/ConnectionExtractor/connections.html">c
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">ConnectionExtractor(Iterable&lt;BridgeModule&gt; modules)
+  <pre class="language-dart"><code class="language-dart">ConnectionExtractor(Iterable&lt;BridgeModule&gt; modules,
+    {this.includeInterfaceConnections = true})
     : modules = Set.unmodifiable(modules) {
   &#47;&#47; algorithm:
   &#47;&#47;  - first, find all full interface-to-interface connections
   &#47;&#47;  - then, the remainder can be ad-hoc
-  _findInterfaceConnections();
+  if (includeInterfaceConnections) {
+    _findInterfaceConnections();
+  }
   _findAdHocConnections();
 }</code></pre>
 </section>

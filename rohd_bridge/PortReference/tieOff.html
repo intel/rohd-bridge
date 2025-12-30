@@ -55,8 +55,9 @@
     <section class="multi-line-signature">
       
 <span class="returntype">void</span>
-<span class="name ">tieOff</span>(<wbr>[<ol class="parameter-list single-line"> <li><span class="parameter" id="tieOff-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span> = <span class="default-value">0</span></span></li>
-</ol>])
+<span class="name ">tieOff</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="tieOff-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span> = <span class="default-value">0</span>, </span></li>
+<li><span class="parameter" id="tieOff-param-fill"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">fill</span> = <span class="default-value">false</span>, </span></li>
+</ol>})
 
       
 
@@ -73,8 +74,9 @@ will be tied to 0.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void tieOff([dynamic value = 0]) {
-  getsLogic(Const(value, width: width));
+  <pre class="language-dart"><code class="language-dart">void tieOff({dynamic value = 0, bool fill = false}) {
+  getsLogic(Const(value, width: width, fill: fill)
+      .named(&#39;tieoff_const$value&#39;, naming: Naming.mergeable));
 }</code></pre>
 </section>
 

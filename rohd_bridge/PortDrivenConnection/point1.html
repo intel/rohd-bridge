@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the tieOff method from the InterfacePortReference mixin, for the Dart programming language.">
-  <title>tieOff method - InterfacePortReference mixin - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the point1 property from the PortDrivenConnection mixin, for the Dart programming language.">
+  <title>point1 property - PortDrivenConnection mixin - rohd_bridge library - Dart API</title>
 
 
   
@@ -26,10 +26,10 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
-    <li><a href="../../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></li>
-    <li class="self-crumb">tieOff method</li>
+    <li><a href="../../rohd_bridge/PortDrivenConnection-mixin.html">PortDrivenConnection<span class="signature">&lt;<wbr><span class="type-parameter">ReferenceType extends Reference</span>&gt;</span></a></li>
+    <li class="self-crumb">point1 property</li>
   </ol>
-  <div class="self-name">tieOff</div>
+  <div class="self-name">point1</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,44 +46,36 @@
 <div
     id="dartdoc-main-content"
     class="main-content"
-    data-above-sidebar="rohd_bridge&#47;InterfacePortReference-mixin-sidebar.html"
+    data-above-sidebar="rohd_bridge&#47;PortDrivenConnection-mixin-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">tieOff</span> method 
+<h1><span class="kind-property">point1</span> property 
 </h1></div>
 
-    <section class="multi-line-signature">
-      
-<span class="returntype">void</span>
-<span class="name ">tieOff</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="tieOff-param-value"><span class="type-annotation">dynamic</span> <span class="parameter-name">value</span> = <span class="default-value">0</span>, </span></li>
-<li><span class="parameter" id="tieOff-param-fill"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">fill</span> = <span class="default-value">false</span>, </span></li>
-</ol>})
-
-      <div class="features"><span class="feature">inherited</span></div>
-
-    </section>
     
+      <section class="multi-line-signature">
+        
+        ReferenceType
+        <span class="name ">point1</span>
+        <div class="features"><span class="feature">final</span><span class="feature">inherited</span></div>
+
+      </section>
+      
 <section class="desc markdown">
-  <p>Ties this port to a constant <code>value</code>.</p>
-<p>The <code>value</code> can be any type that can be used to construct a <a href="https://pub.dev/documentation/rohd/0.6.7/rohd/Const-class.html">Const</a>, such
-as an integer, boolean, or <a href="https://pub.dev/documentation/rohd/0.6.7/rohd/LogicValue-class.html">LogicValue</a>. If no value is provided, the port
-will be tied to 0.</p>
+  <p>The first point of the connection.</p>
 </section>
 
-
-    
+      
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void tieOff({dynamic value = 0, bool fill = false}) {
-  getsLogic(Const(value, width: width, fill: fill)
-      .named(&#39;tieoff_const$value&#39;, naming: Naming.mergeable));
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">final RefType point1;</code></pre>
 </section>
 
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+    
+</div> <!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -92,14 +84,14 @@ will be tied to 0.</p>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
-    <li><a href="../../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></li>
-    <li class="self-crumb">tieOff method</li>
+    <li><a href="../../rohd_bridge/PortDrivenConnection-mixin.html">PortDrivenConnection<span class="signature">&lt;<wbr><span class="type-parameter">ReferenceType extends Reference</span>&gt;</span></a></li>
+    <li class="self-crumb">point1 property</li>
 </ol>
 
-    <h5>InterfacePortReference mixin</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div><!--/.sidebar-offcanvas-->
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  <h5>PortDrivenConnection mixin</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div><!--/.sidebar-offcanvas-->
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
 </div><!--/.sidebar-offcanvas-->
 </main>
 <footer>
