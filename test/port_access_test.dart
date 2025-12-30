@@ -374,18 +374,86 @@ void main() {
     expect(dutDst.input('a').value, LogicValue.of('1111zzzz'));
   });
 
-  void testInoutResult(PortReference pInEx, PortReference pOutEx,
-      PortExample inEx, PortExample outEx) {
-    pInEx.port.put(inEx.putVal);
-    expect(pOutEx.port.value, outEx.checkVal);
+  group('parent port reference of slice port reference', () {
+    test('one dimension, one slice', () {
+      final mod = BridgeModule('mod')
+        ..createArrayPort(
+          'myPort',
+          PortDirection.input,
+          dimensions: [4],
+          elementWidth: 8,
+        );
+      final p = mod.port('myPort[2][2:1]') as SlicePortReference;
+      final expected = mod.port('myPort[2]');
+      expect(p.parentPortReference, expected);
+    });
 
-    pInEx.port.put(LogicValue.filled(pInEx.port.width, LogicValue.z));
+    test('no dimensions, one slice', () {
+      final mod = BridgeModule('mod')..addInput('myPort', null, width: 8);
+      final p = mod.port('myPort[6:3]') as SlicePortReference;
+      final expected = mod.port('myPort');
+      expect(p.parentPortReference, expected);
+    });
 
-    pOutEx.port.put(outEx.putVal);
-    expect(pInEx.port.value, inEx.checkVal);
-  }
+    test('multiple dimensions, one slice', () {
+      final mod = BridgeModule('mod')
+        ..createArrayPort(
+          'myPort',
+          PortDirection.input,
+          dimensions: [4, 3],
+          elementWidth: 8,
+        );
+      final p = mod.port('myPort[2][1][5:2]') as SlicePortReference;
+      final expected = mod.port('myPort[2][1]');
+      expect(p.parentPortReference, expected);
+    });
+
+    test('multiple dimensions, no slice', () {
+      final mod = BridgeModule('mod')
+        ..createArrayPort(
+          'myPort',
+          PortDirection.input,
+          dimensions: [4, 3],
+          elementWidth: 8,
+        );
+      final p = mod.port('myPort[2][1]') as SlicePortReference;
+      final expected = mod.port('myPort[2]');
+      expect(p.parentPortReference, expected);
+    });
+
+    test('one dimension, no slice', () {
+      final mod = BridgeModule('mod')
+        ..createArrayPort(
+          'myPort',
+          PortDirection.input,
+          dimensions: [4],
+          elementWidth: 8,
+        );
+      final p = mod.port('myPort[2]') as SlicePortReference;
+      final expected = mod.port('myPort');
+      expect(p.parentPortReference, expected);
+    });
+
+    test('no dimensions, no slice - should return null', () {
+      final mod = BridgeModule('mod')..addInput('myPort', null, width: 8);
+      final p = SlicePortReference(mod, 'myPort');
+
+      expect(p.parentPortReference, isNull);
+    });
+  });
 
   group('connections', () {
+    void testInoutResult(PortReference pInEx, PortReference pOutEx,
+        PortExample inEx, PortExample outEx) {
+      pInEx.port.put(inEx.putVal);
+      expect(pOutEx.port.value, outEx.checkVal);
+
+      pInEx.port.put(LogicValue.filled(pInEx.port.width, LogicValue.z));
+
+      pOutEx.port.put(outEx.putVal);
+      expect(pInEx.port.value, inEx.checkVal);
+    }
+
     final connType =
         <String, Future<void> Function(PortExample outEx, PortExample inEx)>{
       'port to port': (outEx, inEx) async {
