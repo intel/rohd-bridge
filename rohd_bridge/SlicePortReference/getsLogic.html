@@ -135,13 +135,18 @@ void getsLogic(Logic other) {
   final receiverDriver = Logic(width: endIdx - startIdx + 1);
   receiverDriver &lt;= other;
 
-  if (receiver is LogicArray &amp;&amp; hasSlicing) {
-    final receivers = receiver.elements
-        .getRange(receiverStartIdx, receiverStartIdx + _sliceCount!);
-    var incrIndex = 0;
-    for (final r in receivers) {
-      r &lt;= receiverDriver.getRange(incrIndex, incrIndex + r.width);
-      incrIndex += r.width;
+  if (receiver is LogicArray) {
+    if (hasSlicing) {
+      final receivers = receiver.elements
+          .getRange(receiverStartIdx, receiverStartIdx + _sliceCount!);
+      var incrIndex = 0;
+      for (final r in receivers) {
+        r &lt;= receiverDriver.getRange(incrIndex, incrIndex + r.width);
+        incrIndex += r.width;
+      }
+    } else {
+      &#47;&#47; this is a full sub-array
+      receiver &lt;= receiverDriver;
     }
   } else {
     receiver.assignSubset(receiverDriver.elements, start: receiverStartIdx);
