@@ -1,6 +1,10 @@
 ## 0.2.0
 
-- Breaking: `PortReference.tieOff` and `BridgeModule.tieOffInterface` now accept `value` as a named argument instead of a positional argument to support additional arguments (e.g. `fill`).
+- Breaking: `PortReference.tieOff` and `BridgeModule.tieOffInterface` now accept `value` as a named argument instead of a positional argument to support additional arguments (e.g. `fill`) (<https://github.com/intel/rohd-bridge/pull/27>).
+- Upgraded `ConnectionExtractor` to support identification of constant tie-offs in addition to port connections and to optionally ignore full interface connections to make some kinds of connection analysis easier (<https://github.com/intel/rohd-bridge/pull/27>).
+- Fixed a bug where calling `getsLogic` on a sub-array of a port could incorrectly count the number of elements, leading to a confusing error message instead of the expected correct connection (<https://github.com/intel/rohd-bridge/pull/28>).
+- Added `parentPortReference` to `SlicePortReference` to allow easier access a port reference one dimension up (<https://github.com/intel/rohd-bridge/pull/29>).
+- Updates to properly support leaving unconnected ports empty in generated SystemVerilog in support of new ROHD features in <https://github.com/intel/rohd/pull/638> (<https://github.com/intel/rohd-bridge/pull/26>).
 
 ## 0.1.4
 
