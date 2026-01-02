@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // bridge_module.dart
@@ -943,9 +943,13 @@ class BridgeModule extends Module with SystemVerilog {
   }
 
   /// Calls [build] and generates SystemVerilog and a filelist into the
-  /// [outputPath], with optional logging sent to the [logger].
-  Future<void> buildAndGenerateRTL(
-      {Logger? logger, String outputPath = 'output'}) async {
+  /// [outputPath].
+  Future<void> buildAndGenerateRTL({
+    @Deprecated('Leave null to use the default logger') Logger? logger,
+    String outputPath = 'output',
+  }) async {
+    logger ??= RohdBridgeLogger.logger;
+
     var synthResults = <SynthesisResult>{};
 
     // Build
@@ -956,14 +960,12 @@ class BridgeModule extends Module with SystemVerilog {
       final defNames =
           synthResults.map((result) => result.module.definitionName);
       logger
-        ?..info('Build Complete...\n')
+        ..info('Build Complete...\n')
         ..info('Found ${synthResults.length} hierarchical instances in '
             'design $name')
         ..info('Synth Results: ${defNames.join(', ')}');
     } on Exception catch (e, stackTrace) {
-      logger != null
-          ? logger.error('Build failed $e, $stackTrace')
-          : throw RohdBridgeException('Build failed $e, $stackTrace');
+      logger.error('Build failed $e, $stackTrace');
     }
 
     // Write out RTL
@@ -971,7 +973,7 @@ class BridgeModule extends Module with SystemVerilog {
     Directory(outputGenerationPath).createSync(recursive: true);
 
     final filelistContents = StringBuffer();
-    logger?.sectionSeparator('Generating RTL');
+    logger.sectionSeparator('Generating RTL');
     final fileIoFutures = <Future<void>>[];
     for (final synthResult in synthResults) {
       final fileName = '${synthResult.module.definitionName}.sv';
@@ -981,14 +983,14 @@ class BridgeModule extends Module with SystemVerilog {
       fileIoFutures.add(File(filePath)
           .writeAsString(synthResult.toSynthFileContents().join('\n')));
 
-      logger?.finer('Generated file ${Directory(filePath).absolute.path}');
+      logger.finer('Generated file ${Directory(filePath).absolute.path}');
     }
     await Future.wait(fileIoFutures);
 
     File('$outputPath/filelist.f')
         .writeAsStringSync(filelistContents.toString());
 
-    logger?.fine('done!');
+    logger.fine('done!');
   }
 
   /// Adds an interface to this module with comprehensive configuration options.
