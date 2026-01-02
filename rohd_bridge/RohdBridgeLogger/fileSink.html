@@ -27,7 +27,7 @@
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
     <li><a href="../../rohd_bridge/RohdBridgeLogger-class.html">RohdBridgeLogger</a></li>
-    <li class="self-crumb">fileSink property</li>
+    <li class="self-crumb"><span class="deprecated">fileSink</span> property</li>
   </ol>
   <div class="self-name">fileSink</div>
   <form class="search navbar-right" role="search">
@@ -53,26 +53,38 @@
 </h1></div>
 
     
-      <section class="multi-line-signature">
-        
-        <a href="https://api.dart.dev/stable/3.10.7/file/IOSink-class.html">IOSink</a>?
-        <span class="name ">fileSink</span>
-        <div class="features"><span class="feature">getter/setter pair</span></div>
 
-      </section>
+    
+        
+  <section id="getter">
+    <section class="multi-line-signature">
       
+  <div>
+    <ol class="annotation-list">
+        <li>@<a href="https://api.dart.dev/stable/3.10.7/dart-core/Deprecated/Deprecated.html">Deprecated</a>(&#39;API is moved to be private.  Use separate logging if needed.&#39;)</li>
+    </ol>
+  </div>
+      <span class="returntype"><a href="https://api.dart.dev/stable/3.10.7/file/IOSink-class.html">IOSink</a>?</span>
+      get
+      <span class="name deprecated">fileSink</span>
+      
+
+    </section>
+    
 <section class="desc markdown">
   <p>The file sink to write to.</p>
 </section>
 
-      
+    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">static IOSink? fileSink;</code></pre>
+  <pre class="language-dart"><code class="language-dart">@Deprecated(&#39;API is moved to be private.  Use separate logging if needed.&#39;)
+static IOSink? get fileSink =&gt; _fileSink;</code></pre>
 </section>
 
+  </section>
 
-    
+
 </div> <!-- /.main-content -->
 <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
   <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
@@ -85,7 +97,7 @@
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/RohdBridgeLogger-class.html">RohdBridgeLogger</a></li>
-    <li class="self-crumb">fileSink property</li>
+    <li class="self-crumb"><span class="deprecated">fileSink</span> property</li>
 </ol>
 
   <h5>RohdBridgeLogger class</h5>

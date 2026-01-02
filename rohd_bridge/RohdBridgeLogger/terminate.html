@@ -72,8 +72,8 @@
   <pre class="language-dart"><code class="language-dart">static Future&lt;void&gt; terminate() async {
   Logger.root.clearListeners();
   await flush();
-  await fileSink!.close();
-  fileSink = null;
+  await _fileSink?.close();
+  _fileSink = null;
 }</code></pre>
 </section>
 

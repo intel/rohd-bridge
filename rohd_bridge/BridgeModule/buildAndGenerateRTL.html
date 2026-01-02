@@ -55,7 +55,7 @@
     <section class="multi-line-signature">
       
 <span class="returntype"><a href="https://api.dart.dev/stable/3.10.7/dart-core/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">buildAndGenerateRTL</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="buildAndGenerateRTL-param-logger"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.3.0/logging/Logger-class.html">Logger</a>?</span> <span class="parameter-name">logger</span>, </span></li>
+<span class="name ">buildAndGenerateRTL</span>(<wbr>{<ol class="parameter-list"> <li><span class="parameter" id="buildAndGenerateRTL-param-logger"><span>@<a href="https://api.dart.dev/stable/3.10.7/dart-core/Deprecated/Deprecated.html">Deprecated</a>(&#39;Leave null to use the default logger&#39;)</span> <span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.3.0/logging/Logger-class.html">Logger</a>?</span> <span class="parameter-name">logger</span>, </span></li>
 <li><span class="parameter" id="buildAndGenerateRTL-param-outputPath"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.7/dart-core/String-class.html">String</a></span> <span class="parameter-name">outputPath</span> = <span class="default-value">&#39;output&#39;</span>, </span></li>
 </ol>})
 
@@ -65,15 +65,19 @@
     
 <section class="desc markdown">
   <p>Calls <a href="../../rohd_bridge/BridgeModule/build.html">build</a> and generates SystemVerilog and a filelist into the
-<code>outputPath</code>, with optional logging sent to the <code>logger</code>.</p>
+<code>outputPath</code>.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; buildAndGenerateRTL(
-    {Logger? logger, String outputPath = &#39;output&#39;}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; buildAndGenerateRTL({
+  @Deprecated(&#39;Leave null to use the default logger&#39;) Logger? logger,
+  String outputPath = &#39;output&#39;,
+}) async {
+  logger ??= RohdBridgeLogger.logger;
+
   var synthResults = &lt;SynthesisResult&gt;{};
 
   &#47;&#47; Build
@@ -84,14 +88,12 @@
     final defNames =
         synthResults.map((result) =&gt; result.module.definitionName);
     logger
-      ?..info(&#39;Build Complete...\n&#39;)
+      ..info(&#39;Build Complete...\n&#39;)
       ..info(&#39;Found ${synthResults.length} hierarchical instances in &#39;
           &#39;design $name&#39;)
       ..info(&#39;Synth Results: ${defNames.join(&#39;, &#39;)}&#39;);
   } on Exception catch (e, stackTrace) {
-    logger != null
-        ? logger.error(&#39;Build failed $e, $stackTrace&#39;)
-        : throw RohdBridgeException(&#39;Build failed $e, $stackTrace&#39;);
+    logger.error(&#39;Build failed $e, $stackTrace&#39;);
   }
 
   &#47;&#47; Write out RTL
@@ -99,7 +101,7 @@
   Directory(outputGenerationPath).createSync(recursive: true);
 
   final filelistContents = StringBuffer();
-  logger?.sectionSeparator(&#39;Generating RTL&#39;);
+  logger.sectionSeparator(&#39;Generating RTL&#39;);
   final fileIoFutures = &lt;Future&lt;void&gt;&gt;[];
   for (final synthResult in synthResults) {
     final fileName = &#39;${synthResult.module.definitionName}.sv&#39;;
@@ -109,14 +111,14 @@
     fileIoFutures.add(File(filePath)
         .writeAsString(synthResult.toSynthFileContents().join(&#39;\n&#39;)));
 
-    logger?.finer(&#39;Generated file ${Directory(filePath).absolute.path}&#39;);
+    logger.finer(&#39;Generated file ${Directory(filePath).absolute.path}&#39;);
   }
   await Future.wait(fileIoFutures);
 
   File(&#39;$outputPath&#47;filelist.f&#39;)
       .writeAsStringSync(filelistContents.toString());
 
-  logger?.fine(&#39;done!&#39;);
+  logger.fine(&#39;done!&#39;);
 }</code></pre>
 </section>
 
