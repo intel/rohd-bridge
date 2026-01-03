@@ -1,3 +1,10 @@
+## 0.2.1
+
+- Fixed a bug where a confusing exception could be thrown if the logger was used but not yet configured (<https://github.com/intel/rohd-bridge/pull/32>).
+- Fixed a bug where if a directory did not exist for a log file, it would crash instead of creating the necessary directory structure (<https://github.com/intel/rohd-bridge/pull/32>).
+- Deprecated `logger` in `BridgeModule.buildAndGenerateRTL` in favor of using the default logger (<https://github.com/intel/rohd-bridge/pull/32>).
+- Deprecated `enableDebugMesage` and `fileSink` in `RohdBridgeLogger` (<https://github.com/intel/rohd-bridge/pull/32>).
+
 ## 0.2.0
 
 - Breaking: `PortReference.tieOff` and `BridgeModule.tieOffInterface` now accept `value` as a named argument instead of a positional argument to support additional arguments (e.g. `fill`) (<https://github.com/intel/rohd-bridge/pull/27>).

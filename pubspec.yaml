@@ -1,6 +1,6 @@
 name: rohd_bridge
 description: A ROHD-based framework for connectivity and assembly of hardware designs.
-version: 0.2.0
+version: 0.2.1
 homepage: https://intel.github.io/rohd-website
 repository: https://github.com/intel/rohd-bridge
 issue_tracker: https://github.com/intel/rohd-bridge/issues
