@@ -45,17 +45,13 @@ void main() {
     expect(testPass1 && testPass2, true);
   });
 
-    test('Feedback connection', () {
-    // This is to make sure that the feedthrough cases are caught
-    // This test must fail
-
+  test('Feedback connection', () {
     final top = BridgeModule('Top')
-    ..createPort('x', PortDirection.input)
-    ..createPort('y', PortDirection.output);
+      ..createPort('x', PortDirection.input)
+      ..createPort('y', PortDirection.output);
 
     connectPorts(top.port('x'), top.port('y'));
     top.input('x').put(1);
     expect(top.output('y').value.toInt(), 1);
-
   });
 }
