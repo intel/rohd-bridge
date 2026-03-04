@@ -46,8 +46,6 @@ void main() {
   });
 
     test('Feedback connection', () {
-    // This is to make sure that the feedthrough cases are caught
-    // This test must fail
 
     final top = BridgeModule('Top')
     ..createPort('x', PortDirection.input)
