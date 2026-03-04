@@ -145,6 +145,11 @@ Module? findCommonParent(Module firstChild, Module secondChild) {
     return null;
   }
 
+  if (firstChild == secondChild) {
+    // if the two modules are the same, return that module as the common parent
+    return firstChild;
+  }
+
   if (secondPath.contains(firstChild) && !firstPath.contains(secondChild)) {
     // firstChild is in the parent hierarchy of second
     return firstChild;
