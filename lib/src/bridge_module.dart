@@ -1000,7 +1000,7 @@ class BridgeModule extends Module with SystemVerilog {
   /// automatically connected to module ports or left unconnected for manual
   /// configuration.
   ///
-  /// The [intf] specifies the interface instance to add, [new_name] provides the
+  /// The [intf] specifies the interface instance to add, [name] provides the
   /// name for the interface reference (subject to uniquification), and [role]
   /// sets the interface role (consumer or provider) determining port
   /// directions. The [connect] controls whether to auto-connect interface ports
