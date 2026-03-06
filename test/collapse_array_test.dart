@@ -25,25 +25,26 @@ class ArrayModule extends Module {
 
 class ArrayModuleWithNetIntermediates extends Module {
   ArrayModuleWithNetIntermediates(LogicArray a, LogicArray b) {
-    a = addInOutArray('a', a,
+
+    final localA = addInOutArray('a', a,
         dimensions: a.dimensions,
         elementWidth: a.elementWidth,
         numUnpackedDimensions: a.numUnpackedDimensions);
 
     final intermediate = LogicArray.net(
-      a.dimensions,
-      a.elementWidth,
+      localA.dimensions,
+      localA.elementWidth,
       name: 'intermediate',
       naming: Naming.reserved,
     );
 
-    b = addInOutArray('b', b,
+    final localB = addInOutArray('b', b,
         dimensions: a.dimensions,
         elementWidth: a.elementWidth,
         numUnpackedDimensions: a.numUnpackedDimensions);
 
-    intermediate <= a;
-    b <= intermediate;
+    intermediate <= localA;
+    localB <= intermediate;
   }
 }
 

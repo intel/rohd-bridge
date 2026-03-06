@@ -1000,7 +1000,7 @@ class BridgeModule extends Module with SystemVerilog {
   /// automatically connected to module ports or left unconnected for manual
   /// configuration.
   ///
-  /// The [intf] specifies the interface instance to add, [name] provides the
+  /// The [intf] specifies the interface instance to add, [new_name] provides the
   /// name for the interface reference (subject to uniquification), and [role]
   /// sets the interface role (consumer or provider) determining port
   /// directions. The [connect] controls whether to auto-connect interface ports
@@ -1028,20 +1028,20 @@ class BridgeModule extends Module with SystemVerilog {
     bool allowNameUniquification = false,
     String Function(String logical)? portUniquify,
   }) {
-    name = _interfaceUniquifier.getUniqueName(
+    final newName = _interfaceUniquifier.getUniqueName(
       initialName: name,
       reserved: !allowUniquification || !allowNameUniquification,
     );
 
-    if (_interfaces.containsKey(name)) {
-      throw RohdBridgeException('Interface $name already exists in $this');
+    if (_interfaces.containsKey(newName)) {
+      throw RohdBridgeException('Interface $newName already exists in $this');
     }
 
-    final ref = InterfaceReference(name, this, intf, role,
+    final ref = InterfaceReference(newName, this, intf, role,
         connect: connect,
-        portUniquify: portUniquify ?? (original) => '${name}_$original');
+        portUniquify: portUniquify ?? (original) => '${newName}_$original');
 
-    _interfaces[name] = ref;
+    _interfaces[newName] = ref;
 
     return ref;
   }

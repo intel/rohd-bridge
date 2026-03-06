@@ -129,8 +129,9 @@ extension RohdBridgeModuleExtensions on Module {
   }
 }
 
-/// Returns the common parent of two modules [firstChild] and [secondChild]
-/// Assuming at least one common parent exists
+/// Returns the common parent of two modules [firstChild] and [secondChild]. 
+/// If the two modules are the same, returns that module.
+/// If no common parent is found and they are not the same module, returns null.
 Module? findCommonParent(Module firstChild, Module secondChild) {
   final firstPath = List<Module>.from(firstChild.hierarchy(), growable: false);
   final secondPath =

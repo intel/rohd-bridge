@@ -75,13 +75,14 @@ sealed class PortReference extends Reference {
     }
 
     final dimAccesses = <String>[];
-    while (port.isArrayMember) {
-      dimAccesses.add('[${port.arrayIndex!}]');
-      port = port.parentStructure!;
+    var currentPort = port; // Use a local variable
+    while (currentPort.isArrayMember) {
+      dimAccesses.add('[${currentPort.arrayIndex!}]');
+      currentPort = currentPort.parentStructure!;
     }
 
-    return PortReference.fromString(port.parentModule! as BridgeModule,
-        port.name + dimAccesses.reversed.join());
+    return PortReference.fromString(currentPort.parentModule! as BridgeModule,
+        currentPort.name + dimAccesses.reversed.join());
   }
 
   @override
