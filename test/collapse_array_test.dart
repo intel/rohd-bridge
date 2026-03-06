@@ -25,7 +25,6 @@ class ArrayModule extends Module {
 
 class ArrayModuleWithNetIntermediates extends Module {
   ArrayModuleWithNetIntermediates(LogicArray a, LogicArray b) {
-
     final localA = addInOutArray('a', a,
         dimensions: a.dimensions,
         elementWidth: a.elementWidth,
