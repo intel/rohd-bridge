@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // feedthrough_test.dart
@@ -43,5 +43,15 @@ void main() {
     }
 
     expect(testPass1 && testPass2, true);
+  });
+
+  test('Feedback connection', () {
+    final top = BridgeModule('Top')
+      ..createPort('x', PortDirection.input)
+      ..createPort('y', PortDirection.output);
+
+    connectPorts(top.port('x'), top.port('y'));
+    top.input('x').put(1);
+    expect(top.output('y').value.toInt(), 1);
   });
 }

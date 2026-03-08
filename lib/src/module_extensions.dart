@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // module_extensions.dart
@@ -129,8 +129,9 @@ extension RohdBridgeModuleExtensions on Module {
   }
 }
 
-/// Returns the common parent of two modules [firstChild] and [secondChild]
-/// Assuming at least one common parent exists
+/// Returns the common parent of two modules [firstChild] and [secondChild].
+/// If the two modules are the same, returns that module.
+/// If no common parent is found and they are not the same module, returns null.
 Module? findCommonParent(Module firstChild, Module secondChild) {
   final firstPath = List<Module>.from(firstChild.hierarchy(), growable: false);
   final secondPath =
@@ -143,6 +144,11 @@ Module? findCommonParent(Module firstChild, Module secondChild) {
   if (firstPath[0] != secondPath[0]) {
     // base top parent is not the same, no common parent
     return null;
+  }
+
+  if (firstChild == secondChild) {
+    // if the two modules are the same, return that module as the common parent
+    return firstChild;
   }
 
   if (secondPath.contains(firstChild) && !firstPath.contains(secondChild)) {
