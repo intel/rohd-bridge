@@ -8,6 +8,9 @@
 // Author:
 //   Shankar Sharma <shankar.sharma@intel.com>
 
+// In here we are creating ports, where reassignment is a good ROHD pattern.
+// ignore_for_file: parameter_assignments
+
 import 'package:rohd/rohd.dart';
 import 'package:rohd/src/utilities/simcompare.dart';
 import 'package:test/test.dart';

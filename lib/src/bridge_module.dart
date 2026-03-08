@@ -1028,20 +1028,20 @@ class BridgeModule extends Module with SystemVerilog {
     bool allowNameUniquification = false,
     String Function(String logical)? portUniquify,
   }) {
-    name = _interfaceUniquifier.getUniqueName(
+    final newName = _interfaceUniquifier.getUniqueName(
       initialName: name,
       reserved: !allowUniquification || !allowNameUniquification,
     );
 
-    if (_interfaces.containsKey(name)) {
-      throw RohdBridgeException('Interface $name already exists in $this');
+    if (_interfaces.containsKey(newName)) {
+      throw RohdBridgeException('Interface $newName already exists in $this');
     }
 
-    final ref = InterfaceReference(name, this, intf, role,
+    final ref = InterfaceReference(newName, this, intf, role,
         connect: connect,
-        portUniquify: portUniquify ?? (original) => '${name}_$original');
+        portUniquify: portUniquify ?? (original) => '${newName}_$original');
 
-    _interfaces[name] = ref;
+    _interfaces[newName] = ref;
 
     return ref;
   }
