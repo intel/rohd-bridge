@@ -1,3 +1,8 @@
+## 0.2.2
+
+- Fixed handling of connections between `PairInterface`s that contained `subInterfaces`, and added checks that `exceptPorts` are not used in those cases (<https://github.com/intel/rohd-bridge/pull/37>).
+- Fixed a bug where `findCommonParent` would fail to properly identify a module if both provided arguments were the same module (<https://github.com/intel/rohd-bridge/pull/35>).
+
 ## 0.2.1
 
 - Fixed a bug where a confusing exception could be thrown if the logger was used but not yet configured (<https://github.com/intel/rohd-bridge/pull/32>).
