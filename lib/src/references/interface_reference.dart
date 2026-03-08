@@ -511,22 +511,46 @@ extension _ExceptPairInterfaceExtensions on PairInterface {
   /// [exceptPorts].
   void _driveOtherExcept(PairInterface other, Iterable<PairDirection> tags,
       {required Set<String>? exceptPorts}) {
-    getPorts(tags).forEach((portName, thisPort) {
-      if (exceptPorts == null || !exceptPorts.contains(portName)) {
-        other.port(portName) <= thisPort;
-      }
-    });
+    final subInterfacesPresent =
+        subInterfaces.isNotEmpty || other.subInterfaces.isNotEmpty;
+    if (subInterfacesPresent &&
+        (exceptPorts != null && exceptPorts.isNotEmpty)) {
+      throw RohdBridgeException(
+          'Cannot use exceptPorts when driving interfaces with sub-interfaces');
+    }
+
+    if (subInterfacesPresent) {
+      driveOther(other, tags);
+    } else {
+      getPorts(tags).forEach((portName, thisPort) {
+        if (exceptPorts == null || !exceptPorts.contains(portName)) {
+          other.port(portName) <= thisPort;
+        }
+      });
+    }
   }
 
   /// Performs the same operation as [receiveOther], but excludes ports listed
   /// in [exceptPorts].
   void _receiveOtherExcept(PairInterface other, Iterable<PairDirection> tags,
       {required Set<String>? exceptPorts}) {
-    getPorts(tags).forEach((portName, thisPort) {
-      if (exceptPorts == null || !exceptPorts.contains(portName)) {
-        thisPort <= other.port(portName);
-      }
-    });
+    final subInterfacesPresent =
+        subInterfaces.isNotEmpty || other.subInterfaces.isNotEmpty;
+    if (subInterfacesPresent &&
+        (exceptPorts != null && exceptPorts.isNotEmpty)) {
+      throw RohdBridgeException(
+          'Cannot use exceptPorts when driving interfaces with sub-interfaces');
+    }
+
+    if (subInterfacesPresent) {
+      receiveOther(other, tags);
+    } else {
+      getPorts(tags).forEach((portName, thisPort) {
+        if (exceptPorts == null || !exceptPorts.contains(portName)) {
+          thisPort <= other.port(portName);
+        }
+      });
+    }
   }
 
   /// Creates a copy of an interface with optional port exclusions.
