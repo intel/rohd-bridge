@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // interface_reference.dart
@@ -509,24 +509,54 @@ class InterfaceReference<InterfaceType extends PairInterface>
 extension _ExceptPairInterfaceExtensions on PairInterface {
   /// Performs the same operation as [driveOther], but excludes ports listed in
   /// [exceptPorts].
+  ///
+  /// Throws [RohdBridgeException] if [exceptPorts] is provided and not empty
+  /// when either this interface or [other] has sub-interfaces.
   void _driveOtherExcept(PairInterface other, Iterable<PairDirection> tags,
       {required Set<String>? exceptPorts}) {
-    getPorts(tags).forEach((portName, thisPort) {
-      if (exceptPorts == null || !exceptPorts.contains(portName)) {
-        other.port(portName) <= thisPort;
-      }
-    });
+    final subInterfacesPresent =
+        subInterfaces.isNotEmpty || other.subInterfaces.isNotEmpty;
+    if (subInterfacesPresent &&
+        (exceptPorts != null && exceptPorts.isNotEmpty)) {
+      throw RohdBridgeException(
+          'Cannot use exceptPorts when driving interfaces with sub-interfaces');
+    }
+
+    if (subInterfacesPresent) {
+      driveOther(other, tags);
+    } else {
+      getPorts(tags).forEach((portName, thisPort) {
+        if (exceptPorts == null || !exceptPorts.contains(portName)) {
+          other.port(portName) <= thisPort;
+        }
+      });
+    }
   }
 
   /// Performs the same operation as [receiveOther], but excludes ports listed
   /// in [exceptPorts].
+  ///
+  /// Throws [RohdBridgeException] if [exceptPorts] is provided and not empty
+  /// when either this interface or [other] has sub-interfaces.
   void _receiveOtherExcept(PairInterface other, Iterable<PairDirection> tags,
       {required Set<String>? exceptPorts}) {
-    getPorts(tags).forEach((portName, thisPort) {
-      if (exceptPorts == null || !exceptPorts.contains(portName)) {
-        thisPort <= other.port(portName);
-      }
-    });
+    final subInterfacesPresent =
+        subInterfaces.isNotEmpty || other.subInterfaces.isNotEmpty;
+    if (subInterfacesPresent &&
+        (exceptPorts != null && exceptPorts.isNotEmpty)) {
+      throw RohdBridgeException(
+          'Cannot use exceptPorts when driving interfaces with sub-interfaces');
+    }
+
+    if (subInterfacesPresent) {
+      receiveOther(other, tags);
+    } else {
+      getPorts(tags).forEach((portName, thisPort) {
+        if (exceptPorts == null || !exceptPorts.contains(portName)) {
+          thisPort <= other.port(portName);
+        }
+      });
+    }
   }
 
   /// Creates a copy of an interface with optional port exclusions.
@@ -537,7 +567,16 @@ extension _ExceptPairInterfaceExtensions on PairInterface {
   ///
   /// This is used internally when creating interface variants that exclude
   /// certain ports during hierarchical interface operations.
+  ///
+  /// Throws [RohdBridgeException] if [exceptPorts] is provided and not empty
+  /// when this interface has sub-interfaces.
   PairInterface _cloneExcept({required Set<String>? exceptPorts}) {
+    if (subInterfaces.isNotEmpty &&
+        (exceptPorts != null && exceptPorts.isNotEmpty)) {
+      throw RohdBridgeException(
+          'Cannot use exceptPorts when cloning interfaces with sub-interfaces');
+    }
+
     if (exceptPorts == null || exceptPorts.isEmpty) {
       return clone();
     }
