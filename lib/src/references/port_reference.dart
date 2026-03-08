@@ -75,7 +75,7 @@ sealed class PortReference extends Reference {
     }
 
     final dimAccesses = <String>[];
-    var currentPort = port; // Use a local variable
+    var currentPort = port;
     while (currentPort.isArrayMember) {
       dimAccesses.add('[${currentPort.arrayIndex!}]');
       currentPort = currentPort.parentStructure!;
