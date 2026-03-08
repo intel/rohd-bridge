@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // collapse_array_test.dart
@@ -28,25 +28,25 @@ class ArrayModule extends Module {
 
 class ArrayModuleWithNetIntermediates extends Module {
   ArrayModuleWithNetIntermediates(LogicArray a, LogicArray b) {
-    final localA = addInOutArray('a', a,
+    a = addInOutArray('a', a,
         dimensions: a.dimensions,
         elementWidth: a.elementWidth,
         numUnpackedDimensions: a.numUnpackedDimensions);
 
     final intermediate = LogicArray.net(
-      localA.dimensions,
-      localA.elementWidth,
+      a.dimensions,
+      a.elementWidth,
       name: 'intermediate',
       naming: Naming.reserved,
     );
 
-    final localB = addInOutArray('b', b,
+    b = addInOutArray('b', b,
         dimensions: a.dimensions,
         elementWidth: a.elementWidth,
         numUnpackedDimensions: a.numUnpackedDimensions);
 
-    intermediate <= localA;
-    localB <= intermediate;
+    intermediate <= a;
+    b <= intermediate;
   }
 }
 
