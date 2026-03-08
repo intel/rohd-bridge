@@ -314,8 +314,9 @@ as necessary.
 
 </dt>
 <dd>
-  Returns the common parent of two modules <code>firstChild</code> and <code>secondChild</code>
-Assuming at least one common parent exists
+  Returns the common parent of two modules <code>firstChild</code> and <code>secondChild</code>.
+If the two modules are the same, returns that module.
+If no common parent is found and they are not the same module, returns null.
   
 
 </dd>

@@ -64,8 +64,9 @@
     </section>
     
 <section class="desc markdown">
-  <p>Returns the common parent of two modules <code>firstChild</code> and <code>secondChild</code>
-Assuming at least one common parent exists</p>
+  <p>Returns the common parent of two modules <code>firstChild</code> and <code>secondChild</code>.
+If the two modules are the same, returns that module.
+If no common parent is found and they are not the same module, returns null.</p>
 </section>
 
 
@@ -84,6 +85,11 @@ Assuming at least one common parent exists</p>
   if (firstPath[0] != secondPath[0]) {
     &#47;&#47; base top parent is not the same, no common parent
     return null;
+  }
+
+  if (firstChild == secondChild) {
+    &#47;&#47; if the two modules are the same, return that module as the common parent
+    return firstChild;
   }
 
   if (secondPath.contains(firstChild) &amp;&amp; !firstPath.contains(secondChild)) {
