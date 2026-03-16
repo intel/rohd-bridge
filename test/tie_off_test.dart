@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // tie_off_test.dart
@@ -15,25 +15,48 @@ import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('simple port tie off to 0', () {
+  test('simple port tie off to 0', () async {
+    final top = BridgeModule('top');
     final mod = BridgeModule('mod')
       ..addInput('apple', null)
       ..addOutput('banana');
+    top
+      ..addSubModule(mod)
+      ..pullUpPort(mod.createPort('clk', PortDirection.input));
 
     mod.port('apple').tieOff();
     mod.port('banana').tieOff();
+
+    await top.build();
+
+    final sv = top.generateSynth();
+
+    expect(sv, contains(".apple(1'h0)"));
+    expect(sv, contains("assign banana = 1'h0;"));
 
     expect(mod.input('apple').value.toInt(), 0);
     expect(mod.output('banana').value.toInt(), 0);
   });
 
-  test('tie off a subset of a port', () {
+  test('tie off a subset of a port', () async {
+    final top = BridgeModule('top');
     final mod = BridgeModule('mod')
       ..addInputArray('apple', null, dimensions: [4], elementWidth: 4)
       ..addOutputArray('banana', dimensions: [4], elementWidth: 4);
+    top
+      ..addSubModule(mod)
+      ..pullUpPort(mod.createPort('clk', PortDirection.input));
 
     mod.port('apple[1][2:1]').tieOff();
     mod.port('banana[1][2:1]').tieOff();
+
+    await top.build();
+
+    final sv = top.generateSynth();
+
+    expect("assign tieoff_const0 = 2'h0;".allMatches(sv).length, 2);
+    expect(sv, contains('assign apple_1_subset[1] = tieoff_const0[0];'));
+    expect(sv, contains('assign banana_1_subset[2] = tieoff_const0[1];'));
 
     expect(mod.input('apple').value,
         LogicValue.of('${'z' * 4}${'z' * 4}z00z${'z' * 4}'));

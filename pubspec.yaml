@@ -13,7 +13,7 @@ dependencies:
   collection: ^1.15.0
   logging: ^1.2.0
   meta: ^1.15.0
-  rohd: ^0.6.7
+  rohd: ^0.6.8
 
 dev_dependencies:
   test: ^1.16.0
