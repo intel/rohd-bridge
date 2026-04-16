@@ -1109,6 +1109,13 @@ class BridgeModule extends Module with SystemVerilog {
 /// `false`, then the port names will not be uniquified on those paths.
 /// Uniquification also respects [BridgeModule.allowUniquification] at each
 /// level.
+///
+/// When [driver] and [receiver] are on the same module and the connection is
+/// ambiguous (at least one port is [PortDirection.inOut] and neither is
+/// [PortDirection.input]), [sameModuleConnectionType] must be provided to
+/// disambiguate whether the connection is a [SameModuleConnectionType.loopback]
+/// (using external-facing ports) or a [SameModuleConnectionType.passthrough]
+/// (using internal-facing ports). See [PortReference.gets] for full details.
 void connectPorts(
   PortReference driver,
   PortReference receiver, {
@@ -1116,6 +1123,7 @@ void connectPorts(
   String? receiverPathNewPortName,
   bool allowDriverPathUniquification = true,
   bool allowReceiverPathUniquification = true,
+  SameModuleConnectionType? sameModuleConnectionType,
 }) {
   // TODO(mkorbel1): need to add better control over naming of intermediate
   //  ports -- default allow renaming? or should it prefer the top/leaf?
@@ -1280,7 +1288,8 @@ void connectPorts(
     receiverPortModule._upperSourceMap[driverPortRef] = createdReceiverPort;
   }
 
-  receiverPortRef.gets(driverPortRef);
+  receiverPortRef.gets(driverPortRef,
+      sameModuleConnectionType: sameModuleConnectionType);
 }
 
 /// Connects [intf1] to [intf2], creating all necessary ports through the

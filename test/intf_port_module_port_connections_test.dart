@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // intf_port_module_port_connections_test.dart
@@ -195,6 +195,19 @@ void main() {
                         testCase.dst.direction == PortDirection.input &&
                         testCase.src.direction == PortDirection.input) {
                       // port cant drive input on same module
+                      expectFailure = true;
+                    }
+
+                    if (testCase.relativePosition ==
+                            _RelativePosition.sameModule &&
+                        !testCase.src.isIntfPort &&
+                        !testCase.dst.isIntfPort &&
+                        (testCase.src.direction == PortDirection.inOut ||
+                            testCase.dst.direction == PortDirection.inOut) &&
+                        testCase.src.direction != PortDirection.input &&
+                        testCase.dst.direction != PortDirection.input) {
+                      // ambiguous same-module connection involving inOut
+                      // requires SameModuleConnectionType
                       expectFailure = true;
                     }
 

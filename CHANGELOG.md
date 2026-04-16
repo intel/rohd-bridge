@@ -1,3 +1,7 @@
+## X.X.X
+
+- Added `SameModuleConnectionType` enum to disambiguate same-module connections involving `inOut` ports. When connecting two ports on the same module where at least one is `inOut` and neither is `input`, a `SameModuleConnectionType` (`loopback` or `passthrough`) must now be provided to `gets()` or `connectPorts()` to specify whether the connection should use external-facing or internal-facing ports. (<https://github.com/intel/rohd-bridge/pull/XX>).
+
 ## 0.2.2
 
 - Fixed handling of connections between `PairInterface`s that contained `subInterfaces`, and added checks that `exceptPorts` are not used in those cases (<https://github.com/intel/rohd-bridge/pull/37>).
