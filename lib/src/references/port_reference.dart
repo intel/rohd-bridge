@@ -190,6 +190,14 @@ sealed class PortReference extends Reference {
           'parent module ($module) input ($this).');
     }
 
+    if (relativeLocation != _RelativePortLocation.sameModule &&
+        sameModuleConnectionType != null) {
+      throw RohdBridgeException(
+          'SameModuleConnectionType should only be provided when connecting'
+          ' ports on the same module, but $this is on $module'
+          ' and $other is on ${other.module}.');
+    }
+
     // Same-module connection type validation
     var resolvedConnectionType = sameModuleConnectionType;
     if (relativeLocation == _RelativePortLocation.sameModule &&

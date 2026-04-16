@@ -327,14 +327,16 @@ void main() {
       }
     });
 
-    group('non-same-module ignores enum', () {
+    group('non-same-module rejects enum', () {
       for (final ct in [
         SameModuleConnectionType.loopback,
         SameModuleConnectionType.passthrough,
       ]) {
-        test('sibling modules with ${ct.name}', () async {
+        test('sibling modules with ${ct.name}', () {
           final modA = BridgeModule('modA');
           final modB = BridgeModule('modB');
+          // top is only needed to establish hierarchy for gets() validation.
+          // ignore: unused_local_variable
           final top = BridgeModule('top')
             ..addSubModule(modA)
             ..addSubModule(modB);
@@ -344,17 +346,43 @@ void main() {
           final receiverPort =
               modB.createPort('receiver', PortDirection.input, width: 8);
 
-          // enum should be silently ignored for non-same-module connections
-          connectPorts(driverPort, receiverPort, sameModuleConnectionType: ct);
-
-          // pullUpPort to top so build can succeed
-          top
-            ..pullUpPort(modA.createPort('dummyIn', PortDirection.input))
-            ..pullUpPort(modB.createPort('dummyOut', PortDirection.output));
-
-          await top.build();
+          expect(
+            () => connectPorts(driverPort, receiverPort,
+                sameModuleConnectionType: ct),
+            throwsA(isA<RohdBridgeException>()),
+          );
         });
       }
+
+      test('gives helpful message', () {
+        final modA = BridgeModule('modA');
+        final modB = BridgeModule('modB');
+        // top is only needed to establish hierarchy for gets() validation.
+        // ignore: unused_local_variable
+        final top = BridgeModule('top')
+          ..addSubModule(modA)
+          ..addSubModule(modB);
+
+        final driverPort =
+            modA.createPort('driver', PortDirection.output, width: 8);
+        final receiverPort =
+            modB.createPort('receiver', PortDirection.input, width: 8);
+
+        expect(
+          () => connectPorts(driverPort, receiverPort,
+              sameModuleConnectionType: SameModuleConnectionType.loopback),
+          throwsA(
+            isA<RohdBridgeException>().having(
+              (e) => e.message,
+              'message',
+              allOf(
+                contains('only be provided'),
+                contains('same module'),
+              ),
+            ),
+          ),
+        );
+      });
     });
 
     group('error messages', () {
