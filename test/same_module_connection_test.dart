@@ -539,5 +539,109 @@ void main() {
         );
       });
     });
+
+    group('signal routing verification', () {
+      test('inOut←inOut loopback routes through external ports', () async {
+        final mod = BridgeModule('mod');
+        final top = BridgeModule('top')
+          ..addSubModule(mod)
+          ..pullUpPort(mod.createPort('dummyIn', PortDirection.input));
+
+        final driver = mod.createPort('driver', PortDirection.inOut, width: 8);
+        mod.createPort('receiver', PortDirection.inOut, width: 8).gets(driver,
+            sameModuleConnectionType: SameModuleConnectionType.loopback);
+        await top.build();
+
+        // External ports live on the parent module.
+        final driverExternal = mod.inOutSource('driver');
+        final receiverExternal = mod.inOutSource('receiver');
+        expect(driverExternal.parentModule, equals(top));
+        expect(receiverExternal.parentModule, equals(top));
+        expect(receiverExternal.srcConnections, contains(driverExternal));
+
+        // Internal path should NOT have a direct driver←driver connection.
+        expect(mod.inOut('receiver').srcConnections,
+            isNot(contains(mod.inOut('driver'))));
+      });
+
+      test('inOut←inOut passthrough routes through internal ports', () async {
+        final mod = BridgeModule('mod');
+        final top = BridgeModule('top')
+          ..addSubModule(mod)
+          ..pullUpPort(mod.createPort('dummyIn', PortDirection.input));
+
+        final driver = mod.createPort('driver', PortDirection.inOut, width: 8);
+        mod.createPort('receiver', PortDirection.inOut, width: 8).gets(driver,
+            sameModuleConnectionType: SameModuleConnectionType.passthrough);
+        await top.build();
+
+        // Internal ports live on the module itself.
+        final driverInternal = mod.inOut('driver');
+        final receiverInternal = mod.inOut('receiver');
+        expect(driverInternal.parentModule, equals(mod));
+        expect(receiverInternal.parentModule, equals(mod));
+        expect(receiverInternal.srcConnections, contains(driverInternal));
+
+        // External path should NOT have the connection.
+        expect(mod.inOutSource('receiver').srcConnections,
+            isNot(contains(mod.inOutSource('driver'))));
+      });
+
+      test('inOut←output loopback routes through external ports', () async {
+        final mod = BridgeModule('mod');
+        final top = BridgeModule('top')
+          ..addSubModule(mod)
+          ..pullUpPort(mod.createPort('dummyIn', PortDirection.input));
+
+        mod.createPort('driver', PortDirection.output, width: 8);
+        mod.createPort('receiver', PortDirection.inOut, width: 8).gets(
+            mod.port('driver'),
+            sameModuleConnectionType: SameModuleConnectionType.loopback);
+        await top.build();
+
+        // Receiver external port lives on parent; driver output connects to it.
+        final receiverExternal = mod.inOutSource('receiver');
+        expect(receiverExternal.parentModule, equals(top));
+        expect(receiverExternal.srcConnections, contains(mod.output('driver')));
+      });
+
+      test('inOut←output passthrough routes through internal ports', () async {
+        final mod = BridgeModule('mod');
+        final top = BridgeModule('top')
+          ..addSubModule(mod)
+          ..pullUpPort(mod.createPort('dummyIn', PortDirection.input));
+
+        mod.createPort('driver', PortDirection.output, width: 8);
+        mod.createPort('receiver', PortDirection.inOut, width: 8).gets(
+            mod.port('driver'),
+            sameModuleConnectionType: SameModuleConnectionType.passthrough);
+        await top.build();
+
+        // Internal receiver lives on mod; driver output connects to it.
+        final receiverInternal = mod.inOut('receiver');
+        expect(receiverInternal.parentModule, equals(mod));
+        expect(receiverInternal.srcConnections, contains(mod.output('driver')));
+      });
+
+      test('output←inOut passthrough routes through internal ports', () async {
+        final mod = BridgeModule('mod');
+        final top = BridgeModule('top')
+          ..addSubModule(mod)
+          ..pullUpPort(mod.createPort('dummyIn', PortDirection.input));
+
+        mod.createPort('driver', PortDirection.inOut, width: 8);
+        mod.createPort('receiver', PortDirection.output, width: 8).gets(
+            mod.port('driver'),
+            sameModuleConnectionType: SameModuleConnectionType.passthrough);
+        await top.build();
+
+        // Output receiver is driven by the internal inOut port (on mod).
+        final receiverOut = mod.output('receiver');
+        final driverInternal = mod.inOut('driver');
+        expect(receiverOut.parentModule, equals(mod));
+        expect(driverInternal.parentModule, equals(mod));
+        expect(receiverOut.srcConnection, equals(driverInternal));
+      });
+    });
   });
 }
