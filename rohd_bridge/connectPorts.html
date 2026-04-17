@@ -57,10 +57,11 @@
 <span class="returntype">void</span>
 <span class="name ">connectPorts</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="connectPorts-param-driver"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">driver</span>, </span></li>
 <li><span class="parameter" id="connectPorts-param-receiver"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">receiver</span>, {</span></li>
-<li><span class="parameter" id="connectPorts-param-driverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.1/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">driverPathNewPortName</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-receiverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.1/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">receiverPathNewPortName</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-allowDriverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.1/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowDriverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-allowReceiverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.1/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowReceiverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-driverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.5/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">driverPathNewPortName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-receiverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.5/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">receiverPathNewPortName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-allowDriverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.5/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowDriverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-allowReceiverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.5/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowReceiverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-sameModuleConnectionType"><span class="type-annotation"><a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a>?</span> <span class="parameter-name">sameModuleConnectionType</span>, </span></li>
 </ol>})
 
         
@@ -76,6 +77,12 @@ it will prefer to name new ports with those names. If
 <code>false</code>, then the port names will not be uniquified on those paths.
 Uniquification also respects <a href="../rohd_bridge/BridgeModule/allowUniquification.html">BridgeModule.allowUniquification</a> at each
 level.</p>
+<p>When <code>driver</code> and <code>receiver</code> are on the same module and the connection is
+ambiguous (at least one port is <a href="../rohd_bridge/PortDirection.html">PortDirection.inOut</a> and neither is
+<a href="../rohd_bridge/PortDirection.html">PortDirection.input</a>), <code>sameModuleConnectionType</code> must be provided to
+disambiguate whether the connection is a <a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType.loopback</a>
+(using external-facing ports) or a <a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType.passthrough</a>
+(using internal-facing ports). See <a href="../rohd_bridge/PortReference/gets.html">PortReference.gets</a> for full details.</p>
 </section>
 
 
@@ -89,6 +96,7 @@ level.</p>
   String? receiverPathNewPortName,
   bool allowDriverPathUniquification = true,
   bool allowReceiverPathUniquification = true,
+  SameModuleConnectionType? sameModuleConnectionType,
 }) {
   &#47;&#47; TODO(mkorbel1): need to add better control over naming of intermediate
   &#47;&#47;  ports -- default allow renaming? or should it prefer the top&#47;leaf?
@@ -253,7 +261,8 @@ level.</p>
     receiverPortModule._upperSourceMap[driverPortRef] = createdReceiverPort;
   }
 
-  receiverPortRef.gets(driverPortRef);
+  receiverPortRef.gets(driverPortRef,
+      sameModuleConnectionType: sameModuleConnectionType);
 }</code></pre>
 </section>
 

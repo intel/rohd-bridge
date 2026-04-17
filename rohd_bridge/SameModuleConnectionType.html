@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the PortDirection enum from the rohd_bridge library, for the Dart programming language.">
-  <title>PortDirection enum - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the SameModuleConnectionType enum from the rohd_bridge library, for the Dart programming language.">
+  <title>SameModuleConnectionType enum - rohd_bridge library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge.dart</a></li>
-    <li class="self-crumb">PortDirection enum</li>
+    <li class="self-crumb">SameModuleConnectionType enum</li>
   </ol>
-  <div class="self-name">PortDirection</div>
+  <div class="self-name">SameModuleConnectionType</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,11 +46,11 @@
     id="dartdoc-main-content"
     class="main-content"
     data-above-sidebar="rohd_bridge&#47;rohd_bridge-library-sidebar.html"
-    data-below-sidebar="rohd_bridge&#47;PortDirection-enum-sidebar.html">
+    data-below-sidebar="rohd_bridge&#47;SameModuleConnectionType-enum-sidebar.html">
     <div>
 
       <h1>
-        <span class="kind-enum">PortDirection</span>
+        <span class="kind-enum">SameModuleConnectionType</span>
         enum 
  
 
@@ -59,7 +59,15 @@
 
     
 <section class="desc markdown">
-  <p>A direction type for a port of a <a href="https://pub.dev/documentation/rohd/0.6.9/rohd/Module-class.html">Module</a>.</p>
+  <p>The type of connection to make between two ports on the same module.</p>
+<p>When connecting two ports on the same <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>, the connection can
+either be a <a href="../rohd_bridge/SameModuleConnectionType.html">loopback</a> (external, pin-to-pin) or a <a href="../rohd_bridge/SameModuleConnectionType.html">passthrough</a> (internal,
+net-to-net).</p>
+<p>For most direction combinations, the connection type is unambiguous and
+<a href="../rohd_bridge/PortReference/gets.html">PortReference.gets</a> can infer it automatically. However, when at least one
+port is <a href="../rohd_bridge/PortDirection.html">PortDirection.inOut</a> and neither port is <a href="../rohd_bridge/PortDirection.html">PortDirection.input</a>, the
+connection type must be explicitly specified via <a href="../rohd_bridge/PortReference/gets.html">PortReference.gets</a> or
+<code>connectPorts</code>.</p>
 </section>
 
 
@@ -71,7 +79,7 @@
     <ul class="gt-separated dark eNum-relationships">
       <li><a href="https://api.dart.dev/stable/3.11.5/dart-core/Object-class.html">Object</a></li>
         <li><a href="https://api.dart.dev/stable/3.11.5/dart-core/Enum-class.html">Enum</a></li>
-      <li>PortDirection</li>
+      <li>SameModuleConnectionType</li>
     </ul>
   </dd>
 
@@ -91,38 +99,30 @@
       <section class="summary offset-anchor" id="values">
         <h2>Values</h2>
         <dl class="properties">
-            <dt id="input" class="constant">
-    <span class="name ">input</span>
-  <span class="signature">&#8594; const <a href="../rohd_bridge/PortDirection.html">PortDirection</a></span>
+            <dt id="loopback" class="constant">
+    <span class="name ">loopback</span>
+  <span class="signature">&#8594; const <a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a></span>
   
 
 </dt>
 <dd>
-  <p>Input.</p>
+  <p>An external (loopback) connection between ports on the same module.</p>
+<p>This connects the external-facing sides of the ports, making the
+connection visible outside the module.</p>
   
 
 </dd>
 
-            <dt id="output" class="constant">
-    <span class="name ">output</span>
-  <span class="signature">&#8594; const <a href="../rohd_bridge/PortDirection.html">PortDirection</a></span>
+            <dt id="passthrough" class="constant">
+    <span class="name ">passthrough</span>
+  <span class="signature">&#8594; const <a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a></span>
   
 
 </dt>
 <dd>
-  <p>Output.</p>
-  
-
-</dd>
-
-            <dt id="inOut" class="constant">
-    <span class="name ">inOut</span>
-  <span class="signature">&#8594; const <a href="../rohd_bridge/PortDirection.html">PortDirection</a></span>
-  
-
-</dt>
-<dd>
-  <p>In/Out.</p>
+  <p>An internal (passthrough) connection between ports on the same module.</p>
+<p>This connects the internal-facing sides of the ports, making the
+connection visible only within the module.</p>
   
 
 </dd>
@@ -248,45 +248,14 @@
   </section>
     
     
-  <section class="summary offset-anchor" id="static-methods">
-    <h2>Static Methods</h2>
-    <dl class="callables">
-        <dt id="fromString" class="callable">
-  <span class="name"><a href="../rohd_bridge/PortDirection/fromString.html">fromString</a></span><span class="signature">(<wbr><span class="parameter" id="fromString-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.11.5/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortDirection.html">PortDirection</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-  Converts from a name of <a href="../rohd_bridge/PortDirection/values-constant.html">values</a> to a <a href="../rohd_bridge/PortDirection.html">PortDirection</a>.
-  
-
-</dd>
-
-        <dt id="ofPort" class="callable">
-  <span class="name"><a href="../rohd_bridge/PortDirection/ofPort.html">ofPort</a></span><span class="signature">(<wbr><span class="parameter" id="ofPort-param-port"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.9/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">port</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortDirection.html">PortDirection</a></span>
-  </span>
-  
-
-</dt>
-<dd>
-  Identifies a <a href="https://pub.dev/documentation/rohd/0.6.9/rohd/Module-class.html">Module</a>'s port into a <a href="../rohd_bridge/PortDirection.html">PortDirection</a>.
-  
-
-</dd>
-
-    </dl>
-  </section>
     
 
   <section class="summary offset-anchor" id="constants">
     <h2>Constants</h2>
     <dl class="properties">
         <dt id="values" class="constant">
-    <span class="name "><a href="../rohd_bridge/PortDirection/values-constant.html">values</a></span>
-  <span class="signature">&#8594; const <a href="https://api.dart.dev/stable/3.11.5/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../rohd_bridge/PortDirection.html">PortDirection</a></span>&gt;</span></span>
+    <span class="name "><a href="../rohd_bridge/SameModuleConnectionType/values-constant.html">values</a></span>
+  <span class="signature">&#8594; const <a href="https://api.dart.dev/stable/3.11.5/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a></span>&gt;</span></span>
   
 
 </dt>
@@ -309,7 +278,7 @@
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge</a></li>
-    <li class="self-crumb">PortDirection enum</li>
+    <li class="self-crumb">SameModuleConnectionType enum</li>
 </ol>
 
   <h5>rohd_bridge library</h5>

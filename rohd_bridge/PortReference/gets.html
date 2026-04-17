@@ -55,8 +55,9 @@
     <section class="multi-line-signature">
       
 <span class="returntype">void</span>
-<span class="name ">gets</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="gets-param-other"><span class="type-annotation"><a href="../../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">other</span></span></li>
-</ol>)
+<span class="name ">gets</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="gets-param-other"><span class="type-annotation"><a href="../../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">other</span>, {</span></li>
+<li><span class="parameter" id="gets-param-sameModuleConnectionType"><span class="type-annotation"><a href="../../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a>?</span> <span class="parameter-name">sameModuleConnectionType</span>, </span></li>
+</ol>})
 
       
 
@@ -67,13 +68,18 @@
 <p>This establishes a connection where the signal from <code>other</code> drives this
 port. The connection respects the hierarchical nature of the modules and
 handles directionality of ports appropriately.</p>
+<p>When connecting two ports on the same module where the connection type is
+ambiguous (at least one port is <a href="../../rohd_bridge/PortDirection.html">PortDirection.inOut</a> and neither is
+<a href="../../rohd_bridge/PortDirection.html">PortDirection.input</a>), a <code>sameModuleConnectionType</code> must be provided to
+disambiguate.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void gets(PortReference other) {
+  <pre class="language-dart"><code class="language-dart">void gets(PortReference other,
+    {SameModuleConnectionType? sameModuleConnectionType}) {
   final relativeLocation = _relativeLocationOf(other);
 
   if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
@@ -139,7 +145,24 @@ handles directionality of ports appropriately.</p>
         &#39;parent module ($module) input ($this).&#39;);
   }
 
-  getsInternal(other);
+  if (relativeLocation != _RelativePortLocation.sameModule &amp;&amp;
+      sameModuleConnectionType != null) {
+    throw RohdBridgeException(
+        &#39;SameModuleConnectionType should only be provided when connecting&#39;
+        &#39; ports on the same module, but $this is on $module&#39;
+        &#39; and $other is on ${other.module}.&#39;);
+  }
+
+  &#47;&#47; Same-module connection type validation
+  var resolvedConnectionType = sameModuleConnectionType;
+  if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
+      other is! InterfacePortReference &amp;&amp;
+      this is! InterfacePortReference) {
+    resolvedConnectionType =
+        _validateSameModuleConnectionType(other, sameModuleConnectionType);
+  }
+
+  getsInternal(other, sameModuleConnectionType: resolvedConnectionType);
 }</code></pre>
 </section>
 
