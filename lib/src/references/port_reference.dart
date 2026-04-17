@@ -12,6 +12,31 @@
 
 part of 'references.dart';
 
+/// The type of connection to make between two ports on the same module.
+///
+/// When connecting two ports on the same [BridgeModule], the connection can
+/// either be a [loopback] (external, pin-to-pin) or a [passthrough] (internal,
+/// net-to-net).
+///
+/// For most direction combinations, the connection type is unambiguous and
+/// [PortReference.gets] can infer it automatically. However, when at least one
+/// port is [PortDirection.inOut] and neither port is [PortDirection.input], the
+/// connection type must be explicitly specified via [PortReference.gets] or
+/// `connectPorts`.
+enum SameModuleConnectionType {
+  /// An external (loopback) connection between ports on the same module.
+  ///
+  /// This connects the external-facing sides of the ports, making the
+  /// connection visible outside the module.
+  loopback,
+
+  /// An internal (passthrough) connection between ports on the same module.
+  ///
+  /// This connects the internal-facing sides of the ports, making the
+  /// connection visible only within the module.
+  passthrough,
+}
+
 /// An enumeration of the possible relative locations of two ports' modules.
 enum _RelativePortLocation {
   thisAboveOther,
@@ -93,7 +118,13 @@ sealed class PortReference extends Reference {
   /// This establishes a connection where the signal from [other] drives this
   /// port. The connection respects the hierarchical nature of the modules and
   /// handles directionality of ports appropriately.
-  void gets(PortReference other) {
+  ///
+  /// When connecting two ports on the same module where the connection type is
+  /// ambiguous (at least one port is [PortDirection.inOut] and neither is
+  /// [PortDirection.input]), a [sameModuleConnectionType] must be provided to
+  /// disambiguate.
+  void gets(PortReference other,
+      {SameModuleConnectionType? sameModuleConnectionType}) {
     final relativeLocation = _relativeLocationOf(other);
 
     if (relativeLocation == _RelativePortLocation.sameModule &&
@@ -159,12 +190,100 @@ sealed class PortReference extends Reference {
           'parent module ($module) input ($this).');
     }
 
-    getsInternal(other);
+    if (relativeLocation != _RelativePortLocation.sameModule &&
+        sameModuleConnectionType != null) {
+      throw RohdBridgeException(
+          'SameModuleConnectionType should only be provided when connecting'
+          ' ports on the same module, but $this is on $module'
+          ' and $other is on ${other.module}.');
+    }
+
+    // Same-module connection type validation
+    var resolvedConnectionType = sameModuleConnectionType;
+    if (relativeLocation == _RelativePortLocation.sameModule &&
+        other is! InterfacePortReference &&
+        this is! InterfacePortReference) {
+      resolvedConnectionType =
+          _validateSameModuleConnectionType(other, sameModuleConnectionType);
+    }
+
+    getsInternal(other, sameModuleConnectionType: resolvedConnectionType);
+  }
+
+  /// Validates and resolves the [SameModuleConnectionType] for a same-module
+  /// connection.
+  ///
+  /// Returns the resolved [SameModuleConnectionType] to use for the connection,
+  /// or `null` if it doesn't matter.
+  ///
+  /// Throws if the connection is ambiguous and no type is specified, or if the
+  /// specified type conflicts with the forced connection type for the given
+  /// direction combination.
+  SameModuleConnectionType? _validateSameModuleConnectionType(
+      PortReference other, SameModuleConnectionType? provided) {
+    // Determine if the connection is ambiguous:
+    // At least one port is inOut and neither is input.
+    final isAmbiguous = (direction == PortDirection.inOut ||
+            other.direction == PortDirection.inOut) &&
+        direction != PortDirection.input &&
+        other.direction != PortDirection.input;
+
+    if (isAmbiguous) {
+      if (provided == null) {
+        throw RohdBridgeException('Connecting ${other.direction.name} $other to'
+            ' ${direction.name} $this on the same module (${module.name})'
+            ' is ambiguous.'
+            ' Provide a SameModuleConnectionType'
+            ' (loopback or passthrough) to disambiguate.');
+      }
+
+      // output←inOut with loopback is invalid: output ports cannot be driven
+      // by external inOut sources.
+      if (direction == PortDirection.output &&
+          other.direction == PortDirection.inOut &&
+          provided == SameModuleConnectionType.loopback) {
+        throw RohdBridgeException(
+            'SameModuleConnectionType.loopback is not valid for'
+            ' output←inOut on the same module.'
+            ' An output port cannot be driven by the external side of an'
+            ' inOut port. Use passthrough instead.');
+      }
+
+      return provided;
+    }
+
+    // Non-ambiguous cases: determine the forced type.
+    SameModuleConnectionType? forcedType;
+
+    if (direction == PortDirection.input) {
+      // input receiver → always loopback (external)
+      forcedType = SameModuleConnectionType.loopback;
+    } else if (direction == PortDirection.output &&
+        other.direction == PortDirection.input) {
+      // output←input → always passthrough (internal)
+      forcedType = SameModuleConnectionType.passthrough;
+    } else if (direction == PortDirection.inOut &&
+        other.direction == PortDirection.input) {
+      // inOut←input → always passthrough (internal)
+      forcedType = SameModuleConnectionType.passthrough;
+    }
+    // output←output → equivalent, no forced type
+
+    // If a type was provided, validate it matches the forced type.
+    if (provided != null && forcedType != null && provided != forcedType) {
+      throw RohdBridgeException(
+          'SameModuleConnectionType.${provided.name} is not valid for'
+          ' ${direction.name}←${other.direction.name} on the same module.'
+          ' Must be ${forcedType.name}.');
+    }
+
+    return provided ?? forcedType;
   }
 
   /// Implementation of [gets] after some validation.
   @internal
-  void getsInternal(PortReference other);
+  void getsInternal(PortReference other,
+      {SameModuleConnectionType? sameModuleConnectionType});
 
   /// Connects this port to be driven by a [Logic] [other].
   ///
@@ -247,8 +366,12 @@ sealed class PortReference extends Reference {
   /// The receiver and driver considering the relative hierarchy of the ports.
   ///
   /// It is assumed that [other] is driving `this` (part of a call to [gets]).
+  ///
+  /// When [sameModuleConnectionType] is provided for same-module connections,
+  /// it overrides the default internal/external port selection.
   ({Logic receiver, Logic driver}) _relativeReceiverAndDriver(
-      PortReference other) {
+      PortReference other,
+      {SameModuleConnectionType? sameModuleConnectionType}) {
     final loc = _relativeLocationOf(other);
 
     switch (loc) {
@@ -279,6 +402,14 @@ sealed class PortReference extends Reference {
                 return (receiver: _externalPort, driver: other._externalPort);
               }
           }
+        }
+
+        // When an explicit connection type is provided, use it directly.
+        if (sameModuleConnectionType == SameModuleConnectionType.loopback) {
+          return (driver: other._externalPort, receiver: _externalPort);
+        } else if (sameModuleConnectionType ==
+            SameModuleConnectionType.passthrough) {
+          return (driver: other._internalPort, receiver: _internalPort);
         }
 
         if (direction == PortDirection.input &&
@@ -301,7 +432,11 @@ sealed class PortReference extends Reference {
   /// The driver subset considering the relative hierarchy of the ports.
   ///
   /// It is assumed that [other] is driving `this` (part of a call to [gets]).
-  dynamic _relativeDriverSubset(PortReference other) {
+  ///
+  /// When [sameModuleConnectionType] is provided for same-module connections,
+  /// it overrides the default internal/external port selection.
+  dynamic _relativeDriverSubset(PortReference other,
+      {SameModuleConnectionType? sameModuleConnectionType}) {
     final loc = _relativeLocationOf(other);
 
     switch (loc) {
@@ -332,6 +467,14 @@ sealed class PortReference extends Reference {
                 return other._externalPortSubset;
               }
           }
+        }
+
+        // When an explicit connection type is provided, use it directly.
+        if (sameModuleConnectionType == SameModuleConnectionType.loopback) {
+          return other._externalPortSubset;
+        } else if (sameModuleConnectionType ==
+            SameModuleConnectionType.passthrough) {
+          return other._internalPortSubset;
         }
 
         if (direction == PortDirection.input &&

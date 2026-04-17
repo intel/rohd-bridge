@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // standard_port_reference.dart
@@ -44,14 +44,19 @@ class StandardPortReference extends PortReference {
 
   @override
   @internal
-  void getsInternal(PortReference other) {
+  void getsInternal(PortReference other,
+      {SameModuleConnectionType? sameModuleConnectionType}) {
     if (other is StandardPortReference) {
-      final (receiver: receiver, driver: driver) =
-          _relativeReceiverAndDriver(other);
+      final (receiver: receiver, driver: driver) = _relativeReceiverAndDriver(
+          other,
+          sameModuleConnectionType: sameModuleConnectionType);
       receiver <= driver;
     } else if (other is SlicePortReference) {
-      final otherDriver = _relativeDriverSubset(other);
-      final receiver = _relativeReceiverAndDriver(other).receiver;
+      final otherDriver = _relativeDriverSubset(other,
+          sameModuleConnectionType: sameModuleConnectionType);
+      final receiver = _relativeReceiverAndDriver(other,
+              sameModuleConnectionType: sameModuleConnectionType)
+          .receiver;
 
       if (otherDriver is Logic) {
         receiver <= otherDriver;

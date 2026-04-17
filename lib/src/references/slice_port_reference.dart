@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // slice_port_reference.dart
@@ -257,9 +257,13 @@ class SlicePortReference extends PortReference {
 
   @override
   @internal
-  void getsInternal(PortReference other) {
-    var receiverPort = _relativeReceiverAndDriver(other).receiver;
-    final otherDriver = _relativeDriverSubset(other);
+  void getsInternal(PortReference other,
+      {SameModuleConnectionType? sameModuleConnectionType}) {
+    var receiverPort = _relativeReceiverAndDriver(other,
+            sameModuleConnectionType: sameModuleConnectionType)
+        .receiver;
+    final otherDriver = _relativeDriverSubset(other,
+        sameModuleConnectionType: sameModuleConnectionType);
 
     int? leafIndex;
 

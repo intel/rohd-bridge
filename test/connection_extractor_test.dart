@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // connection_extractor_test.dart
@@ -1056,7 +1056,8 @@ void main() {
 
       final top = BridgeModule('top')..addSubModule(mod);
 
-      connectPorts(port.slice(2, 1), port.slice(5, 4));
+      connectPorts(port.slice(2, 1), port.slice(5, 4),
+          sameModuleConnectionType: SameModuleConnectionType.passthrough);
 
       top.pullUpPort(mod.createPort('clk', PortDirection.input));
 
