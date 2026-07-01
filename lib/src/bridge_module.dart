@@ -1124,9 +1124,8 @@ void connectPorts(
   bool allowDriverPathUniquification = true,
   bool allowReceiverPathUniquification = true,
   SameModuleConnectionType? sameModuleConnectionType,
+  String? intermediateSignalName,
 }) {
-  // TODO(mkorbel1): need to add better control over naming of intermediate
-  //  ports -- default allow renaming? or should it prefer the top/leaf?
 
   if (driver.module.hasBuilt || receiver.module.hasBuilt) {
     throw RohdBridgeException('Cannot connect ports after build.');
@@ -1289,7 +1288,8 @@ void connectPorts(
   }
 
   receiverPortRef.gets(driverPortRef,
-      sameModuleConnectionType: sameModuleConnectionType);
+      sameModuleConnectionType: sameModuleConnectionType,
+      intermediateSignalName: intermediateSignalName);
 }
 
 /// Connects [intf1] to [intf2], creating all necessary ports through the

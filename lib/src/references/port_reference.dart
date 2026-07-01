@@ -124,7 +124,8 @@ sealed class PortReference extends Reference {
   /// [PortDirection.input]), a [sameModuleConnectionType] must be provided to
   /// disambiguate.
   void gets(PortReference other,
-      {SameModuleConnectionType? sameModuleConnectionType}) {
+      {SameModuleConnectionType? sameModuleConnectionType,
+      String? intermediateSignalName}) {
     final relativeLocation = _relativeLocationOf(other);
 
     if (relativeLocation == _RelativePortLocation.sameModule &&
@@ -207,7 +208,9 @@ sealed class PortReference extends Reference {
           _validateSameModuleConnectionType(other, sameModuleConnectionType);
     }
 
-    getsInternal(other, sameModuleConnectionType: resolvedConnectionType);
+    getsInternal(other,
+        sameModuleConnectionType: resolvedConnectionType,
+        intermediateSignalName: intermediateSignalName);
   }
 
   /// Validates and resolves the [SameModuleConnectionType] for a same-module
@@ -283,7 +286,56 @@ sealed class PortReference extends Reference {
   /// Implementation of [gets] after some validation.
   @internal
   void getsInternal(PortReference other,
-      {SameModuleConnectionType? sameModuleConnectionType});
+      {SameModuleConnectionType? sameModuleConnectionType,
+      String? intermediateSignalName});
+
+  /// Returns the value that should drive the receiver for a connection sourced
+  /// from [driverValue], inserting a named intermediate net when requested.
+  ///
+  /// When [intermediateSignalName] is provided and this is a sibling-level
+  /// connection whose [driverValue] is a simple (non-array) [Logic], this
+  /// creates a [Naming.renameable] intermediate signal (a [LogicNet] for
+  /// bidirectional connections, otherwise a [Logic]) driven by [driverValue]
+  /// and returns it, so the requested name appears in the generated
+  /// SystemVerilog. The width of the net matches [driverValue], which for a
+  /// sliced driver is the width of the slice.
+  ///
+  /// If a net with the same name already exists on the same [driverValue]
+  /// (fan-out), it is reused so multiple receivers share a single net.
+  ///
+  /// For cases that cannot be cleanly represented by a single named net (array
+  /// or list-typed drivers, or vertical connections), [driverValue] is returned
+  /// unchanged and the connection remains unnamed.
+  dynamic _insertIntermediateNetIfNeeded(
+      dynamic driverValue, String? intermediateSignalName, PortReference other) {
+    if (intermediateSignalName == null ||
+        driverValue is! Logic ||
+        driverValue is LogicArray ||
+        _relativeLocationOf(other) != _RelativePortLocation.sameLevel) {
+      return driverValue;
+    }
+
+    // Fan-out: reuse an existing net with this name already driven by the same
+    // driver, so multiple receivers can share a single net.
+    final existingNet = driverValue.dstConnections
+        .where((s) => !s.isPort && s.name == intermediateSignalName)
+        .firstOrNull;
+    if (existingNet != null) {
+      return existingNet;
+    }
+
+    final net = (driverValue.isNet || port.isNet)
+        ? LogicNet(
+            name: intermediateSignalName,
+            width: driverValue.width,
+            naming: Naming.renameable)
+        : Logic(
+            name: intermediateSignalName,
+            width: driverValue.width,
+            naming: Naming.renameable);
+    net <= driverValue;
+    return net;
+  }
 
   /// Connects this port to be driven by a [Logic] [other].
   ///
