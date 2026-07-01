@@ -680,6 +680,51 @@ class BridgeModule extends Module with SystemVerilog {
     return thisPort;
   }
 
+  /// Tries to create a port reference from a string representation with
+  /// advanced parsing.
+  ///
+  /// This method handles both simple ports and complex port references
+  /// including:
+  /// - Simple port names: "clk", "reset_n"
+  /// - Bit ranges and indices: "data[7:0]", "addr[5]"
+  /// - Struct member access: "mystruct.field" (using [structMap] lookup)
+  /// - Renamed ports: automatically resolves to original port names
+  ///
+  /// For struct ports (containing '.'), the method looks up the actual bit
+  /// slice in [structMap]. For renamed ports, it automatically resolves to the
+  /// original port name while preserving any range specification.
+  ///
+  /// Returns a [PortReference] that can be used for connections and operations,
+  /// or `null` if the referenced port access is valid but the port does not
+  /// exist.
+  ///
+  /// Throws an [Exception] if [portRefString] is not a valid port access
+  /// string.
+  PortReference? tryPort(String portRefString) {
+    if (portRefString.contains('.')) {
+      return structMap[portRefString];
+    }
+
+    final portRefComponents =
+        SlicePortReference.extractPortAccessSliceComponents(portRefString);
+
+    final portName = portRefComponents.portName;
+    final resolvedPortName = renamedPorts[portName] ?? portName;
+
+    if (tryInput(resolvedPortName) == null &&
+        tryOutput(resolvedPortName) == null &&
+        tryInOut(resolvedPortName) == null) {
+      return null;
+    }
+
+    if (renamedPorts.containsKey(portName)) {
+      return PortReference.fromString(
+          this, portRefString.replaceFirst(portName, resolvedPortName));
+    }
+
+    return PortReference.fromString(this, portRefString);
+  }
+
   /// Creates a port reference from a string representation with advanced
   /// parsing.
   ///
@@ -696,32 +741,11 @@ class BridgeModule extends Module with SystemVerilog {
   ///
   /// Returns a [PortReference] that can be used for connections and operations.
   ///
-  /// Throws an [Exception] if a struct port is not found in [structMap].
-  PortReference port(String portRefString) {
-    if (portRefString.contains('.')) {
-      // this is a struct port, special handling
-      if (!structMap.containsKey(portRefString)) {
-        throw RohdBridgeException(
-            'Struct port $portRefString not found in $name');
-      }
-
-      return structMap[portRefString]!;
-    } else {
-      final portRefComponents =
-          SlicePortReference.extractPortAccessSliceComponents(portRefString);
-
-      if (renamedPorts.containsKey(portRefComponents.portName)) {
-        return PortReference.fromString(
-            this,
-            portRefString.replaceFirst(
-              portRefComponents.portName,
-              renamedPorts[portRefComponents.portName]!,
-            ));
-      } else {
-        return PortReference.fromString(this, portRefString);
-      }
-    }
-  }
+  /// Throws an [Exception] if the port access string is invalid or the port is
+  /// not found.
+  PortReference port(String portRefString) =>
+      tryPort(portRefString) ??
+      (throw RohdBridgeException('Port $portRefString not found in $name'));
 
   /// Internal tracking map for hierarchical port connectivity optimization.
   ///
