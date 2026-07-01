@@ -69,6 +69,38 @@ void main() {
     expect(mod.output('banana').value, LogicValue.of('10xz'));
   });
 
+  test('zero tieOffs do not introduce named constants in RTL', () async {
+    final mod = BridgeModule('mod')..addOutput('banana', width: 8);
+
+    for (var i = 0; i < mod.output('banana').width; i++) {
+      mod.port('banana[$i]').tieOff();
+    }
+
+    await mod.build();
+    final sv = mod.generateSynth();
+
+    expect(sv, isNot(contains('tieoff_const0')));
+    expect(mod.output('banana').value, LogicValue.filled(8, LogicValue.zero));
+  });
+
+  test('non-zero tieOffs preserve a shared readable constant in RTL', () async {
+    final mod = BridgeModule('mod')
+      ..addOutput('apple', width: 8)
+      ..addOutput('banana', width: 8);
+
+    mod.port('apple[7:0]').tieOff(value: 0x5a);
+    mod.port('banana[7:0]').tieOff(value: 0x5a);
+
+    await mod.build();
+    final sv = mod.generateSynth();
+
+    expect(RegExp("8'h5a").allMatches(sv), hasLength(1));
+    expect(sv, contains('tieoff_const90'));
+    expect(sv, isNot(contains('tieoff_const90_0')));
+    expect(mod.output('apple').value, LogicValue.ofInt(0x5a, 8));
+    expect(mod.output('banana').value, LogicValue.ofInt(0x5a, 8));
+  });
+
   test('tieOff with fill', () {
     final mod = BridgeModule('mod')
       ..addInput('apple', null, width: 8)
