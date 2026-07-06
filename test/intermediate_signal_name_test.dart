@@ -40,6 +40,9 @@ void main() {
       await top.build();
       final sv = top.generateSynth();
       expect(sv, contains('myNamedNet'));
+
+      src.output('myPortOut').put(0xAB);
+      expect(dst.input('myPortIn').value.toInt(), equals(0xAB));
     });
 
     test('net name appears in portmap for both submodules', () async {
@@ -56,6 +59,9 @@ void main() {
       expect(sv, contains('sharedWire'));
       // dst's input port should be connected to sharedWire in the portmap
       expect(sv, matches(RegExp(r'\.myPortIn\s*\(\s*sharedWire\s*\)')));
+
+      src.output('myPortOut').put(0xA);
+      expect(dst.input('myPortIn').value.toInt(), equals(0xA));
     });
 
     test('without intermediateSignalName: connection works normally', () async {
@@ -70,6 +76,9 @@ void main() {
       final sv = top.generateSynth();
       // should compile, net name is auto-chosen
       expect(sv, isNotEmpty);
+
+      src.output('myPortOut').put(0xA);
+      expect(dst.input('myPortIn').value.toInt(), equals(0xA));
     });
 
     test('aligned slices: each half gets its own named net', () async {
@@ -98,6 +107,10 @@ void main() {
       // Lower net driven by the low half, upper net by the high half.
       expect(sv, matches(RegExp(r'myPortOutLower\s*=\s*myPortOut\[15:0\]')));
       expect(sv, matches(RegExp(r'myPortOutUpper\s*=\s*myPortOut\[31:16\]')));
+
+      // Verify all bits propagate correctly.
+      mod1.output('myPortOut').put(0xDEADBEEF);
+      expect(mod2.input('myPortIn').value.toInt(), equals(0xDEADBEEF));
     });
 
     test('driver slice into full receiver gets named net', () async {
@@ -116,6 +129,10 @@ void main() {
       expect(sv, matches(RegExp(r'logic\s*\[3:0\]\s*lowNibble')));
       expect(sv, matches(RegExp(r'lowNibble\s*=\s*myPortOut\[3:0\]')));
       expect(sv, matches(RegExp(r'\.myPortIn\s*\(\s*lowNibble\s*\)')));
+
+      // Low nibble (0xB) of 0xAB should appear on myPortIn.
+      src.output('myPortOut').put(0xAB);
+      expect(dst.input('myPortIn').value.toInt(), equals(0xB));
     });
 
     test('sibling inOut ports: net appears by name in generated SV', () async {
@@ -135,6 +152,9 @@ void main() {
       await top.build();
       final sv = top.generateSynth();
       expect(sv, contains('inoutBus'));
+
+      modA.port('portA').port.put(0xA);
+      expect(modB.port('portB').port.value.toInt(), equals(0xA));
     });
 
     test('fan-out: multiple receivers share one named net', () async {
@@ -175,6 +195,12 @@ void main() {
       expect(sv, matches(RegExp(r'\.myPortIn_b\s*\(\s*mySharedNet\s*\)')));
       expect(
           sv, matches(RegExp(r'\.myPortIn_c\s*\(\s*mySharedNet\s*\)')));
+
+      // All three receivers should see the driven value.
+      src.output('myPortOut').put(1);
+      expect(dst1.input('myPortIn_a').value.toInt(), equals(1));
+      expect(dst2.input('myPortIn_b').value.toInt(), equals(1));
+      expect(dst3.input('myPortIn_c').value.toInt(), equals(1));
     });
 
     test('name collision auto-uniquifies (Naming.renameable)', () async {
@@ -210,6 +236,12 @@ void main() {
           reason: 'at least one net should use the requested name');
       expect(sv, matches(RegExp(r'mySharedNet_\d+')),
           reason: 'second net with colliding name should be uniquified');
+
+      // Each src should independently drive its intended dst.
+      src.output('myPortOut1').put(0xAB);
+      src.output('myPortOut2').put(0xCD);
+      expect(dst1.input('myPortIn').value.toInt(), equals(0xAB));
+      expect(dst2.input('myPortIn').value.toInt(), equals(0xCD));
     });
 
     test('vertical connection: intermediateSignalName is ignored (no-op)',
@@ -223,9 +255,12 @@ void main() {
 
       // intermediateSignalName is silently ignored for non-sibling connections;
       // connectPorts handles the vertical punch-up as normal.
-      // Should not throw.
+      // Should not throw, and signal should still propagate.
       connectPorts(grandParent.port('clk'), child.port('clk'),
           intermediateSignalName: 'clkRouted');
+
+      grandParent.input('clk').put(1);
+      expect(child.input('clk').value.toInt(), equals(1));
 
       await grandParent.build();
     });
