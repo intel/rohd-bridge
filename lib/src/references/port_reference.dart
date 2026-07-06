@@ -123,6 +123,11 @@ sealed class PortReference extends Reference {
   /// ambiguous (at least one port is [PortDirection.inOut] and neither is
   /// [PortDirection.input]), a [sameModuleConnectionType] must be provided to
   /// disambiguate.
+  ///
+  /// If [intermediateSignalName] is provided, an intermediate signal with that
+  /// name is inserted on sibling-level connections. See
+  /// [_insertIntermediateSignalIfNeeded] for details on when the name is
+  /// applied and when it is silently ignored.
   void gets(PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType,
       String? intermediateSignalName}) {
@@ -284,29 +289,33 @@ sealed class PortReference extends Reference {
   }
 
   /// Implementation of [gets] after some validation.
+  ///
+  /// The [intermediateSignalName], if provided, is forwarded to
+  /// [_insertIntermediateSignalIfNeeded] so that a named intermediate signal
+  /// can be inserted on sibling-level connections.
   @internal
   void getsInternal(PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType,
       String? intermediateSignalName});
 
   /// Returns the value that should drive the receiver for a connection sourced
-  /// from [driverValue], inserting a named intermediate net when requested.
+  /// from [driverValue], inserting a named intermediate signal when requested.
   ///
   /// When [intermediateSignalName] is provided and this is a sibling-level
   /// connection whose [driverValue] is a simple (non-array) [Logic], this
   /// creates a [Naming.renameable] intermediate signal (a [LogicNet] for
   /// bidirectional connections, otherwise a [Logic]) driven by [driverValue]
   /// and returns it, so the requested name appears in the generated
-  /// SystemVerilog. The width of the net matches [driverValue], which for a
+  /// SystemVerilog. The width of the signal matches [driverValue], which for a
   /// sliced driver is the width of the slice.
   ///
-  /// If a net with the same name already exists on the same [driverValue]
-  /// (fan-out), it is reused so multiple receivers share a single net.
+  /// If a signal with the same name already exists on the same [driverValue]
+  /// (fan-out), it is reused so multiple receivers share a single signal.
   ///
-  /// For cases that cannot be cleanly represented by a single named net (array
-  /// or list-typed drivers, or vertical connections), [driverValue] is returned
-  /// unchanged and the connection remains unnamed.
-  dynamic _insertIntermediateNetIfNeeded(
+  /// For cases that cannot be cleanly represented by a single named signal
+  /// (array or list-typed drivers, or vertical connections), [driverValue] is
+  /// returned unchanged and the connection remains unnamed.
+  dynamic _insertIntermediateSignalIfNeeded(
       dynamic driverValue, String? intermediateSignalName, PortReference other) {
     if (intermediateSignalName == null ||
         driverValue is! Logic ||

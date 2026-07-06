@@ -1116,6 +1116,13 @@ class BridgeModule extends Module with SystemVerilog {
 /// disambiguate whether the connection is a [SameModuleConnectionType.loopback]
 /// (using external-facing ports) or a [SameModuleConnectionType.passthrough]
 /// (using internal-facing ports). See [PortReference.gets] for full details.
+///
+/// If [intermediateSignalName] is provided, an intermediate signal with that
+/// name is inserted on the direct (sibling-level) segment of the connection.
+/// This gives control over the name of the net that appears in the generated
+/// SystemVerilog. When multiple receivers share the same driver and
+/// [intermediateSignalName], the same intermediate signal is reused. The name
+/// is ignored for array-typed drivers or vertical (parent/child) connections.
 void connectPorts(
   PortReference driver,
   PortReference receiver, {
