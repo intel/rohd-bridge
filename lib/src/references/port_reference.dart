@@ -328,8 +328,7 @@ sealed class PortReference extends Reference {
     // Fan-out: reuse an existing net with this name already driven by the same
     // driver, so multiple receivers can share a single net.
     final existingNet = driverValue.dstConnections
-        .where((s) => !s.isPort && s.name == intermediateSignalName)
-        .firstOrNull;
+      .firstWhereOrNull((s) => !s.isPort && s.name == intermediateSignalName);
     if (existingNet != null) {
       return existingNet;
     }
