@@ -315,8 +315,8 @@ sealed class PortReference extends Reference {
   /// For cases that cannot be cleanly represented by a single named signal
   /// (structured/array or list-typed drivers, or vertical connections),
   /// [driverValue] is returned unchanged and the connection remains unnamed.
-  dynamic _insertIntermediateSignalIfNeeded(
-      dynamic driverValue, String? intermediateSignalName, PortReference other) {
+  dynamic _insertIntermediateSignalIfNeeded(dynamic driverValue,
+      String? intermediateSignalName, PortReference other) {
     if (intermediateSignalName == null ||
         driverValue is! Logic ||
         driverValue is LogicArray ||
@@ -328,7 +328,7 @@ sealed class PortReference extends Reference {
     // Fan-out: reuse an existing net with this name already driven by the same
     // driver, so multiple receivers can share a single net.
     final existingNet = driverValue.dstConnections
-      .firstWhereOrNull((s) => !s.isPort && s.name == intermediateSignalName);
+        .firstWhereOrNull((s) => !s.isPort && s.name == intermediateSignalName);
     if (existingNet != null) {
       return existingNet;
     }

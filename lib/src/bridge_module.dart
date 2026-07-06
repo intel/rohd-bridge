@@ -1133,7 +1133,6 @@ void connectPorts(
   SameModuleConnectionType? sameModuleConnectionType,
   String? intermediateSignalName,
 }) {
-
   if (driver.module.hasBuilt || receiver.module.hasBuilt) {
     throw RohdBridgeException('Cannot connect ports after build.');
   }

@@ -43,10 +43,11 @@ void main() {
 
       // The intermediate signal should exist in top's internal signals,
       // driven by src's output and driving dst's input source.
-      final intermediate = top.internalSignals
-          .firstWhere((s) => s.name == 'myNamedNet');
+      final intermediate =
+          top.internalSignals.firstWhere((s) => s.name == 'myNamedNet');
       expect(intermediate.srcConnections, contains(src.output('myPortOut')));
-      expect(dst.inputSource('myPortIn').srcConnections, contains(intermediate));
+      expect(
+          dst.inputSource('myPortIn').srcConnections, contains(intermediate));
 
       src.output('myPortOut').put(0xAB);
       expect(dst.input('myPortIn').value.toInt(), equals(0xAB));
@@ -98,11 +99,9 @@ void main() {
       mod2.createPort('myPortIn', PortDirection.input, width: 32);
       top.pullUpPort(mod1.createPort('dummy', PortDirection.output));
 
-      connectPorts(
-          mod1.port('myPortOut[15:0]'), mod2.port('myPortIn[15:0]'),
+      connectPorts(mod1.port('myPortOut[15:0]'), mod2.port('myPortIn[15:0]'),
           intermediateSignalName: 'myPortOutLower');
-      connectPorts(
-          mod1.port('myPortOut[31:16]'), mod2.port('myPortIn[31:16]'),
+      connectPorts(mod1.port('myPortOut[31:16]'), mod2.port('myPortIn[31:16]'),
           intermediateSignalName: 'myPortOutUpper');
 
       await top.build();
@@ -201,8 +200,7 @@ void main() {
       // All three inputs should be connected to mySharedNet in the portmaps.
       expect(sv, matches(RegExp(r'\.myPortIn_a\s*\(\s*mySharedNet\s*\)')));
       expect(sv, matches(RegExp(r'\.myPortIn_b\s*\(\s*mySharedNet\s*\)')));
-      expect(
-          sv, matches(RegExp(r'\.myPortIn_c\s*\(\s*mySharedNet\s*\)')));
+      expect(sv, matches(RegExp(r'\.myPortIn_c\s*\(\s*mySharedNet\s*\)')));
 
       // All three receivers should see the driven value.
       src.output('myPortOut').put(1);
@@ -258,7 +256,7 @@ void main() {
       final parent = grandParent.addSubModule(BridgeModule('parent'));
       final child = parent.addSubModule(BridgeModule('child'))
         ..createPort('clk', PortDirection.input);
-      
+
       grandParent.createPort('clk', PortDirection.input);
 
       // intermediateSignalName is silently ignored for non-sibling connections;
