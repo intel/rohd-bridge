@@ -41,6 +41,13 @@ void main() {
       final sv = top.generateSynth();
       expect(sv, contains('myNamedNet'));
 
+      // The intermediate signal should exist in top's internal signals,
+      // driven by src's output and driving dst's input source.
+      final intermediate = top.internalSignals
+          .firstWhere((s) => s.name == 'myNamedNet');
+      expect(intermediate.srcConnections, contains(src.output('myPortOut')));
+      expect(dst.inputSource('myPortIn').srcConnections, contains(intermediate));
+
       src.output('myPortOut').put(0xAB);
       expect(dst.input('myPortIn').value.toInt(), equals(0xAB));
     });
@@ -57,7 +64,8 @@ void main() {
       await top.build();
       final sv = top.generateSynth();
       expect(sv, contains('sharedWire'));
-      // dst's input port should be connected to sharedWire in the portmap
+      // The net should appear in both submodules' portmaps.
+      expect(sv, matches(RegExp(r'\.myPortOut\s*\(\s*sharedWire\s*\)')));
       expect(sv, matches(RegExp(r'\.myPortIn\s*\(\s*sharedWire\s*\)')));
 
       src.output('myPortOut').put(0xA);
