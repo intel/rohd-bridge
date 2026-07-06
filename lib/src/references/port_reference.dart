@@ -313,13 +313,14 @@ sealed class PortReference extends Reference {
   /// (fan-out), it is reused so multiple receivers share a single signal.
   ///
   /// For cases that cannot be cleanly represented by a single named signal
-  /// (array or list-typed drivers, or vertical connections), [driverValue] is
-  /// returned unchanged and the connection remains unnamed.
+  /// (structured/array or list-typed drivers, or vertical connections),
+  /// [driverValue] is returned unchanged and the connection remains unnamed.
   dynamic _insertIntermediateSignalIfNeeded(
       dynamic driverValue, String? intermediateSignalName, PortReference other) {
     if (intermediateSignalName == null ||
         driverValue is! Logic ||
         driverValue is LogicArray ||
+        driverValue is LogicStructure ||
         _relativeLocationOf(other) != _RelativePortLocation.sameLevel) {
       return driverValue;
     }
