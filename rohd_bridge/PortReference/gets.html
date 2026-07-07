@@ -57,6 +57,7 @@
 <span class="returntype">void</span>
 <span class="name ">gets</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="gets-param-other"><span class="type-annotation"><a href="../../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">other</span>, {</span></li>
 <li><span class="parameter" id="gets-param-sameModuleConnectionType"><span class="type-annotation"><a href="../../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a>?</span> <span class="parameter-name">sameModuleConnectionType</span>, </span></li>
+<li><span class="parameter" id="gets-param-intermediateSignalName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.12.2/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intermediateSignalName</span>, </span></li>
 </ol>})
 
       
@@ -72,6 +73,10 @@ handles directionality of ports appropriately.</p>
 ambiguous (at least one port is <a href="../../rohd_bridge/PortDirection.html">PortDirection.inOut</a> and neither is
 <a href="../../rohd_bridge/PortDirection.html">PortDirection.input</a>), a <code>sameModuleConnectionType</code> must be provided to
 disambiguate.</p>
+<p>If <code>intermediateSignalName</code> is provided, an intermediate signal with that
+name is inserted on sibling-level connections. See
+<code>_insertIntermediateSignalIfNeeded</code> for details on when the name is
+applied and when it is silently ignored.</p>
 </section>
 
 
@@ -79,7 +84,8 @@ disambiguate.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void gets(PortReference other,
-    {SameModuleConnectionType? sameModuleConnectionType}) {
+    {SameModuleConnectionType? sameModuleConnectionType,
+    String? intermediateSignalName}) {
   final relativeLocation = _relativeLocationOf(other);
 
   if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
@@ -162,7 +168,9 @@ disambiguate.</p>
         _validateSameModuleConnectionType(other, sameModuleConnectionType);
   }
 
-  getsInternal(other, sameModuleConnectionType: resolvedConnectionType);
+  getsInternal(other,
+      sameModuleConnectionType: resolvedConnectionType,
+      intermediateSignalName: intermediateSignalName);
 }</code></pre>
 </section>
 
