@@ -75,8 +75,7 @@ will be tied to 0.</p>
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">void tieOff({dynamic value = 0, bool fill = false}) {
-  getsLogic(Const(value, width: width, fill: fill)
-      .named(&#39;tieoff_const$value&#39;, naming: Naming.mergeable));
+  getsLogic(module.tieOffConst(value, width: width, fill: fill));
 }</code></pre>
 </section>
 
