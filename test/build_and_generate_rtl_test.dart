@@ -14,7 +14,7 @@ import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('uses uniquified synthesis names for generated RTL files', () async {
+  test('uses synthesis order and uniquified names for RTL files', () async {
     final output = await Directory.systemTemp.createTemp('rohd_bridge_rtl_');
     addTearDown(() => output.delete(recursive: true));
 
@@ -30,7 +30,7 @@ void main() {
       reserveDefinitionName: false,
     )..createPort('data', PortDirection.output, width: 16);
 
-    final top = BridgeModule('top')
+    final top = BridgeModule('aaa_top')
       ..addSubModule(leaf8)
       ..addSubModule(leaf16)
       ..pullUpPort(leaf8.port('data'))
@@ -40,7 +40,10 @@ void main() {
 
     final filelist = await File('${output.path}/filelist.f').readAsLines();
 
-    expect(filelist, ['./rtl/leaf.sv', './rtl/leaf_0.sv', './rtl/top.sv']);
+    expect(
+      filelist,
+      ['./rtl/leaf.sv', './rtl/leaf_0.sv', './rtl/aaa_top.sv'],
+    );
     expect(File('${output.path}/rtl/leaf_0.sv').existsSync(), isTrue);
   });
 }

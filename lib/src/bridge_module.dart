@@ -995,10 +995,8 @@ class BridgeModule extends Module with SystemVerilog {
     final filelistContents = StringBuffer();
     logger.sectionSeparator('Generating RTL');
     final fileIoFutures = <Future<void>>[];
-    final synthFiles = synthResults
-        .expand((synthResult) => synthResult.toSynthFileContents())
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final synthFiles =
+        synthResults.expand((synthResult) => synthResult.toSynthFileContents());
     for (final synthFile in synthFiles) {
       final fileName = '${synthFile.name}.sv';
       final filePath = '$outputGenerationPath/$fileName';
