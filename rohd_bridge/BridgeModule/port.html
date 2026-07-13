@@ -77,38 +77,17 @@ including:</p>
 slice in <a href="../../rohd_bridge/BridgeModule/structMap.html">structMap</a>. For renamed ports, it automatically resolves to the
 original port name while preserving any range specification.</p>
 <p>Returns a <a href="../../rohd_bridge/PortReference-class.html">PortReference</a> that can be used for connections and operations.</p>
-<p>Throws an <a href="https://api.dart.dev/stable/3.12.2/dart-core/Exception-class.html">Exception</a> if a struct port is not found in <a href="../../rohd_bridge/BridgeModule/structMap.html">structMap</a>.</p>
+<p>Throws an <a href="https://api.dart.dev/stable/3.12.2/dart-core/Exception-class.html">Exception</a> if the port access string is invalid or the port is
+not found.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">PortReference port(String portRefString) {
-  if (portRefString.contains(&#39;.&#39;)) {
-    &#47;&#47; this is a struct port, special handling
-    if (!structMap.containsKey(portRefString)) {
-      throw RohdBridgeException(
-          &#39;Struct port $portRefString not found in $name&#39;);
-    }
-
-    return structMap[portRefString]!;
-  } else {
-    final portRefComponents =
-        SlicePortReference.extractPortAccessSliceComponents(portRefString);
-
-    if (renamedPorts.containsKey(portRefComponents.portName)) {
-      return PortReference.fromString(
-          this,
-          portRefString.replaceFirst(
-            portRefComponents.portName,
-            renamedPorts[portRefComponents.portName]!,
-          ));
-    } else {
-      return PortReference.fromString(this, portRefString);
-    }
-  }
-}</code></pre>
+  <pre class="language-dart"><code class="language-dart">PortReference port(String portRefString) =&gt;
+    tryPort(portRefString) ??
+    (throw RohdBridgeException(&#39;Port $portRefString not found in $name&#39;));</code></pre>
 </section>
 
 
