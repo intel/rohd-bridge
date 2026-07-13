@@ -100,9 +100,15 @@ class InterfaceReference<InterfaceType extends PairInterface>
 
       for (final portName in internalInterface!.ports.keys) {
         final intfPortRef = port(portName);
+        final physicalPortName = portUniquify?.call(portName) ?? portName;
+        final physicalPortRef = module.tryPort(physicalPortName);
+
         _portMaps.add(
           PortMap(
-            port: module.port(portUniquify?.call(portName) ?? portName),
+            port: physicalPortRef ??
+                (intfPortRef.isDirectionless
+                    ? PortReference.fromString(module, physicalPortName)
+                    : module.port(physicalPortName)),
             interfacePort: intfPortRef,
             preConnected: true, // pre-resolved since we just connectIO'd
           ),
