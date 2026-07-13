@@ -103,13 +103,14 @@
   final filelistContents = StringBuffer();
   logger.sectionSeparator(&#39;Generating RTL&#39;);
   final fileIoFutures = &lt;Future&lt;void&gt;&gt;[];
-  for (final synthResult in synthResults) {
-    final fileName = &#39;${synthResult.module.definitionName}.sv&#39;;
+  final synthFiles =
+      synthResults.expand((synthResult) =&gt; synthResult.toSynthFileContents());
+  for (final synthFile in synthFiles) {
+    final fileName = &#39;${synthFile.name}.sv&#39;;
     final filePath = &#39;$outputGenerationPath&#47;$fileName&#39;;
     filelistContents.writeln(&#39;.&#47;rtl&#47;$fileName&#39;);
 
-    fileIoFutures.add(File(filePath)
-        .writeAsString(synthResult.toSynthFileContents().join(&#39;\n&#39;)));
+    fileIoFutures.add(File(filePath).writeAsString(synthFile.contents));
 
     logger.finer(&#39;Generated file ${Directory(filePath).absolute.path}&#39;);
   }
