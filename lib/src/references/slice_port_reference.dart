@@ -258,11 +258,12 @@ class SlicePortReference extends PortReference {
   @override
   @internal
   void getsInternal(PortReference other,
-      {SameModuleConnectionType? sameModuleConnectionType}) {
+      {SameModuleConnectionType? sameModuleConnectionType,
+      String? intermediateSignalName}) {
     var receiverPort = _relativeReceiverAndDriver(other,
             sameModuleConnectionType: sameModuleConnectionType)
         .receiver;
-    final otherDriver = _relativeDriverSubset(other,
+    var otherDriver = _relativeDriverSubset(other,
         sameModuleConnectionType: sameModuleConnectionType);
 
     int? leafIndex;
@@ -288,6 +289,13 @@ class SlicePortReference extends PortReference {
 
     assert(!((leafIndex != null) && hasSlicing),
         'cannot have both slicing and a leaf index');
+
+    // Insert a named intermediate signal for simple (non-array) sibling slice
+    // connections, so the requested name appears in the generated
+    // SystemVerilog. The signal is electrically a pass-through of the driver
+    // subset, so the downstream assignment logic remains correct.
+    otherDriver = _insertIntermediateSignalIfNeeded(
+        otherDriver, intermediateSignalName, other);
 
     if (otherDriver is Logic) {
       if (leafIndex != null) {

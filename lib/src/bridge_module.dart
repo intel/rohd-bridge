@@ -15,6 +15,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:logging/logging.dart';
+import 'package:meta/meta.dart';
 import 'package:rohd/rohd.dart';
 // Use ROHD implementation imports for access to internal utilities.
 // ignore: implementation_imports
@@ -47,6 +48,8 @@ class BridgeModule extends Module with SystemVerilog {
       UnmodifiableListView(_definitionParameters);
   final List<SystemVerilogParameterDefinition> _definitionParameters;
 
+  final Map<LogicValue, Logic> _tieOffConstCache = {};
+
   /// Pass-through parameters used when instantiating this module in
   /// SystemVerilog.
   ///
@@ -69,6 +72,23 @@ class BridgeModule extends Module with SystemVerilog {
   // since we have a "normal" `instantiationVerilog` that has module
   // instantiation ports, we can accept empty port connections
   bool get acceptsEmptyPortConnections => true;
+
+  /// Returns the [Logic] to use for a tie-off to [value].
+  ///
+  /// Zero-valued tie-offs are intentionally left unnamed so generated
+  /// SystemVerilog can inline them. Non-zero tie-offs are cached by their
+  /// normalized [LogicValue] so repeated tie-offs share a readable constant.
+  @internal
+  Logic tieOffConst(dynamic value, {required int width, bool fill = false}) {
+    final constValue = Const(value, width: width, fill: fill);
+
+    if (constValue.value.isZero) {
+      return constValue;
+    }
+
+    return _tieOffConstCache.putIfAbsent(constValue.value,
+        () => constValue.named('tieoff_const$value', naming: Naming.mergeable));
+  }
 
   @override
   String instantiationVerilog(
@@ -999,13 +1019,14 @@ class BridgeModule extends Module with SystemVerilog {
     final filelistContents = StringBuffer();
     logger.sectionSeparator('Generating RTL');
     final fileIoFutures = <Future<void>>[];
-    for (final synthResult in synthResults) {
-      final fileName = '${synthResult.module.definitionName}.sv';
+    final synthFiles =
+        synthResults.expand((synthResult) => synthResult.toSynthFileContents());
+    for (final synthFile in synthFiles) {
+      final fileName = '${synthFile.name}.sv';
       final filePath = '$outputGenerationPath/$fileName';
       filelistContents.writeln('./rtl/$fileName');
 
-      fileIoFutures.add(File(filePath)
-          .writeAsString(synthResult.toSynthFileContents().join('\n')));
+      fileIoFutures.add(File(filePath).writeAsString(synthFile.contents));
 
       logger.finer('Generated file ${Directory(filePath).absolute.path}');
     }
@@ -1140,6 +1161,13 @@ class BridgeModule extends Module with SystemVerilog {
 /// disambiguate whether the connection is a [SameModuleConnectionType.loopback]
 /// (using external-facing ports) or a [SameModuleConnectionType.passthrough]
 /// (using internal-facing ports). See [PortReference.gets] for full details.
+///
+/// If [intermediateSignalName] is provided, an intermediate signal with that
+/// name is inserted on the direct (sibling-level) segment of the connection.
+/// This gives control over the name of the net that appears in the generated
+/// SystemVerilog. When multiple receivers share the same driver and
+/// [intermediateSignalName], the same intermediate signal is reused. The name
+/// is ignored for array-typed drivers or vertical (parent/child) connections.
 void connectPorts(
   PortReference driver,
   PortReference receiver, {
@@ -1148,10 +1176,8 @@ void connectPorts(
   bool allowDriverPathUniquification = true,
   bool allowReceiverPathUniquification = true,
   SameModuleConnectionType? sameModuleConnectionType,
+  String? intermediateSignalName,
 }) {
-  // TODO(mkorbel1): need to add better control over naming of intermediate
-  //  ports -- default allow renaming? or should it prefer the top/leaf?
-
   if (driver.module.hasBuilt || receiver.module.hasBuilt) {
     throw RohdBridgeException('Cannot connect ports after build.');
   }
@@ -1313,7 +1339,8 @@ void connectPorts(
   }
 
   receiverPortRef.gets(driverPortRef,
-      sameModuleConnectionType: sameModuleConnectionType);
+      sameModuleConnectionType: sameModuleConnectionType,
+      intermediateSignalName: intermediateSignalName);
 }
 
 /// Connects [intf1] to [intf2], creating all necessary ports through the

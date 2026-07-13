@@ -45,15 +45,21 @@ class StandardPortReference extends PortReference {
   @override
   @internal
   void getsInternal(PortReference other,
-      {SameModuleConnectionType? sameModuleConnectionType}) {
+      {SameModuleConnectionType? sameModuleConnectionType,
+      String? intermediateSignalName}) {
     if (other is StandardPortReference) {
       final (receiver: receiver, driver: driver) = _relativeReceiverAndDriver(
           other,
           sameModuleConnectionType: sameModuleConnectionType);
-      receiver <= driver;
+      final effectiveDriver = _insertIntermediateSignalIfNeeded(
+          driver, intermediateSignalName, other);
+      receiver <= (effectiveDriver as Logic);
     } else if (other is SlicePortReference) {
-      final otherDriver = _relativeDriverSubset(other,
-          sameModuleConnectionType: sameModuleConnectionType);
+      final otherDriver = _insertIntermediateSignalIfNeeded(
+          _relativeDriverSubset(other,
+              sameModuleConnectionType: sameModuleConnectionType),
+          intermediateSignalName,
+          other);
       final receiver = _relativeReceiverAndDriver(other,
               sameModuleConnectionType: sameModuleConnectionType)
           .receiver;
