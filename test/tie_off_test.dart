@@ -94,8 +94,8 @@ void main() {
     await mod.build();
     final sv = mod.generateSynth();
 
-    expect(RegExp("8'h5a").allMatches(sv), hasLength(1));
-    expect(sv, contains('tieoff_const90'));
+    expect(RegExp("8'h5a").allMatches(sv), hasLength(2));
+    expect(sv, isNot(contains('tieoff_const90')));
     expect(sv, isNot(contains('tieoff_const90_0')));
     expect(mod.output('apple').value, LogicValue.ofInt(0x5a, 8));
     expect(mod.output('banana').value, LogicValue.ofInt(0x5a, 8));

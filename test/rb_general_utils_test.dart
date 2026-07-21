@@ -154,8 +154,8 @@ void main() {
 
     await mod.build();
     final sv = mod.generateSynth();
-    expect(sv, contains('input logic [5:0] portA [5:0]'));
-    expect(sv, contains('output logic portB [5:0]'));
+    expect(sv, contains('input wire logic [5:0] portA [5:0]'));
+    expect(sv, contains('output var logic portB [5:0]'));
   });
 
   test('Process input file test (json from xml)', () {

@@ -10,6 +10,7 @@
 
 import 'dart:io';
 
+import 'package:rohd/rohd.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:test/test.dart';
 
@@ -45,5 +46,26 @@ void main() {
       ['./rtl/leaf.sv', './rtl/leaf_0.sv', './rtl/aaa_top.sv'],
     );
     expect(File('${output.path}/rtl/leaf_0.sv').existsSync(), isTrue);
+  });
+
+  test('uses the provided synthesizer configuration', () async {
+    final output = await Directory.systemTemp.createTemp('rohd_bridge_rtl_');
+    addTearDown(() => output.delete(recursive: true));
+
+    final top = BridgeModule('top')
+      ..createPort('data', PortDirection.input, width: 8);
+
+    await top.buildAndGenerateRTL(
+      outputPath: output.path,
+      synthesizerConfiguration: const SystemVerilogSynthesizerConfiguration(
+        portObjectType: SystemVerilogPortType.implicit,
+        portDataType: SystemVerilogPortType.implicit,
+      ),
+    );
+
+    final rtl = await File('${output.path}/rtl/top.sv').readAsString();
+
+    expect(rtl, contains('input [7:0] data'));
+    expect(rtl, isNot(contains('input wire logic [7:0] data')));
   });
 }
