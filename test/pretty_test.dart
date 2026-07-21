@@ -85,13 +85,13 @@ west  west(.myInput(myInput));'''));
 
     expect(sv, contains('''
 aggregator  aggregator(.merged_bits(({
-merged_bits_subset[3], /* 3 */
-merged_bits_subset[2], /* 2 */
-merged_bits_subset[1], /* 1 */
-merged_bits_subset[0]  /* 0 */
+out_bit_1, /* 3 */
+out_bit_0, /* 2 */
+out_bit, /* 1 */
+out_bit_2  /* 0 */
 })),.clk(clk));
 '''));
-    expect(sv, contains('leaf1  leaf1(.out_bit(merged_bits_subset[1]));'));
+    expect(sv, contains('leaf1  leaf1(.out_bit(out_bit));'));
   });
 
   test('unconnected ports left unconnected', () async {

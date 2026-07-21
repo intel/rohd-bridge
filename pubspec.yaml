@@ -15,5 +15,11 @@ dependencies:
   meta: ^1.15.0
   rohd: ^0.6.9
 
+dependency_overrides: 
+  rohd: 
+    git:
+      url: https://github.com/intel/rohd
+      ref: main
+
 dev_dependencies:
   test: ^1.16.0
