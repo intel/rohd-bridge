@@ -100,9 +100,15 @@ class InterfaceReference<InterfaceType extends PairInterface>
 
       for (final portName in internalInterface!.ports.keys) {
         final intfPortRef = port(portName);
+        final physicalPortName = portUniquify?.call(portName) ?? portName;
+        final physicalPortRef = module.tryPort(physicalPortName);
+
         _portMaps.add(
           PortMap(
-            port: module.port(portUniquify?.call(portName) ?? portName),
+            port: physicalPortRef ??
+                (intfPortRef.isDirectionless
+                    ? PortReference.fromString(module, physicalPortName)
+                    : module.port(physicalPortName)),
             interfacePort: intfPortRef,
             preConnected: true, // pre-resolved since we just connectIO'd
           ),
@@ -189,14 +195,24 @@ class InterfaceReference<InterfaceType extends PairInterface>
   @override
   int get hashCode => name.hashCode ^ module.hashCode ^ interface.hashCode;
 
-  /// Gets a reference to a specific port within this interface.
+  /// Tries to get a reference to a specific port within this interface.
   ///
   /// The [portRef] can be either a simple port name (e.g., "data") or include
   /// slicing/indexing syntax (e.g., "data[7:0]", "addr[3]").
   ///
   /// Returns either a [StandardInterfacePortReference] for simple port names or
-  /// a [SliceInterfacePortReference] for sliced access.
-  InterfacePortReference port(String portRef) {
+  /// a [SliceInterfacePortReference] for sliced access, or `null` if the
+  /// referenced port access is valid but the interface port does not exist.
+  ///
+  /// Throws an [Exception] if [portRef] is not a valid port access string.
+  InterfacePortReference? tryPort(String portRef) {
+    final portRefComponents =
+        SlicePortReference.extractPortAccessSliceComponents(portRef);
+
+    if (interface.tryPort(portRefComponents.portName) == null) {
+      return null;
+    }
+
     if (SlicePortReference._isSliceAccess(portRef)) {
       return SliceInterfacePortReference.fromString(this, portRef);
     }
@@ -207,6 +223,17 @@ class InterfaceReference<InterfaceType extends PairInterface>
 
     throw RohdBridgeException('Invalid port access string: $portRef');
   }
+
+  /// Gets a reference to a specific port within this interface.
+  ///
+  /// The [portRef] can be either a simple port name (e.g., "data") or include
+  /// slicing/indexing syntax (e.g., "data[7:0]", "addr[3]").
+  ///
+  /// Returns either a [StandardInterfacePortReference] for simple port names or
+  /// a [SliceInterfacePortReference] for sliced access.
+  InterfacePortReference port(String portRef) =>
+      tryPort(portRef) ??
+      (throw RohdBridgeException('Port $portRef not found on $this'));
 
   /// Creates a copy of this interface in a parent module.
   ///

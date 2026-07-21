@@ -143,6 +143,17 @@ void main() {
     expect(BadMappingModule.new, throwsException);
   });
 
+  test('tryPort returns null for missing interface ports', () {
+    final intf = IntfPortAccessModule().interface('accessIntf');
+
+    expect(intf.tryPort('portFromConsumer'), intf.port('portFromConsumer'));
+    expect(intf.tryPort('portFromConsumer[3:0]'),
+        intf.port('portFromConsumer[3:0]'));
+    expect(intf.tryPort('missingPort'), isNull);
+    expect(intf.tryPort('missingPort[0]'), isNull);
+    expect(() => intf.tryPort('portFromConsumer[0:1:2]'), throwsException);
+  });
+
   group('slice function', () {
     test('intf normal to slice', () {
       final mod = IntfPortAccessModule();

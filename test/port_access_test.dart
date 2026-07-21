@@ -105,6 +105,22 @@ void main() {
       expect(p.portName, 'myPort');
     });
 
+    test('tryPort returns null for missing ports', () {
+      final mod = BridgeModule('mod')..addInput('myPort', null, width: 8);
+      mod
+        ..renamePort('myPort', 'renamedPort')
+        ..addStructMap('myStruct.field', mod.port('myPort[3:0]'));
+
+      expect(mod.tryPort('myPort'), mod.port('myPort'));
+      expect(mod.tryPort('renamedPort'), mod.port('renamedPort'));
+      expect(mod.tryPort('renamedPort[3:0]'), mod.port('renamedPort[3:0]'));
+      expect(mod.tryPort('myStruct.field'), mod.port('myStruct.field'));
+      expect(mod.tryPort('missingPort'), isNull);
+      expect(mod.tryPort('missingPort[0]'), isNull);
+      expect(mod.tryPort('myStruct.missing'), isNull);
+      expect(() => mod.tryPort('myPort[0:1:2]'), throwsException);
+    });
+
     group('port with slice access', () {
       test('single dimension', () {
         final p =
