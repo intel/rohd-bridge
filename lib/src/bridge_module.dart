@@ -1000,10 +1000,11 @@ class BridgeModule extends Module with SystemVerilog {
     // Build
     try {
       await build();
-      final synthBuilder = SynthBuilder(this, SystemVerilogSynthesizer(
-        configuration: synthesizerConfiguration ?? 
-        const SystemVerilogSynthesizerConfiguration()
-      ));
+      final synthBuilder = SynthBuilder(
+          this,
+          SystemVerilogSynthesizer(
+              configuration: synthesizerConfiguration ??
+                  const SystemVerilogSynthesizerConfiguration()));
       synthResults = synthBuilder.synthesisResults;
       final defNames =
           synthResults.map((result) => result.module.definitionName);
