@@ -990,6 +990,7 @@ class BridgeModule extends Module with SystemVerilog {
   /// [outputPath].
   Future<void> buildAndGenerateRTL({
     @Deprecated('Leave null to use the default logger') Logger? logger,
+    SystemVerilogSynthesizerConfiguration? synthesizerConfiguration,
     String outputPath = 'output',
   }) async {
     logger ??= RohdBridgeLogger.logger;
@@ -999,7 +1000,10 @@ class BridgeModule extends Module with SystemVerilog {
     // Build
     try {
       await build();
-      final synthBuilder = SynthBuilder(this, SystemVerilogSynthesizer());
+      final synthBuilder = SynthBuilder(this, SystemVerilogSynthesizer(
+        configuration: synthesizerConfiguration ?? 
+        const SystemVerilogSynthesizerConfiguration()
+      ));
       synthResults = synthBuilder.synthesisResults;
       final defNames =
           synthResults.map((result) => result.module.definitionName);
