@@ -80,6 +80,8 @@ when possible.</p>
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void getsLogic(Logic other) {
+  _connectOverlappingInterfacePortMaps();
+
   _externalPort &lt;= other;
 }</code></pre>
 </section>

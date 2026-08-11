@@ -82,6 +82,8 @@ port's <code>module</code>.</p>
         &#39;Cannot punch down to a module that is not a submodule.&#39;);
   }
 
+  _connectOverlappingInterfacePortMaps();
+
   &#47;&#47; make a new port in the same direction on new module
   final newPortRef =
       replicateTo(subModule, direction, newPortName: newPortName);

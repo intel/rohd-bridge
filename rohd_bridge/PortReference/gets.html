@@ -181,6 +181,9 @@ applied and when it is silently ignored.</p>
     other._connectSameModuleInterfacePortMaps();
   }
 
+  _connectOverlappingInterfacePortMaps();
+  other._connectOverlappingInterfacePortMaps();
+
   getsInternal(other,
       sameModuleConnectionType: resolvedConnectionType,
       intermediateSignalName: intermediateSignalName);

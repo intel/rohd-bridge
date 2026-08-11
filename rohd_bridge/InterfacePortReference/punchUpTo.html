@@ -82,6 +82,8 @@ port's <code>module</code>.</p>
         &#39;Cannot punch up to a module that is not a parent.&#39;);
   }
 
+  _connectOverlappingInterfacePortMaps();
+
   if (!parentModule.subModules.contains(module)) {
     return parentModule.pullUpPort(this, newPortName: newPortName);
   }
