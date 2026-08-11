@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // port_map.dart
@@ -57,6 +57,10 @@ class PortMap {
 
     _isConnected = preConnected;
   }
+
+  /// Whether this map has [port] and [interfacePort] as its exact endpoints.
+  bool maps(PortReference port, InterfacePortReference interfacePort) =>
+      this.port == port && this.interfacePort == interfacePort;
 
   /// Resolves a port map by connecting the [port] to the [interfacePort] in
   /// the appropriate direction.

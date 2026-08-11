@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // delayed_portmap_test.dart
@@ -114,9 +114,14 @@ void main() {
   });
 
   test('interface portmap directly', () {
-    final top = BridgeModule('top');
-    final leaf1 = leaf('leaf1', PairRole.consumer);
-    top.addSubModule(leaf1);
+    final leaf1 = BridgeModule('leaf1')
+      ..createPort('in1', PortDirection.input)
+      ..addInterface(
+        SimpleIntf(),
+        name: 'myIntf',
+        role: PairRole.consumer,
+        connect: false,
+      );
 
     final intf = leaf1.interface('myIntf');
     final pm =
@@ -129,6 +134,70 @@ void main() {
       ..connect(); // a second time to test double connect
 
     expect(pm.isConnected, isTrue);
+  });
+
+  test('exact duplicate portmap rejected', () {
+    final module = BridgeModule('leaf')..addInput('physical', null);
+    final interfaceRef = module.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('logical')]),
+      name: 'example',
+      role: PairRole.consumer,
+      connect: false,
+    );
+
+    final portMap = module.addPortMap(
+      module.port('physical'),
+      interfaceRef.port('logical'),
+    );
+
+    expect(
+      portMap.maps(
+        module.port('physical'),
+        interfaceRef.port('logical'),
+      ),
+      isTrue,
+    );
+    expect(
+      () => module.addPortMap(
+        module.port('physical'),
+        interfaceRef.port('logical'),
+      ),
+      throwsA(isA<RohdBridgeException>()),
+    );
+    expect(interfaceRef.portMaps, hasLength(1));
+  });
+
+  test('portmaps differing by either endpoint accepted', () {
+    final module = BridgeModule('leaf')
+      ..addInput('physicalA', null)
+      ..addInput('physicalB', null);
+    final interfaceRef = module.addInterface(
+      PairInterface(
+        portsFromProvider: [
+          Logic.port('logicalA'),
+          Logic.port('logicalB'),
+        ],
+      ),
+      name: 'example',
+      role: PairRole.consumer,
+      connect: false,
+    );
+
+    module
+      ..addPortMap(
+        module.port('physicalA'),
+        interfaceRef.port('logicalA'),
+      )
+      ..addPortMap(
+        module.port('physicalA'),
+        interfaceRef.port('logicalB'),
+      )
+      ..addPortMap(
+        module.port('physicalB'),
+        interfaceRef.port('logicalA'),
+      );
+
+    expect(interfaceRef.portMaps, hasLength(3));
   });
 
   group('port mapped interface connection', () {
