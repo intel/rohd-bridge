@@ -133,11 +133,23 @@ sealed class PortReference extends Reference {
       String? intermediateSignalName}) {
     final relativeLocation = _relativeLocationOf(other);
 
-    if (relativeLocation == _RelativePortLocation.sameModule &&
-        (other is InterfacePortReference || this is InterfacePortReference)) {
-      throw RohdBridgeException(
-          'Connections involving interface ports on the same module'
-          ' ${module.name} should be done using port maps.');
+    if (relativeLocation == _RelativePortLocation.sameModule) {
+      _validateSameModuleInterfacePortMap();
+      other._validateSameModuleInterfacePortMap();
+
+      if (_isMappedTo(other) || other._isMappedTo(this)) {
+        _connectSameModuleInterfacePortMaps();
+        other._connectSameModuleInterfacePortMaps();
+        return;
+      }
+
+      if (sameModuleConnectionType == null &&
+          (_requiresExplicitSameModuleConnectionType ||
+              other._requiresExplicitSameModuleConnectionType)) {
+        throw RohdBridgeException(
+            'Same-module connections involving interface ports require an '
+            'explicit SameModuleConnectionType.');
+      }
     }
 
     if (relativeLocation == _RelativePortLocation.sameLevel &&
@@ -206,11 +218,12 @@ sealed class PortReference extends Reference {
 
     // Same-module connection type validation
     var resolvedConnectionType = sameModuleConnectionType;
-    if (relativeLocation == _RelativePortLocation.sameModule &&
-        other is! InterfacePortReference &&
-        this is! InterfacePortReference) {
+    if (relativeLocation == _RelativePortLocation.sameModule) {
       resolvedConnectionType =
           _validateSameModuleConnectionType(other, sameModuleConnectionType);
+
+      _connectSameModuleInterfacePortMaps();
+      other._connectSameModuleInterfacePortMaps();
     }
 
     _connectOverlappingInterfacePortMaps();
@@ -363,6 +376,21 @@ sealed class PortReference extends Reference {
   /// possible.
   void drivesLogic(Logic other);
 
+  /// Verifies that this reference has a recorded port map when it represents
+  /// an interface port in a same-module connection.
+  void _validateSameModuleInterfacePortMap() {}
+
+  /// Activates port maps relevant to this reference when it represents an
+  /// interface port in a same-module connection.
+  void _connectSameModuleInterfacePortMaps() {}
+
+  /// Whether this reference is an interface port mapped directly to [other].
+  bool _isMappedTo(PortReference other) => false;
+
+  /// Whether this reference requires an explicit connection type for a
+  /// same-module connection.
+  bool get _requiresExplicitSameModuleConnectionType => false;
+
   /// Creates a slice of this port from [endIndex] down to [startIndex].
   ///
   /// Both indices are inclusive. For example, `slice(7, 0)` would create a
@@ -464,6 +492,14 @@ sealed class PortReference extends Reference {
 
     switch (loc) {
       case _RelativePortLocation.sameModule:
+        // When an explicit connection type is provided, use it directly.
+        if (sameModuleConnectionType == SameModuleConnectionType.loopback) {
+          return (driver: other._externalPort, receiver: _externalPort);
+        } else if (sameModuleConnectionType ==
+            SameModuleConnectionType.passthrough) {
+          return (driver: other._internalPort, receiver: _internalPort);
+        }
+
         final includesOneIntfPortRef =
             [this, other].whereType<InterfacePortReference>().length == 1;
 
@@ -490,14 +526,6 @@ sealed class PortReference extends Reference {
                 return (receiver: _externalPort, driver: other._externalPort);
               }
           }
-        }
-
-        // When an explicit connection type is provided, use it directly.
-        if (sameModuleConnectionType == SameModuleConnectionType.loopback) {
-          return (driver: other._externalPort, receiver: _externalPort);
-        } else if (sameModuleConnectionType ==
-            SameModuleConnectionType.passthrough) {
-          return (driver: other._internalPort, receiver: _internalPort);
         }
 
         if (direction == PortDirection.input &&
@@ -529,6 +557,14 @@ sealed class PortReference extends Reference {
 
     switch (loc) {
       case _RelativePortLocation.sameModule:
+        // When an explicit connection type is provided, use it directly.
+        if (sameModuleConnectionType == SameModuleConnectionType.loopback) {
+          return other._externalPortSubset;
+        } else if (sameModuleConnectionType ==
+            SameModuleConnectionType.passthrough) {
+          return other._internalPortSubset;
+        }
+
         final includesOneIntfPortRef =
             [this, other].whereType<InterfacePortReference>().length == 1;
 
@@ -555,14 +591,6 @@ sealed class PortReference extends Reference {
                 return other._externalPortSubset;
               }
           }
-        }
-
-        // When an explicit connection type is provided, use it directly.
-        if (sameModuleConnectionType == SameModuleConnectionType.loopback) {
-          return other._externalPortSubset;
-        } else if (sameModuleConnectionType ==
-            SameModuleConnectionType.passthrough) {
-          return other._internalPortSubset;
         }
 
         if (direction == PortDirection.input &&

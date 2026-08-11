@@ -8,6 +8,7 @@
 // 2026 April
 // Author: Max Korbel <max.korbel@intel.com>
 
+import 'package:rohd/rohd.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
 import 'package:test/test.dart';
 
@@ -641,6 +642,273 @@ void main() {
         expect(receiverOut.parentModule, equals(mod));
         expect(driverInternal.parentModule, equals(mod));
         expect(receiverOut.srcConnection, equals(driverInternal));
+      });
+    });
+
+    group('mapped interface ports', () {
+      ({
+        BridgeModule module,
+        InterfaceReference intfRef,
+        PortMap sourceMap,
+        PortMap sinkMap,
+      }) makeDeferredInterface() {
+        final module = BridgeModule('leaf')
+          ..addOutput('source_o')
+          ..addInput('sink_i', null);
+        final intfRef = module.addInterface(
+          PairInterface(
+            portsFromProvider: [Logic.port('source')],
+            portsFromConsumer: [Logic.port('sink')],
+          ),
+          name: 'example',
+          role: PairRole.provider,
+          connect: false,
+        );
+        final sourceMap = module.addPortMap(
+          module.port('source_o'),
+          intfRef.port('source'),
+        );
+        final sinkMap = module.addPortMap(
+          module.port('sink_i'),
+          intfRef.port('sink'),
+        );
+
+        return (
+          module: module,
+          intfRef: intfRef,
+          sourceMap: sourceMap,
+          sinkMap: sinkMap,
+        );
+      }
+
+      test('gets loopback activates deferred mappings', () {
+        final fixture = makeDeferredInterface();
+        final source = fixture.intfRef.port('source');
+        fixture.intfRef.port('sink').gets(
+              source,
+              sameModuleConnectionType: SameModuleConnectionType.loopback,
+            );
+
+        expect(fixture.sourceMap.isConnected, isTrue);
+        expect(fixture.sinkMap.isConnected, isTrue);
+        expect(
+          fixture.intfRef.interface.port('sink').srcConnection,
+          fixture.intfRef.interface.port('source'),
+        );
+      });
+
+      test('connectPorts loopback activates deferred mappings', () {
+        final fixture = makeDeferredInterface();
+
+        connectPorts(
+          fixture.intfRef.port('source'),
+          fixture.intfRef.port('sink'),
+          sameModuleConnectionType: SameModuleConnectionType.loopback,
+        );
+
+        expect(fixture.sourceMap.isConnected, isTrue);
+        expect(fixture.sinkMap.isConnected, isTrue);
+      });
+
+      test('gets passthrough routes through internal interface ports', () {
+        final fixture = makeDeferredInterface();
+        final source = fixture.intfRef.port('source');
+        final sink = fixture.intfRef.port('sink');
+
+        source.gets(
+          sink,
+          sameModuleConnectionType: SameModuleConnectionType.passthrough,
+        );
+
+        expect(fixture.sourceMap.isConnected, isTrue);
+        expect(fixture.sinkMap.isConnected, isTrue);
+        expect(
+          fixture.intfRef.internalInterface!.port('source').srcConnection,
+          fixture.intfRef.internalInterface!.port('sink'),
+        );
+      });
+
+      test('preserves invalid connection type validation', () {
+        final fixture = makeDeferredInterface();
+
+        expect(
+          () => fixture.intfRef.port('sink').gets(
+                fixture.intfRef.port('source'),
+                sameModuleConnectionType: SameModuleConnectionType.passthrough,
+              ),
+          throwsA(
+            isA<RohdBridgeException>().having(
+              (exception) => exception.message,
+              'message',
+              allOf(contains('not valid'), contains('loopback')),
+            ),
+          ),
+        );
+        expect(fixture.sourceMap.isConnected, isFalse);
+        expect(fixture.sinkMap.isConnected, isFalse);
+      });
+
+      test('requires an explicit connection type', () {
+        final fixture = makeDeferredInterface();
+
+        expect(
+          () =>
+              fixture.intfRef.port('sink').gets(fixture.intfRef.port('source')),
+          throwsA(
+            isA<RohdBridgeException>().having(
+              (exception) => exception.message,
+              'message',
+              allOf(
+                contains('explicit'),
+                contains('SameModuleConnectionType'),
+              ),
+            ),
+          ),
+        );
+        expect(fixture.sourceMap.isConnected, isFalse);
+        expect(fixture.sinkMap.isConnected, isFalse);
+      });
+
+      test('mixed passthrough uses internal interface and physical ports',
+          () async {
+        final module = BridgeModule('leaf')
+          ..addInOut('bus_io', null)
+          ..addInOut('peer_io', null);
+        final intfRef = module.addInterface(
+          PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
+          name: 'example',
+          role: PairRole.provider,
+          connect: false,
+        );
+        final portMap = module.addPortMap(
+          module.port('bus_io'),
+          intfRef.port('bus'),
+        );
+        final top = BridgeModule('top')
+          ..addSubModule(module)
+          ..pullUpPort(module.createPort('dummy', PortDirection.input));
+
+        module.port('peer_io').gets(
+              intfRef.port('bus'),
+              sameModuleConnectionType: SameModuleConnectionType.passthrough,
+            );
+
+        expect(portMap.isConnected, isTrue);
+
+        await top.build();
+
+        expect(
+          module.inOut('peer_io').srcConnections,
+          contains(intfRef.internalInterface!.port('bus')),
+        );
+        expect(
+          module.inOutSource('peer_io').srcConnections,
+          isNot(contains(intfRef.interface.port('bus'))),
+        );
+      });
+
+      test('mixed loopback uses external interface and physical ports',
+          () async {
+        final module = BridgeModule('leaf')
+          ..addInOut('bus_io', null)
+          ..addInOut('peer_io', null);
+        final intfRef = module.addInterface(
+          PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
+          name: 'example',
+          role: PairRole.provider,
+          connect: false,
+        );
+        final portMap = module.addPortMap(
+          module.port('bus_io'),
+          intfRef.port('bus'),
+        );
+        final top = BridgeModule('top')
+          ..addSubModule(module)
+          ..pullUpPort(module.createPort('dummy', PortDirection.input));
+
+        module.port('peer_io').gets(
+              intfRef.port('bus'),
+              sameModuleConnectionType: SameModuleConnectionType.loopback,
+            );
+
+        expect(portMap.isConnected, isTrue);
+
+        await top.build();
+
+        expect(
+          module.inOutSource('peer_io').srcConnections,
+          contains(intfRef.interface.port('bus')),
+        );
+        expect(intfRef.internalInterface, isNull);
+      });
+
+      test('uses an existing mapping instead of directly reconnecting it', () {
+        final fixture = makeDeferredInterface();
+        fixture.intfRef.port('source').gets(fixture.module.port('source_o'));
+
+        expect(fixture.sourceMap.isConnected, isTrue);
+        expect(
+          fixture.intfRef.interface.port('source').srcConnection,
+          fixture.module.output('source_o'),
+        );
+      });
+
+      test('supports exact sliced interface port mappings', () {
+        final module = BridgeModule('leaf')
+          ..addOutput('source_o', width: 4)
+          ..addInput('sink_i', null, width: 4);
+        final intfRef = module.addInterface(
+          PairInterface(
+            portsFromProvider: [Logic.port('source', 8)],
+            portsFromConsumer: [Logic.port('sink', 8)],
+          ),
+          name: 'example',
+          role: PairRole.provider,
+          connect: false,
+        );
+        final sourceMap = module.addPortMap(
+          module.port('source_o'),
+          intfRef.port('source[3:0]'),
+        );
+        final sinkMap = module.addPortMap(
+          module.port('sink_i'),
+          intfRef.port('sink[3:0]'),
+        );
+
+        intfRef.port('sink[3:0]').gets(
+              intfRef.port('source[3:0]'),
+              sameModuleConnectionType: SameModuleConnectionType.loopback,
+            );
+
+        expect(sourceMap.isConnected, isTrue);
+        expect(sinkMap.isConnected, isTrue);
+      });
+
+      test('rejects an unmapped interface port', () {
+        final module = BridgeModule('leaf');
+        final intfRef = module.addInterface(
+          PairInterface(
+            portsFromProvider: [Logic.port('source')],
+            portsFromConsumer: [Logic.port('sink')],
+          ),
+          name: 'example',
+          role: PairRole.provider,
+          connect: false,
+        );
+
+        expect(
+          () => intfRef.port('sink').gets(
+                intfRef.port('source'),
+                sameModuleConnectionType: SameModuleConnectionType.loopback,
+              ),
+          throwsA(
+            isA<RohdBridgeException>().having(
+              (exception) => exception.message,
+              'message',
+              contains('PortMap'),
+            ),
+          ),
+        );
       });
     });
   });
