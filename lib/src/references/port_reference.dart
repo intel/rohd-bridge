@@ -366,6 +366,26 @@ sealed class PortReference extends Reference {
   /// reference to bits 7 through 0 of the port.
   PortReference slice(int endIndex, int startIndex);
 
+  /// The inclusive bit range of this reference within the flattened port.
+  ///
+  /// This is used to compare standard and sliced references that point into
+  /// the same base port.
+  ({int lower, int upper}) get _flatRange;
+
+  /// Whether this reference and [other] select any common bits of the same
+  /// port on the same module.
+  bool _overlaps(PortReference other) {
+    if (module != other.module || portName != other.portName) {
+      return false;
+    }
+
+    final thisRange = _flatRange;
+    final otherRange = other._flatRange;
+
+    return thisRange.lower <= otherRange.upper &&
+        otherRange.lower <= thisRange.upper;
+  }
+
   /// Gets a single bit of this port at the specified [index].
   ///
   /// This is equivalent to calling `slice(index, index)`.
@@ -561,6 +581,10 @@ sealed class PortReference extends Reference {
   /// as an integer, boolean, or [LogicValue]. If no value is provided, the port
   /// will be tied to 0.
   void tieOff({dynamic value = 0, bool fill = false}) {
+    if (this case final InterfacePortReference intfPort) {
+      intfPort._connectPortMapsForTieOff();
+    }
+
     getsLogic(module.tieOffConst(value, width: width, fill: fill));
   }
 
