@@ -158,4 +158,176 @@ void main() {
     expect(mod.interface('myIntf').port('fromProv').portSubsetLogic.value,
         LogicValue.filled(8, LogicValue.zero));
   });
+
+  test('tieOff activates matching deferred interface port map', () {
+    final mod = BridgeModule('mod')..addInput('request_i', null);
+    final intfRef = mod.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request')]),
+      name: 'myIntf',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final portMap = mod.addPortMap(
+      mod.port('request_i'),
+      intfRef.port('request'),
+    );
+
+    intfRef.port('request').tieOff(value: 1);
+
+    expect(portMap.isConnected, isTrue);
+    expect(mod.input('request_i').value, LogicValue.one);
+  });
+
+  test('getsLogic activates matching deferred interface port map', () {
+    final mod = BridgeModule('mod')..addInput('request_i', null);
+    final intfRef = mod.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request')]),
+      name: 'myIntf',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final portMap = mod.addPortMap(
+      mod.port('request_i'),
+      intfRef.port('request'),
+    );
+
+    intfRef.port('request').getsLogic(Const(1));
+
+    expect(portMap.isConnected, isTrue);
+    expect(mod.input('request_i').value, LogicValue.one);
+  });
+
+  test('drivesLogic activates matching deferred interface port map', () {
+    final mod = BridgeModule('mod')..addOutput('response_o');
+    final intfRef = mod.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('response')]),
+      name: 'myIntf',
+      role: PairRole.provider,
+      connect: false,
+    );
+    final portMap = mod.addPortMap(
+      mod.port('response_o'),
+      intfRef.port('response'),
+    );
+    final probe = Logic(name: 'probe');
+
+    intfRef.port('response').drivesLogic(probe);
+
+    expect(portMap.isConnected, isTrue);
+
+    mod.output('response_o').put(1);
+    expect(probe.value, LogicValue.one);
+  });
+
+  test('tieOffInterface activates matching deferred interface port map', () {
+    final mod = BridgeModule('mod')..addInput('request_i', null);
+    final intfRef = mod.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request')]),
+      name: 'myIntf',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final portMap = mod.addPortMap(
+      mod.port('request_i'),
+      intfRef.port('request'),
+    );
+
+    mod.tieOffInterface(intfRef, value: 1);
+
+    expect(portMap.isConnected, isTrue);
+    expect(mod.input('request_i').value, LogicValue.one);
+  });
+
+  test('tieOff slice activates only overlapping deferred port maps', () {
+    final mod = BridgeModule('mod')
+      ..addInput('request_low_i', null, width: 4)
+      ..addInput('request_high_i', null, width: 4);
+    final intfRef = mod.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request', 8)]),
+      name: 'myIntf',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final lowPortMap = mod.addPortMap(
+      mod.port('request_low_i'),
+      intfRef.port('request[3:0]'),
+    );
+    final highPortMap = mod.addPortMap(
+      mod.port('request_high_i'),
+      intfRef.port('request[7:4]'),
+    );
+
+    intfRef.port('request[3:0]').tieOff(value: 0xa);
+
+    expect(lowPortMap.isConnected, isTrue);
+    expect(highPortMap.isConnected, isFalse);
+    expect(mod.input('request_low_i').value, LogicValue.ofInt(0xa, 4));
+    expect(
+        mod.input('request_high_i').value, LogicValue.filled(4, LogicValue.z));
+  });
+
+  test('tieOff 3d array element activates only overlapping port maps', () {
+    final mod = BridgeModule('mod')
+      ..addInput('request_101_i', null, width: 4)
+      ..addInput('request_110_i', null, width: 4);
+    final intfRef = mod.addInterface(
+      PairInterface(
+        portsFromProvider: [
+          LogicArray.port('request', [2, 2, 2], 4)
+        ],
+      ),
+      name: 'myIntf',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final request101PortMap = mod.addPortMap(
+      mod.port('request_101_i'),
+      intfRef.port('request[1][0][1]'),
+    );
+    final request110PortMap = mod.addPortMap(
+      mod.port('request_110_i'),
+      intfRef.port('request[1][1][0]'),
+    );
+
+    intfRef.port('request[1][0][1]').tieOff(value: 0xc);
+
+    expect(request101PortMap.isConnected, isTrue);
+    expect(request110PortMap.isConnected, isFalse);
+    expect(mod.input('request_101_i').value, LogicValue.ofInt(0xc, 4));
+    expect(
+        mod.input('request_110_i').value, LogicValue.filled(4, LogicValue.z));
+  });
+
+  test('tieOff full 3d array activates overlapping deferred port maps', () {
+    final mod = BridgeModule('mod')
+      ..addInput('request_000_i', null, width: 4)
+      ..addInput('request_111_i', null, width: 4);
+    final intfRef = mod.addInterface(
+      PairInterface(
+        portsFromProvider: [
+          LogicArray.port('request', [2, 2, 2], 4)
+        ],
+      ),
+      name: 'myIntf',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final request000PortMap = mod.addPortMap(
+      mod.port('request_000_i'),
+      intfRef.port('request[0][0][0]'),
+    );
+    final request111PortMap = mod.addPortMap(
+      mod.port('request_111_i'),
+      intfRef.port('request[1][1][1]'),
+    );
+
+    intfRef.port('request').tieOff(value: 1, fill: true);
+
+    expect(request000PortMap.isConnected, isTrue);
+    expect(request111PortMap.isConnected, isTrue);
+    expect(
+        mod.input('request_000_i').value, LogicValue.filled(4, LogicValue.one));
+    expect(
+        mod.input('request_111_i').value, LogicValue.filled(4, LogicValue.one));
+  });
 }

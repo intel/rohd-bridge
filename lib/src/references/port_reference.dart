@@ -226,6 +226,9 @@ sealed class PortReference extends Reference {
       other._connectSameModuleInterfacePortMaps();
     }
 
+    _connectOverlappingInterfacePortMaps();
+    other._connectOverlappingInterfacePortMaps();
+
     getsInternal(other,
         sameModuleConnectionType: resolvedConnectionType,
         intermediateSignalName: intermediateSignalName);
@@ -393,6 +396,30 @@ sealed class PortReference extends Reference {
   /// Both indices are inclusive. For example, `slice(7, 0)` would create a
   /// reference to bits 7 through 0 of the port.
   PortReference slice(int endIndex, int startIndex);
+
+  /// The inclusive bit range of this reference within the flattened port.
+  ///
+  /// This is used to compare standard and sliced references that point into
+  /// the same base port.
+  ({int lower, int upper}) get _flatRange;
+
+  /// Whether this reference and [other] select any common bits of the same
+  /// port on the same module.
+  bool _overlaps(PortReference other) {
+    if (module != other.module || portName != other.portName) {
+      return false;
+    }
+
+    final thisRange = _flatRange;
+    final otherRange = other._flatRange;
+
+    return thisRange.lower <= otherRange.upper &&
+        otherRange.lower <= thisRange.upper;
+  }
+
+  /// Activates any deferred port maps that should be resolved before this
+  /// reference is used as a concrete port operation endpoint.
+  void _connectOverlappingInterfacePortMaps() {}
 
   /// Gets a single bit of this port at the specified [index].
   ///
@@ -589,6 +616,8 @@ sealed class PortReference extends Reference {
   /// as an integer, boolean, or [LogicValue]. If no value is provided, the port
   /// will be tied to 0.
   void tieOff({dynamic value = 0, bool fill = false}) {
+    _connectOverlappingInterfacePortMaps();
+
     getsLogic(module.tieOffConst(value, width: width, fill: fill));
   }
 
@@ -621,6 +650,8 @@ sealed class PortReference extends Reference {
           'Cannot punch up to a module that is not a parent.');
     }
 
+    _connectOverlappingInterfacePortMaps();
+
     if (!parentModule.subModules.contains(module)) {
       return parentModule.pullUpPort(this, newPortName: newPortName);
     }
@@ -650,6 +681,8 @@ sealed class PortReference extends Reference {
       throw RohdBridgeException(
           'Cannot punch down to a module that is not a submodule.');
     }
+
+    _connectOverlappingInterfacePortMaps();
 
     // make a new port in the same direction on new module
     final newPortRef =

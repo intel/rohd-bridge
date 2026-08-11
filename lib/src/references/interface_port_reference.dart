@@ -85,6 +85,16 @@ mixin InterfacePortReference on PortReference {
       !_isFromProvider &&
       !_isFromConsumer;
 
+  /// Activates deferred port maps whose logical interface port overlaps this
+  /// reference before treating it as a concrete port operation endpoint.
+  @override
+  void _connectOverlappingInterfacePortMaps() {
+    for (final portMap in interfaceReference.portMaps
+        .where((portMap) => _overlaps(portMap.interfacePort))) {
+      portMap.connect();
+    }
+  }
+
   /// Port maps recorded for exactly this logical interface port or slice.
   Iterable<PortMap> get _sameModulePortMaps => interfaceReference.portMaps
       .where((portMap) => portMap.interfacePort == this);

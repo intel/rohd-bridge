@@ -371,6 +371,42 @@ class SlicePortReference extends PortReference {
 
   @override
   late final dynamic portSubset = _getPortSubset(port);
+
+  /// The flattened bit range covered by this slice or array element access.
+  @override
+  late final ({int lower, int upper}) _flatRange = _calculateFlatRange();
+
+  /// Calculates the flattened bit range for this reference from its array
+  /// indices and optional bit slice.
+  ({int lower, int upper}) _calculateFlatRange() {
+    var lower = 0;
+    var upper = port.width - 1;
+    var portElement = port;
+
+    if (dimensionAccess != null) {
+      for (final index in dimensionAccess!) {
+        final elementWidth = portElement.elements.first.width;
+        lower += index * elementWidth;
+        upper = lower + elementWidth - 1;
+
+        if (portElement is LogicArray) {
+          portElement = portElement.elements[index];
+        }
+      }
+    }
+
+    if (hasSlicing) {
+      final elementWidth = portElement.elements.first.width;
+      lower += sliceLowerIndex! * elementWidth;
+      upper =
+          lower + (sliceUpperIndex! - sliceLowerIndex! + 1) * elementWidth - 1;
+    }
+
+    return (lower: lower, upper: upper);
+  }
+
+  /// Returns the portion of [p] selected by this reference's array indices and
+  /// optional bit slice.
   dynamic _getPortSubset(Logic p) {
     var d = p;
 
@@ -494,11 +530,15 @@ class SlicePortReference extends PortReference {
 
   @override
   void drivesLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     other <= portSubsetLogic;
   }
 
   @override
   void getsLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     var receiver = _externalPort;
     // we must look at the *port* for dimension analysis
     int? leafIndex;
