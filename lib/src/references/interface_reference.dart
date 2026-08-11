@@ -149,7 +149,7 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// another interface.
   ///
   /// Throws an exception if the [interfacePort] doesn't belong to this
-  /// interface or if a mapping for the [port] already exists.
+  /// interface or if the exact mapping already exists.
   PortMap addPortMap(InterfacePortReference interfacePort, PortReference port,
       {bool connect = true}) {
     if (interfacePort.interfaceReference != this) {
@@ -157,11 +157,12 @@ class InterfaceReference<InterfaceType extends PairInterface>
           '$name in module $module');
     }
 
-    final portMap = PortMap(port: port, interfacePort: interfacePort);
-
-    if (_portMaps.contains(portMap)) {
-      throw RohdBridgeException('Port map for $port already exists in $name');
+    if (_portMaps.any((portMap) => portMap.maps(port, interfacePort))) {
+      throw RohdBridgeException(
+          'Port map from $port to $interfacePort already exists in $name');
     }
+
+    final portMap = PortMap(port: port, interfacePort: interfacePort);
 
     if (connect) {
       portMap.connect();
