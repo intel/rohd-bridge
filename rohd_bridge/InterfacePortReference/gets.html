@@ -88,11 +88,23 @@ applied and when it is silently ignored.</p>
     String? intermediateSignalName}) {
   final relativeLocation = _relativeLocationOf(other);
 
-  if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
-      (other is InterfacePortReference || this is InterfacePortReference)) {
-    throw RohdBridgeException(
-        &#39;Connections involving interface ports on the same module&#39;
-        &#39; ${module.name} should be done using port maps.&#39;);
+  if (relativeLocation == _RelativePortLocation.sameModule) {
+    _validateSameModuleInterfacePortMap();
+    other._validateSameModuleInterfacePortMap();
+
+    if (_isMappedTo(other) || other._isMappedTo(this)) {
+      _connectSameModuleInterfacePortMaps();
+      other._connectSameModuleInterfacePortMaps();
+      return;
+    }
+
+    if (sameModuleConnectionType == null &amp;&amp;
+        (_requiresExplicitSameModuleConnectionType ||
+            other._requiresExplicitSameModuleConnectionType)) {
+      throw RohdBridgeException(
+          &#39;Same-module connections involving interface ports require an &#39;
+          &#39;explicit SameModuleConnectionType.&#39;);
+    }
   }
 
   if (relativeLocation == _RelativePortLocation.sameLevel &amp;&amp;
@@ -161,11 +173,12 @@ applied and when it is silently ignored.</p>
 
   &#47;&#47; Same-module connection type validation
   var resolvedConnectionType = sameModuleConnectionType;
-  if (relativeLocation == _RelativePortLocation.sameModule &amp;&amp;
-      other is! InterfacePortReference &amp;&amp;
-      this is! InterfacePortReference) {
+  if (relativeLocation == _RelativePortLocation.sameModule) {
     resolvedConnectionType =
         _validateSameModuleConnectionType(other, sameModuleConnectionType);
+
+    _connectSameModuleInterfacePortMaps();
+    other._connectSameModuleInterfacePortMaps();
   }
 
   getsInternal(other,
