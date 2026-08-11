@@ -85,6 +85,41 @@ mixin InterfacePortReference on PortReference {
       !_isFromProvider &&
       !_isFromConsumer;
 
+  /// Port maps recorded for exactly this logical interface port or slice.
+  Iterable<PortMap> get _sameModulePortMaps => interfaceReference.portMaps
+      .where((portMap) => portMap.interfacePort == this);
+
+  /// Verifies that this interface port has a recorded physical mapping before
+  /// it participates in a same-module port connection.
+  @override
+  void _validateSameModuleInterfacePortMap() {
+    if (_sameModulePortMaps.isEmpty) {
+      throw RohdBridgeException(
+          'Interface port $this must have a PortMap before it can participate '
+          'in a same-module port connection.');
+    }
+  }
+
+  /// Activates all recorded physical mappings for this exact interface port or
+  /// slice before making a same-module port connection.
+  @override
+  void _connectSameModuleInterfacePortMaps() {
+    for (final portMap in _sameModulePortMaps) {
+      portMap.connect();
+    }
+  }
+
+  /// Whether [other] is already the physical endpoint of one of this logical
+  /// interface port's mappings.
+  @override
+  bool _isMappedTo(PortReference other) =>
+      _sameModulePortMaps.any((portMap) => portMap.port == other);
+
+  /// Interface ports require callers to choose the internal or external face
+  /// explicitly for same-module connections.
+  @override
+  bool get _requiresExplicitSameModuleConnectionType => true;
+
   /// Provides a reference to a [Logic] on an interface in this reference.
   ///
   /// For inputs and inOuts, this is the internal interface port if it exists.
