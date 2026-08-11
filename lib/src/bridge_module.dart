@@ -987,7 +987,7 @@ class BridgeModule extends Module with SystemVerilog {
   }
 
   /// Calls [build] and generates SystemVerilog and a filelist into the
-  /// [outputPath].
+  /// [outputPath], using [synthesizerConfiguration] when provided.
   Future<void> buildAndGenerateRTL({
     @Deprecated('Leave null to use the default logger') Logger? logger,
     SystemVerilogSynthesizerConfiguration? synthesizerConfiguration,

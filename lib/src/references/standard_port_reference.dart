@@ -90,6 +90,10 @@ class StandardPortReference extends PortReference {
   @override
   Logic get _internalPortSubset => _internalPort;
 
+  /// The full flattened bit range covered by an unsliced port reference.
+  @override
+  late final ({int lower, int upper}) _flatRange = (lower: 0, upper: width - 1);
+
   @override
   PortReference replicateTo(BridgeModule newModule, PortDirection direction,
       {String? newPortName}) {
@@ -109,11 +113,15 @@ class StandardPortReference extends PortReference {
 
   @override
   void drivesLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     other <= portSubset;
   }
 
   @override
   void getsLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     _externalPort <= other;
   }
 

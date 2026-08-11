@@ -58,8 +58,10 @@ void main() {
     await top.buildAndGenerateRTL(
       outputPath: output.path,
       synthesizerConfiguration: const SystemVerilogSynthesizerConfiguration(
-        portObjectType: SystemVerilogPortType.implicit,
-        portDataType: SystemVerilogPortType.implicit,
+        inputPortType: SystemVerilogPortTypeConfiguration(
+          objectType: SystemVerilogPortType.implicit,
+          dataType: SystemVerilogPortType.implicit,
+        ),
       ),
     );
 
