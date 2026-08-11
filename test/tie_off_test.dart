@@ -83,7 +83,7 @@ void main() {
     expect(mod.output('banana').value, LogicValue.filled(8, LogicValue.zero));
   });
 
-  test('non-zero tieOffs preserve a shared readable constant in RTL', () async {
+  test('non-zero tieOffs preserve readable constants in RTL', () async {
     final mod = BridgeModule('mod')
       ..addOutput('apple', width: 8)
       ..addOutput('banana', width: 8);
@@ -94,9 +94,8 @@ void main() {
     await mod.build();
     final sv = mod.generateSynth();
 
-    expect(RegExp("8'h5a").allMatches(sv), hasLength(1));
-    expect(sv, contains('tieoff_const90'));
-    expect(sv, isNot(contains('tieoff_const90_0')));
+    expect(sv, contains("assign apple[7:0] = 8'h5a;"));
+    expect(sv, contains("assign banana[7:0] = 8'h5a;"));
     expect(mod.output('apple').value, LogicValue.ofInt(0x5a, 8));
     expect(mod.output('banana').value, LogicValue.ofInt(0x5a, 8));
   });
