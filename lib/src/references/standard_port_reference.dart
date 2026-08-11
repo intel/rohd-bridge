@@ -113,11 +113,15 @@ class StandardPortReference extends PortReference {
 
   @override
   void drivesLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     other <= portSubset;
   }
 
   @override
   void getsLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     _externalPort <= other;
   }
 

@@ -179,6 +179,47 @@ void main() {
     expect(mod.input('request_i').value, LogicValue.one);
   });
 
+  test('getsLogic activates matching deferred interface port map', () {
+    final mod = BridgeModule('mod')..addInput('request_i', null);
+    final intfRef = mod.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request')]),
+      name: 'myIntf',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final portMap = mod.addPortMap(
+      mod.port('request_i'),
+      intfRef.port('request'),
+    );
+
+    intfRef.port('request').getsLogic(Const(1));
+
+    expect(portMap.isConnected, isTrue);
+    expect(mod.input('request_i').value, LogicValue.one);
+  });
+
+  test('drivesLogic activates matching deferred interface port map', () {
+    final mod = BridgeModule('mod')..addOutput('response_o');
+    final intfRef = mod.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('response')]),
+      name: 'myIntf',
+      role: PairRole.provider,
+      connect: false,
+    );
+    final portMap = mod.addPortMap(
+      mod.port('response_o'),
+      intfRef.port('response'),
+    );
+    final probe = Logic(name: 'probe');
+
+    intfRef.port('response').drivesLogic(probe);
+
+    expect(portMap.isConnected, isTrue);
+
+    mod.output('response_o').put(1);
+    expect(probe.value, LogicValue.one);
+  });
+
   test('tieOffInterface activates matching deferred interface port map', () {
     final mod = BridgeModule('mod')..addInput('request_i', null);
     final intfRef = mod.addInterface(

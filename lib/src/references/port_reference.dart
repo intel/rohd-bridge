@@ -213,6 +213,9 @@ sealed class PortReference extends Reference {
           _validateSameModuleConnectionType(other, sameModuleConnectionType);
     }
 
+    _connectOverlappingInterfacePortMaps();
+    other._connectOverlappingInterfacePortMaps();
+
     getsInternal(other,
         sameModuleConnectionType: resolvedConnectionType,
         intermediateSignalName: intermediateSignalName);
@@ -385,6 +388,10 @@ sealed class PortReference extends Reference {
     return thisRange.lower <= otherRange.upper &&
         otherRange.lower <= thisRange.upper;
   }
+
+  /// Activates any deferred port maps that should be resolved before this
+  /// reference is used as a concrete port operation endpoint.
+  void _connectOverlappingInterfacePortMaps() {}
 
   /// Gets a single bit of this port at the specified [index].
   ///
@@ -581,9 +588,7 @@ sealed class PortReference extends Reference {
   /// as an integer, boolean, or [LogicValue]. If no value is provided, the port
   /// will be tied to 0.
   void tieOff({dynamic value = 0, bool fill = false}) {
-    if (this case final InterfacePortReference intfPort) {
-      intfPort._connectPortMapsForTieOff();
-    }
+    _connectOverlappingInterfacePortMaps();
 
     getsLogic(module.tieOffConst(value, width: width, fill: fill));
   }
@@ -617,6 +622,8 @@ sealed class PortReference extends Reference {
           'Cannot punch up to a module that is not a parent.');
     }
 
+    _connectOverlappingInterfacePortMaps();
+
     if (!parentModule.subModules.contains(module)) {
       return parentModule.pullUpPort(this, newPortName: newPortName);
     }
@@ -646,6 +653,8 @@ sealed class PortReference extends Reference {
       throw RohdBridgeException(
           'Cannot punch down to a module that is not a submodule.');
     }
+
+    _connectOverlappingInterfacePortMaps();
 
     // make a new port in the same direction on new module
     final newPortRef =

@@ -530,11 +530,15 @@ class SlicePortReference extends PortReference {
 
   @override
   void drivesLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     other <= portSubsetLogic;
   }
 
   @override
   void getsLogic(Logic other) {
+    _connectOverlappingInterfacePortMaps();
+
     var receiver = _externalPort;
     // we must look at the *port* for dimension analysis
     int? leafIndex;

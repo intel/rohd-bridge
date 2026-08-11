@@ -300,6 +300,161 @@ void main() {
     expect(mod2.port('apple').port.value, LogicValue.of('z1zz'));
   });
 
+  test('punchUpTo activates matching deferred interface port map', () async {
+    final leaf = BridgeModule('leaf')..addInput('request_i', null);
+    final intfRef = leaf.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request')]),
+      name: 'example',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final portMap = leaf.addPortMap(
+      leaf.port('request_i'),
+      intfRef.port('request'),
+    );
+    final top = BridgeModule('top')..addSubModule(leaf);
+
+    final topPortRef = intfRef.port('request').punchUpTo(top);
+
+    expect(portMap.isConnected, isTrue);
+
+    await top.build();
+
+    topPortRef.port.put(1);
+    expect(leaf.input('request_i').value, LogicValue.one);
+  });
+
+  test('punchUpTo activates deferred interface output port map', () async {
+    final leaf = BridgeModule('leaf')..addOutput('response_o');
+    final intfRef = leaf.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('response')]),
+      name: 'example',
+      role: PairRole.provider,
+      connect: false,
+    );
+    final portMap = leaf.addPortMap(
+      leaf.port('response_o'),
+      intfRef.port('response'),
+    );
+    final top = BridgeModule('top')..addSubModule(leaf);
+
+    final topPortRef = intfRef.port('response').punchUpTo(top);
+
+    expect(portMap.isConnected, isTrue);
+
+    await top.build();
+
+    leaf.output('response_o').put(1);
+    expect(topPortRef.port.value, LogicValue.one);
+  });
+
+  test('punchDownTo activates matching deferred interface port map', () async {
+    final top = BridgeModule('top')..addInput('request_i', null);
+    final leaf = BridgeModule('leaf');
+    top.addSubModule(leaf);
+    final intfRef = top.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request')]),
+      name: 'example',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final portMap = top.addPortMap(
+      top.port('request_i'),
+      intfRef.port('request'),
+    );
+
+    final leafPortRef = intfRef.port('request').punchDownTo(leaf);
+
+    expect(portMap.isConnected, isTrue);
+
+    await top.build();
+
+    top.input('request_i').put(1);
+    expect(leafPortRef.port.value, LogicValue.one);
+  });
+
+  test('punchDownTo activates deferred interface output port map', () async {
+    final top = BridgeModule('top')..addOutput('response_o');
+    final leaf = BridgeModule('leaf');
+    top.addSubModule(leaf);
+    final intfRef = top.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('response')]),
+      name: 'example',
+      role: PairRole.provider,
+      connect: false,
+    );
+    final portMap = top.addPortMap(
+      top.port('response_o'),
+      intfRef.port('response'),
+    );
+
+    final leafPortRef = intfRef.port('response').punchDownTo(leaf);
+
+    expect(portMap.isConnected, isTrue);
+
+    await top.build();
+
+    leafPortRef.port.put(1);
+    expect(top.output('response_o').value, LogicValue.one);
+  });
+
+  test('connectPorts activates matching deferred interface port map', () async {
+    final top = BridgeModule('top')..addInput('request_i', null);
+    final leaf = BridgeModule('leaf')..addInput('request_leaf_i', null);
+    top.addSubModule(leaf);
+    final intfRef = leaf.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('request')]),
+      name: 'example',
+      role: PairRole.consumer,
+      connect: false,
+    );
+    final portMap = leaf.addPortMap(
+      leaf.port('request_leaf_i'),
+      intfRef.port('request'),
+    );
+
+    connectPorts(top.port('request_i'), intfRef.port('request'));
+
+    expect(portMap.isConnected, isTrue);
+
+    await top.build();
+
+    top.input('request_i').put(1);
+    expect(leaf.input('request_leaf_i').value, LogicValue.one);
+  });
+
+  test('gets activates deferred interface output port map', () async {
+    final top = BridgeModule('top');
+    final leaf = BridgeModule('leaf')..addOutput('response_o');
+    final sink = BridgeModule('sink')..addInput('response_i', null);
+    top
+      ..addSubModule(leaf)
+      ..addSubModule(sink);
+    final intfRef = leaf.addInterface(
+      PairInterface(portsFromProvider: [Logic.port('response')]),
+      name: 'example',
+      role: PairRole.provider,
+      connect: false,
+    );
+    final portMap = leaf.addPortMap(
+      leaf.port('response_o'),
+      intfRef.port('response'),
+    );
+
+    sink.port('response_i').gets(intfRef.port('response'));
+
+    expect(portMap.isConnected, isTrue);
+
+    top
+      ..pullUpPort(leaf.createPort('dummy_leaf', PortDirection.input))
+      ..pullUpPort(sink.createPort('dummy_sink', PortDirection.input));
+
+    await top.build();
+
+    leaf.output('response_o').put(1);
+    expect(sink.input('response_i').value, LogicValue.one);
+  });
+
   test('hierarchy down to is itself for same module', () {
     final mod1 = BridgeModule('mod1');
     final hier = mod1.getHierarchyDownTo(mod1);

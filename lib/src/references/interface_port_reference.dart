@@ -86,8 +86,9 @@ mixin InterfacePortReference on PortReference {
       !_isFromConsumer;
 
   /// Activates deferred port maps whose logical interface port overlaps this
-  /// reference, so tying off a mapped interface port drives the physical port.
-  void _connectPortMapsForTieOff() {
+  /// reference before treating it as a concrete port operation endpoint.
+  @override
+  void _connectOverlappingInterfacePortMaps() {
     for (final portMap in interfaceReference.portMaps
         .where((portMap) => _overlaps(portMap.interfacePort))) {
       portMap.connect();
