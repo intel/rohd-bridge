@@ -72,7 +72,7 @@ to this interface) and <code>port</code> (which must belong to this module).</p>
 <code>false</code>, the mapping is deferred until the interface is connected to
 another interface.</p>
 <p>Throws an exception if the <code>interfacePort</code> doesn't belong to this
-interface or if a mapping for the <code>port</code> already exists.</p>
+interface or if the exact mapping already exists.</p>
 </section>
 
 
@@ -86,11 +86,12 @@ interface or if a mapping for the <code>port</code> already exists.</p>
         &#39;$name in module $module&#39;);
   }
 
-  final portMap = PortMap(port: port, interfacePort: interfacePort);
-
-  if (_portMaps.contains(portMap)) {
-    throw RohdBridgeException(&#39;Port map for $port already exists in $name&#39;);
+  if (_portMaps.any((portMap) =&gt; portMap.maps(port, interfacePort))) {
+    throw RohdBridgeException(
+        &#39;Port map from $port to $interfacePort already exists in $name&#39;);
   }
+
+  final portMap = PortMap(port: port, interfacePort: interfacePort);
 
   if (connect) {
     portMap.connect();
