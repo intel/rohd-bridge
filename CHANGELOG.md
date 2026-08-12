@@ -1,8 +1,8 @@
 ## Next release
 
-- Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped`.
-- Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup.
-- Added type-preserving interface hierarchy APIs: `pullUpTypedInterface`, `punchUpToTyped`, and `punchDownToTyped`. These APIs intentionally omit port exclusions because a partial interface cannot retain its concrete type.
+- Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped` (<https://github.com/intel/rohd-bridge/pull/58>).
+- Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup (<https://github.com/intel/rohd-bridge/pull/58>).
+- Added type-preserving interface hierarchy APIs: `pullUpTypedInterface`, `punchUpToTyped`, and `punchDownToTyped`. These APIs intentionally omit port exclusions because a partial interface cannot retain its concrete type (<https://github.com/intel/rohd-bridge/pull/58>).
 
 ## 0.2.3
 

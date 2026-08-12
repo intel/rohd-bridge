@@ -203,8 +203,7 @@ final myIntf = myMod.interface('my_interface');
 myIntf.port('intf_port_a[8:3]');
 ```
 
-Typed lookup APIs preserve concrete ROHD port and interface types when they are
-known:
+Typed lookup APIs preserve concrete ROHD port and interface types when they are known:
 
 ```dart
 final TypedPortReference<LogicArray> arrayPort =
@@ -216,13 +215,7 @@ final InterfaceReference<MyIntf> topIntf =
     topMod.pullUpTypedInterface(myTypedIntf);
 ```
 
-`tryPort`, `tryTypedPort`, `tryInterface`, and `tryTypedInterface` provide
-nullable lookup variants. A `TypedPortReference` can be passed directly to APIs
-that accept `PortReference`. Slicing or indexing a typed port returns an
-untyped `PortReference` because the selected shape may differ from the root
-port type. Typed interface punching and pull-up APIs omit `exceptPorts` because
-removing ports changes the concrete interface type; use the existing untyped
-APIs when exclusions are needed.
+`tryPort`, `tryTypedPort`, `tryInterface`, and `tryTypedInterface` provide nullable lookup variants. A `TypedPortReference` can be passed directly to APIs that accept `PortReference`. Slicing or indexing a typed port returns an untyped `PortReference` because the selected shape may differ from the root port type. Typed interface punching and pull-up APIs omit `exceptPorts` because removing ports changes the concrete interface type; use the existing untyped APIs when exclusions are needed.
 
 You can also do things like `slice` or index off a `PortReference`, similar to how you can in ROHD for normal `Logic`s.
 
