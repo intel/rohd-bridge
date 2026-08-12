@@ -109,8 +109,9 @@ void main() {
                         dstMod.addSubModule(srcMod);
                         top.addSubModule(dstMod);
                       case _RelativePosition.sameLevel:
-                        top.addSubModule(srcMod);
-                        top.addSubModule(dstMod);
+                        top
+                          ..addSubModule(srcMod)
+                          ..addSubModule(dstMod);
                       case _RelativePosition.sameModule:
                         top.addSubModule(srcMod);
                     }

@@ -564,6 +564,7 @@ class BridgeModule extends Module with SystemVerilog {
       return subModuleIntf;
     }
 
+    // ignore: parameter_assignments, allow for defaulting
     newIntfName ??= subModuleIntf.name;
 
     final path = getHierarchyDownTo(subModuleIntf.module);
