@@ -506,8 +506,43 @@ class BridgeModule extends Module with SystemVerilog {
   ///
   /// Throws an [Exception] if no interface with the given [name] exists.
   InterfaceReference interface(String name) =>
-      interfaces[name] ??
+      tryInterface(name) ??
       (throw RohdBridgeException('Interface $name not found on $this'));
+
+  /// Tries to get a reference to an interface by [name].
+  ///
+  /// Returns `null` if no interface with the given [name] exists.
+  InterfaceReference? tryInterface(String name) => interfaces[name];
+
+  /// Tries to get an interface named [name] with concrete type [InterfaceType].
+  ///
+  /// Returns `null` if the interface does not exist or is not an
+  /// [InterfaceType].
+  InterfaceReference<InterfaceType>?
+      tryTypedInterface<InterfaceType extends PairInterface>(String name) {
+    final interfaceReference = tryInterface(name);
+
+    return interfaceReference is InterfaceReference<InterfaceType>
+        ? interfaceReference
+        : null;
+  }
+
+  /// Gets an interface named [name] with concrete type [InterfaceType].
+  ///
+  /// Throws a [RohdBridgeException] if the interface does not exist or is not
+  /// an [InterfaceType].
+  InterfaceReference<InterfaceType>
+      typedInterface<InterfaceType extends PairInterface>(String name) {
+    final interfaceReference = interface(name);
+
+    if (interfaceReference is! InterfaceReference<InterfaceType>) {
+      throw RohdBridgeException('Interface $name on $this is a '
+          '${interfaceReference.interface.runtimeType}, not an '
+          '$InterfaceType.');
+    }
+
+    return interfaceReference;
+  }
 
   /// Creates a hierarchical connection by pulling an interface up from a
   /// submodule.
@@ -537,6 +572,34 @@ class BridgeModule extends Module with SystemVerilog {
           allowIntfUniquification: allowIntfUniquification,
           exceptPorts: exceptPorts,
           portUniquify: portUniquify);
+
+  /// Pulls [subModuleIntf] up while preserving [InterfaceType].
+  ///
+  /// This delegates hierarchy traversal and connection behavior to
+  /// [pullUpInterface]. Port exclusions are intentionally unavailable because
+  /// removing ports changes the concrete interface type.
+  InterfaceReference<InterfaceType>
+      pullUpTypedInterface<InterfaceType extends PairInterface>(
+    InterfaceReference<InterfaceType> subModuleIntf, {
+    String? newIntfName,
+    bool allowIntfUniquification = true,
+    String Function(String logical, String physical)? portUniquify,
+  }) {
+    final pulledUpInterface = pullUpInterface(
+      subModuleIntf,
+      newIntfName: newIntfName,
+      allowIntfUniquification: allowIntfUniquification,
+      portUniquify: portUniquify,
+    );
+
+    if (pulledUpInterface is! InterfaceReference<InterfaceType>) {
+      throw RohdBridgeException(
+          'Pulling up ${subModuleIntf.name} did not preserve '
+          '$InterfaceType.');
+    }
+
+    return pulledUpInterface;
+  }
 
   /// Performs the funcitonality of [pullUpInterface], but also connects the
   /// top-level returned interface to [topToConnect].
@@ -746,6 +809,14 @@ class BridgeModule extends Module with SystemVerilog {
     return PortReference.fromString(this, portRefString);
   }
 
+  /// Tries to create a typed port reference from [portRefString].
+  ///
+  /// Returns `null` if the port does not exist or its root port is not a
+  /// [PortType]. Parsing and name resolution are delegated to [tryPort].
+  TypedPortReference<PortType>? tryTypedPort<PortType extends Logic>(
+          String portRefString) =>
+      tryPort(portRefString)?.tryAsTyped<PortType>();
+
   /// Creates a port reference from a string representation with advanced
   /// parsing.
   ///
@@ -767,6 +838,15 @@ class BridgeModule extends Module with SystemVerilog {
   PortReference port(String portRefString) =>
       tryPort(portRefString) ??
       (throw RohdBridgeException('Port $portRefString not found in $name'));
+
+  /// Creates a typed port reference from [portRefString].
+  ///
+  /// Throws a [RohdBridgeException] if the port does not exist or its root
+  /// port is not a [PortType]. Parsing and name resolution are delegated to
+  /// [port].
+  TypedPortReference<PortType> typedPort<PortType extends Logic>(
+          String portRefString) =>
+      port(portRefString).asTyped<PortType>();
 
   /// Internal tracking map for hierarchical port connectivity optimization.
   ///
