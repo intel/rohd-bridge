@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // intf_hier_conn_test.dart
@@ -340,5 +340,119 @@ void main() {
 );
 
 endmodule : leaf'''));
+  });
+
+  test('connect ordinary interfaces with explicit loopback', () async {
+    final leaf = BridgeModule('leaf');
+    final provider =
+        leaf.addInterface(MyIntf(), name: 'provider', role: PairRole.provider);
+    final consumer =
+        leaf.addInterface(MyIntf(), name: 'consumer', role: PairRole.consumer);
+
+    final top = BridgeModule('top')
+      ..addSubModule(leaf)
+      ..pullUpPort(leaf.createPort('dummy', PortDirection.input));
+
+    connectInterfaces(provider, consumer,
+        sameModuleConnectionType: SameModuleConnectionType.loopback);
+
+    await top.build();
+
+    provider.port('myProviderPort').port.put(0x12);
+    expect(consumer.port('myProviderPort').port.value.toInt(), 0x12);
+
+    consumer.port('myConsumerPort').port.put(0x34);
+    expect(provider.port('myConsumerPort').port.value.toInt(), 0x34);
+  });
+
+  test('connect interface ports on the same module with passthrough', () async {
+    final leaf = BridgeModule('leaf');
+    final provider =
+        leaf.addInterface(MyIntf(), name: 'provider', role: PairRole.provider);
+    final consumer =
+        leaf.addInterface(MyIntf(), name: 'consumer', role: PairRole.consumer);
+
+    final top = BridgeModule('top')
+      ..addSubModule(leaf)
+      ..pullUpPort(leaf.createPort('dummy', PortDirection.input));
+
+    connectInterfaces(provider, consumer,
+        sameModuleConnectionType: SameModuleConnectionType.passthrough);
+
+    await top.build();
+
+    expect(
+      provider.internalInterface!.port('myProviderPort').srcConnection,
+      consumer.internalInterface!.port('myProviderPort'),
+    );
+    expect(
+      consumer.internalInterface!.port('myConsumerPort').srcConnection,
+      provider.internalInterface!.port('myConsumerPort'),
+    );
+  });
+
+  for (final connectionType in SameModuleConnectionType.values) {
+    test('connect same-module inOut interfaces with ${connectionType.name}',
+        () async {
+      final leaf = BridgeModule('leaf');
+      final provider = leaf.addInterface(
+        PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
+        name: 'provider',
+        role: PairRole.provider,
+      );
+      final consumer = leaf.addInterface(
+        PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
+        name: 'consumer',
+        role: PairRole.consumer,
+      );
+
+      final top = BridgeModule('top')
+        ..addSubModule(leaf)
+        ..pullUpPort(leaf.createPort('dummy', PortDirection.input));
+
+      connectInterfaces(provider, consumer,
+          sameModuleConnectionType: connectionType);
+
+      await top.build();
+
+      if (connectionType == SameModuleConnectionType.loopback) {
+        expect(
+          consumer.interface.port('bus').srcConnections,
+          contains(provider.interface.port('bus')),
+        );
+      } else {
+        expect(
+          provider.internalInterface!.port('bus').srcConnections,
+          contains(consumer.internalInterface!.port('bus')),
+        );
+      }
+    });
+  }
+
+  test('reject connection type for interfaces on different modules', () {
+    final providerModule = BridgeModule('provider')
+      ..addInterface(MyIntf(), name: 'intf', role: PairRole.provider);
+    final consumerModule = BridgeModule('consumer')
+      ..addInterface(MyIntf(), name: 'intf', role: PairRole.consumer);
+    final top = BridgeModule('top')
+      ..addSubModule(providerModule)
+      ..addSubModule(consumerModule);
+
+    expect(
+      () => connectInterfaces(
+        providerModule.interface('intf'),
+        consumerModule.interface('intf'),
+        sameModuleConnectionType: SameModuleConnectionType.loopback,
+      ),
+      throwsA(
+        isA<RohdBridgeException>().having(
+          (exception) => exception.message,
+          'message',
+          contains('only be provided'),
+        ),
+      ),
+    );
+
+    expect(top.subBridgeModules, hasLength(2));
   });
 }

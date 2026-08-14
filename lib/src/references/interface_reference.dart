@@ -418,12 +418,28 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// connection. When ports are excluded, individual port connections are made
   /// rather than using bulk interface connection methods.
   ///
+  /// When both interfaces are on the same module, [sameModuleConnectionType]
+  /// selects whether the external-facing interfaces are connected for a
+  /// loopback or the internal-facing interfaces are connected for a
+  /// passthrough. It must not be provided for interfaces on different modules.
+  ///
   /// Throws an exception if both interfaces have the same role.
-  void connectTo(InterfaceReference other, {Set<String>? exceptPorts}) {
+  void connectTo(
+    InterfaceReference other, {
+    SameModuleConnectionType? sameModuleConnectionType,
+    Set<String>? exceptPorts,
+  }) {
     // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
     if (other.module.parent != module.parent) {
       throw RohdBridgeException('Both interfaces must be on modules that share'
           ' the same parent module.');
+    }
+
+    if (sameModuleConnectionType != null && other.module != module) {
+      throw RohdBridgeException(
+          'SameModuleConnectionType should only be provided when connecting '
+          'interfaces on the same module, but $this is on $module and $other '
+          'is on ${other.module}.');
     }
 
     if (other.role == role) {
@@ -436,16 +452,43 @@ class InterfaceReference<InterfaceType extends PairInterface>
     final provider = role == PairRole.provider ? this : other;
     final consumer = role == PairRole.consumer ? this : other;
 
-    provider.interface._driveOtherExcept(
-        consumer.interface,
+    if (sameModuleConnectionType == SameModuleConnectionType.passthrough) {
+      if (provider.internalInterface == null) {
+        provider._introduceInternalInterface();
+      }
+      if (consumer.internalInterface == null) {
+        consumer._introduceInternalInterface();
+      }
+    }
+
+    final providerInterface =
+        sameModuleConnectionType == SameModuleConnectionType.passthrough
+            ? provider.internalInterface!
+            : provider.interface;
+    final consumerInterface =
+        sameModuleConnectionType == SameModuleConnectionType.passthrough
+            ? consumer.internalInterface!
+            : consumer.interface;
+
+    final fromProviderSource =
+        sameModuleConnectionType == SameModuleConnectionType.passthrough
+            ? consumerInterface
+            : providerInterface;
+    final fromProviderDestination =
+        sameModuleConnectionType == SameModuleConnectionType.passthrough
+            ? providerInterface
+            : consumerInterface;
+
+    fromProviderSource._driveOtherExcept(
+        fromProviderDestination,
         [
           PairDirection.fromProvider,
           PairDirection.commonInOuts,
         ],
         exceptPorts: exceptPorts);
 
-    consumer.interface._driveOtherExcept(
-        provider.interface,
+    fromProviderDestination._driveOtherExcept(
+        fromProviderSource,
         [
           PairDirection.fromConsumer,
         ],
