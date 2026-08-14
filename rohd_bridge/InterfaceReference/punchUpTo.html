@@ -97,25 +97,23 @@ will be of the same type as this one.</p>
   Set&lt;String&gt;? exceptPorts,
   String Function(String logical)? portUniquify,
 }) {
-  &#47;&#47; TODO(mkorbel1): remove restriction that it must be adjacent (https:&#47;&#47;github.com&#47;intel&#47;rohd-bridge&#47;issues&#47;13)
-  if (module.parent != newModule) {
-    throw RohdBridgeException(
-        &#39;The newModule must be the direct parent of this module.&#39;);
+  if (exceptPorts == null || exceptPorts.isEmpty) {
+    return punchUpToTyped(
+      newModule,
+      newIntfName: newIntfName,
+      allowNameUniquification: allowNameUniquification,
+      portUniquify: portUniquify,
+    );
   }
 
-  _connectAllPortMaps(exceptPorts: exceptPorts);
-
-  final newRef = newModule.addInterface(
+  return _punchUpTo(
+    newModule,
     interface._cloneExcept(exceptPorts: exceptPorts),
-    name: newIntfName ?? name,
-    role: role,
+    newIntfName: newIntfName,
     allowNameUniquification: allowNameUniquification,
+    exceptPorts: exceptPorts,
     portUniquify: portUniquify,
   );
-
-  connectUpTo(newRef, exceptPorts: exceptPorts);
-
-  return newRef;
 }</code></pre>
 </section>
 

@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the StandardInterfacePortReference class from the rohd_bridge library, for the Dart programming language.">
-  <title>StandardInterfacePortReference class - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the TypedPortReference extension type from the rohd_bridge library, for the Dart programming language.">
+  <title>TypedPortReference extension type - rohd_bridge library - Dart API</title>
 
 
   
@@ -26,9 +26,9 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge.dart</a></li>
-    <li class="self-crumb">StandardInterfacePortReference class</li>
+    <li class="self-crumb">TypedPortReference extension type</li>
   </ol>
-  <div class="self-name">StandardInterfacePortReference</div>
+  <div class="self-name">TypedPortReference</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -46,64 +46,59 @@
     id="dartdoc-main-content"
     class="main-content"
     data-above-sidebar="rohd_bridge&#47;rohd_bridge-library-sidebar.html"
-    data-below-sidebar="rohd_bridge&#47;StandardInterfacePortReference-class-sidebar.html">
+    data-below-sidebar="rohd_bridge&#47;TypedPortReference-extension-type-sidebar.html">
     <div>
-<h1><span class="kind-class">StandardInterfacePortReference</span> class 
+<h1><span class="kind-class">TypedPortReference&lt;<wbr><span class="type-parameter">PortType extends Logic</span>&gt;</span>
+      extension type 
  
 </h1></div>
 
     
 <section class="desc markdown">
-  <p>A reference to a complete, unsliced port within an interface.</p>
-<p>This class combines the functionality of <a href="../rohd_bridge/StandardPortReference-class.html">StandardPortReference</a> with
-<a href="../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a> to provide access to entire interface ports without
-any bit-level slicing or array indexing.</p>
+  <p>A typed view of a <a href="../rohd_bridge/PortReference-class.html">PortReference</a>.</p>
+<p><code>PortType</code> is the concrete type of the root <a href="../rohd_bridge/TypedPortReference/port.html">port</a>. It does not describe
+<a href="../rohd_bridge/PortReference/portSubset.html">portSubset</a>, whose type can change based on slicing and array indexing.</p>
+<p>This extension type implements <a href="../rohd_bridge/PortReference-class.html">PortReference</a>, so it can be passed directly
+to existing APIs that accept an untyped reference without allocation or
+conversion.</p>
 </section>
-
 
     <section>
       <dl class="dl-horizontal">
+        <dt>on</dt>
+        <dd>
+          <ul class="comma-separated clazz-relationships">
+              <li><a href="../rohd_bridge/PortReference-class.html">PortReference</a></li>
+          </ul>
+        </dd>
         
-  <dt>Inheritance</dt>
-  <dd>
-    <ul class="gt-separated dark clazz-relationships">
-      <li><a href="https://api.dart.dev/stable/3.13.0/dart-core/Object-class.html">Object</a></li>
-        <li><a href="../rohd_bridge/PortReference-class.html">PortReference</a></li>
-        <li><a href="../rohd_bridge/StandardPortReference-class.html">StandardPortReference</a></li>
-      <li>StandardInterfacePortReference</li>
-    </ul>
-  </dd>
-
-        
-        
-  <dt>Mixed-in types</dt>
+  <dt>Implemented types</dt>
   <dd>
     <ul class="comma-separated clazz-relationships">
-        <li><a href="../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></li>
+        <li><a href="../rohd_bridge/PortReference-class.html">PortReference</a></li>
     </ul>
   </dd>
-
 
         
   <dt>Available extensions</dt>
   <dd><ul class="comma-separated clazz-relationships">
       <li><a href="../rohd_bridge/TypedPortReferenceConversions.html">TypedPortReferenceConversions</a></li>
   </ul></dd>
-        
-
-
       </dl>
-    </section>
+      
 
+
+    </section>
     
   <section class="summary offset-anchor" id="constructors">
     <h2>Constructors</h2>
     <dl class="constructor-summary-list">
-        <dt id="StandardInterfacePortReference.new" class="callable">
-          <span class="name"><a href="../rohd_bridge/StandardInterfacePortReference/StandardInterfacePortReference.html">StandardInterfacePortReference</a></span><span class="signature">(<span class="parameter" id="param-interfaceReference"><span class="type-annotation"><a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">interfaceReference</span>, </span><span class="parameter" id="param-portName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">portName</span></span>)</span>
+        <dt id="TypedPortReference.new" class="callable">
+          <span class="name"><a href="../rohd_bridge/TypedPortReference/TypedPortReference.html">TypedPortReference</a></span><span class="signature">(<span class="parameter" id="param-reference"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">reference</span></span>)</span>
         </dt>
         <dd>
-          Creates a reference to a complete interface port.
+          Creates a typed view of <code>reference</code>.
+            <div class="constructor-modifier features">factory</div>
         </dd>
     </dl>
   </section>
@@ -114,15 +109,14 @@ any bit-level slicing or array indexing.</p>
     <h2>Properties</h2>
     <dl class="properties">
         <dt id="direction" class="property inherited">
-  <span class="name"><a href="../rohd_bridge/InterfacePortReference/direction.html">direction</a></span>
+  <span class="name"><a href="../rohd_bridge/PortReference/direction.html">direction</a></span>
   <span class="signature">&#8594; <a href="../rohd_bridge/PortDirection.html">PortDirection</a></span>
   
 
 </dt>
 <dd class="inherited">
-  The effective direction of this port based on interface role and port
-tags.
-  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+  The direction of the port (input, output, or inOut).
+  <div class="features"><span class="feature">late</span><span class="feature">final</span><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -134,30 +128,6 @@ tags.
 </dt>
 <dd class="inherited">
   The hash code for this object.
-  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
-
-</dd>
-
-        <dt id="interfaceReference" class="property">
-  <span class="name"><a href="../rohd_bridge/StandardInterfacePortReference/interfaceReference.html">interfaceReference</a></span>
-  <span class="signature">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span>
-  
-
-</dt>
-<dd>
-  The interface that contains this port.
-  <div class="features"><span class="feature">final</span></div>
-
-</dd>
-
-        <dt id="isDirectionless" class="property inherited">
-  <span class="name"><a href="../rohd_bridge/InterfacePortReference/isDirectionless.html">isDirectionless</a></span>
-  <span class="signature">&#8594; <a href="https://api.dart.dev/stable/3.13.0/dart-core/bool-class.html">bool</a></span>
-  
-
-</dt>
-<dd class="inherited">
-  Whether this port has no directional tags.
   <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
 
 </dd>
@@ -174,15 +144,15 @@ tags.
 
 </dd>
 
-        <dt id="port" class="property inherited">
-  <span class="name"><a href="../rohd_bridge/InterfacePortReference/port.html">port</a></span>
-  <span class="signature">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span>
+        <dt id="port" class="property">
+  <span class="name"><a href="../rohd_bridge/TypedPortReference/port.html">port</a></span>
+  <span class="signature">&#8594; PortType</span>
   
 
 </dt>
-<dd class="inherited">
-  Provides a reference to a <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a> on an interface in this reference.
-  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
+<dd>
+  The root port with its checked concrete type.
+  <div class="features"><span class="feature">no setter</span></div>
 
 </dd>
 
@@ -199,14 +169,14 @@ tags.
 </dd>
 
         <dt id="portSubset" class="property inherited">
-  <span class="name"><a href="../rohd_bridge/StandardPortReference/portSubset.html">portSubset</a></span>
-  <span class="signature">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span>
+  <span class="name"><a href="../rohd_bridge/PortReference/portSubset.html">portSubset</a></span>
+  <span class="signature">&#8594; dynamic</span>
   
 
 </dt>
 <dd class="inherited">
   The port subset that this reference represents.
-  <div class="features"><span class="feature">late</span><span class="feature">final</span><span class="feature">inherited</span></div>
+  <div class="features"><span class="feature">no setter</span><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -251,7 +221,7 @@ tags.
 
     
   <section
-      class="summary offset-anchor"
+      class="summary offset-anchor inherited"
       id="instance-methods">
     <h2>Methods</h2>
     <dl class="callables">
@@ -274,7 +244,7 @@ tags.
 </dd>
 
         <dt id="drivesLogic" class="callable inherited">
-  <span class="name"><a href="../rohd_bridge/StandardPortReference/drivesLogic.html">drivesLogic</a></span><span class="signature">(<wbr><span class="parameter" id="drivesLogic-param-other"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">other</span></span>)
+  <span class="name"><a href="../rohd_bridge/PortReference/drivesLogic.html">drivesLogic</a></span><span class="signature">(<wbr><span class="parameter" id="drivesLogic-param-other"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">other</span></span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -300,7 +270,7 @@ tags.
 </dd>
 
         <dt id="getsLogic" class="callable inherited">
-  <span class="name"><a href="../rohd_bridge/StandardPortReference/getsLogic.html">getsLogic</a></span><span class="signature">(<wbr><span class="parameter" id="getsLogic-param-other"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">other</span></span>)
+  <span class="name"><a href="../rohd_bridge/PortReference/getsLogic.html">getsLogic</a></span><span class="signature">(<wbr><span class="parameter" id="getsLogic-param-other"><span class="type-annotation"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span> <span class="parameter-name">other</span></span>)
     <span class="returntype parameter">&#8594; void</span>
   </span>
   
@@ -352,7 +322,7 @@ tags.
 </dd>
 
         <dt id="replicateTo" class="callable inherited">
-  <span class="name"><a href="../rohd_bridge/StandardPortReference/replicateTo.html">replicateTo</a></span><span class="signature">(<wbr><span class="parameter" id="replicateTo-param-newModule"><span class="type-annotation"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span> <span class="parameter-name">newModule</span>, </span><span class="parameter" id="replicateTo-param-direction"><span class="type-annotation"><a href="../rohd_bridge/PortDirection.html">PortDirection</a></span> <span class="parameter-name">direction</span>, {</span><span class="parameter" id="replicateTo-param-newPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newPortName</span></span>})
+  <span class="name"><a href="../rohd_bridge/PortReference/replicateTo.html">replicateTo</a></span><span class="signature">(<wbr><span class="parameter" id="replicateTo-param-newModule"><span class="type-annotation"><a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span> <span class="parameter-name">newModule</span>, </span><span class="parameter" id="replicateTo-param-direction"><span class="type-annotation"><a href="../rohd_bridge/PortDirection.html">PortDirection</a></span> <span class="parameter-name">direction</span>, {</span><span class="parameter" id="replicateTo-param-newPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newPortName</span></span>})
     <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>
   </span>
   
@@ -364,16 +334,16 @@ tags.
 
 </dd>
 
-        <dt id="slice" class="callable">
-  <span class="name"><a href="../rohd_bridge/StandardInterfacePortReference/slice.html">slice</a></span><span class="signature">(<wbr><span class="parameter" id="slice-param-endIndex"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/int-class.html">int</a></span> <span class="parameter-name">endIndex</span>, </span><span class="parameter" id="slice-param-startIndex"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/int-class.html">int</a></span> <span class="parameter-name">startIndex</span></span>)
-    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfacePortReference-mixin.html">InterfacePortReference</a></span>
+        <dt id="slice" class="callable inherited">
+  <span class="name"><a href="../rohd_bridge/PortReference/slice.html">slice</a></span><span class="signature">(<wbr><span class="parameter" id="slice-param-endIndex"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/int-class.html">int</a></span> <span class="parameter-name">endIndex</span>, </span><span class="parameter" id="slice-param-startIndex"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/int-class.html">int</a></span> <span class="parameter-name">startIndex</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/PortReference-class.html">PortReference</a></span>
   </span>
   
 
 </dt>
-<dd>
+<dd class="inherited">
   Creates a slice of this port from <code>endIndex</code> down to <code>startIndex</code>.
-  <div class="features"><span class="feature">override</span></div>
+  <div class="features"><span class="feature">inherited</span></div>
 
 </dd>
 
@@ -391,7 +361,7 @@ tags.
 </dd>
 
         <dt id="toString" class="callable inherited">
-  <span class="name"><a href="../rohd_bridge/InterfacePortReference/toString.html">toString</a></span><span class="signature">(<wbr>)
+  <span class="name"><a href="../rohd_bridge/PortReference/toString.html">toString</a></span><span class="signature">(<wbr>)
     <span class="returntype parameter">&#8594; <a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span>
   </span>
   
@@ -461,9 +431,10 @@ port is not a <code>PortType</code>.
     
     
 
-  </div> <!-- /.main-content -->
-  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
-    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+
+</div><!-- /.main-content -->
+<div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+  <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
 <header id="header-search-sidebar" class="hidden-l">
   <form class="search-sidebar" role="search">
     <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
@@ -472,14 +443,14 @@ port is not a <code>PortType</code>.
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">rohd_bridge</a></li>
     <li><a href="../rohd_bridge/">rohd_bridge</a></li>
-    <li class="self-crumb">StandardInterfacePortReference class</li>
+    <li class="self-crumb">TypedPortReference extension type</li>
 </ol>
 
-    <h5>rohd_bridge library</h5>
-    <div id="dartdoc-sidebar-left-content"></div>
-  </div>
-  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
-  </div><!--/.sidebar-offcanvas-->
+  <h5>rohd_bridge library</h5>
+  <div id="dartdoc-sidebar-left-content"></div>
+</div>
+<div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+</div><!--/.sidebar-offcanvas-->
 </main>
 <footer>
   <span class="no-break">

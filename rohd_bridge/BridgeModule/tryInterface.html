@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the interface method from the BridgeModule class, for the Dart programming language.">
-  <title>interface method - BridgeModule class - rohd_bridge library - Dart API</title>
+  <meta name="description" content="API docs for the tryInterface method from the BridgeModule class, for the Dart programming language.">
+  <title>tryInterface method - BridgeModule class - rohd_bridge library - Dart API</title>
 
 
   
@@ -27,9 +27,9 @@
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge.dart</a></li>
     <li><a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></li>
-    <li class="self-crumb">interface method</li>
+    <li class="self-crumb">tryInterface method</li>
   </ol>
-  <div class="self-name">interface</div>
+  <div class="self-name">tryInterface</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
@@ -49,13 +49,13 @@
     data-above-sidebar="rohd_bridge&#47;BridgeModule-class-sidebar.html"
     data-below-sidebar="">
     <div>
-<h1><span class="kind-method">interface</span> method 
+<h1><span class="kind-method">tryInterface</span> method 
 </h1></div>
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span>
-<span class="name ">interface</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="interface-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span></li>
+<span class="returntype"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span>?</span>
+<span class="name ">tryInterface</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="tryInterface-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span></li>
 </ol>)
 
       
@@ -63,20 +63,15 @@
     </section>
     
 <section class="desc markdown">
-  <p>Gets a reference to an interface by name.</p>
-<p>Returns the <a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a> for the interface with the specified
-<code>name</code>. This provides access to the interface's ports, role, and
-connection methods.</p>
-<p>Throws an <a href="https://api.dart.dev/stable/3.13.0/dart-core/Exception-class.html">Exception</a> if no interface with the given <code>name</code> exists.</p>
+  <p>Tries to get a reference to an interface by <code>name</code>.</p>
+<p>Returns <code>null</code> if no interface with the given <code>name</code> exists.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">InterfaceReference interface(String name) =&gt;
-    tryInterface(name) ??
-    (throw RohdBridgeException(&#39;Interface $name not found on $this&#39;));</code></pre>
+  <pre class="language-dart"><code class="language-dart">InterfaceReference? tryInterface(String name) =&gt; interfaces[name];</code></pre>
 </section>
 
 
@@ -92,7 +87,7 @@ connection methods.</p>
     <li><a href="../../index.html">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/">rohd_bridge</a></li>
     <li><a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></li>
-    <li class="self-crumb">interface method</li>
+    <li class="self-crumb">tryInterface method</li>
 </ol>
 
     <h5>BridgeModule class</h5>

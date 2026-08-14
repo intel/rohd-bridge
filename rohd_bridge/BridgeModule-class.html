@@ -1208,6 +1208,19 @@ submodule.
 
 </dd>
 
+        <dt id="pullUpTypedInterface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/pullUpTypedInterface.html">pullUpTypedInterface</a></span><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType extends <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="pullUpTypedInterface-param-subModuleIntf"><span class="type-annotation"><a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType</span>&gt;</span></span> <span class="parameter-name">subModuleIntf</span>, {</span><span class="parameter" id="pullUpTypedInterface-param-newIntfName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newIntfName</span>, </span><span class="parameter" id="pullUpTypedInterface-param-allowIntfUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntfUniquification</span> = <span class="default-value">true</span>, </span><span class="parameter" id="pullUpTypedInterface-param-portUniquify"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">portUniquify</span>(<span class="parameter" id="param-logical"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">logical</span>, </span><span class="parameter" id="param-physical"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">physical</span></span>)?</span>})
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Pulls <code>subModuleIntf</code> up while preserving <code>InterfaceType</code>.
+  
+
+</dd>
+
         <dt id="renamePort" class="callable">
   <span class="name"><a href="../rohd_bridge/BridgeModule/renamePort.html">renamePort</a></span><span class="signature">(<wbr><span class="parameter" id="renamePort-param-currentName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">currentName</span>, </span><span class="parameter" id="renamePort-param-newName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">newName</span></span>)
     <span class="returntype parameter">&#8594; void</span>
@@ -1274,6 +1287,19 @@ generation.
 
 </dd>
 
+        <dt id="tryInterface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/tryInterface.html">tryInterface</a></span><span class="signature">(<wbr><span class="parameter" id="tryInterface-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Tries to get a reference to an interface by <code>name</code>.
+  
+
+</dd>
+
         <dt id="tryOutput" class="callable inherited">
   <span class="name"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Module/tryOutput.html">tryOutput</a></span><span class="signature">(<wbr><span class="parameter" id="tryOutput-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
     <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a>?</span>
@@ -1297,6 +1323,58 @@ generation.
 <dd>
   Tries to create a port reference from a string representation with
 advanced parsing.
+  
+
+</dd>
+
+        <dt id="tryTypedInterface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/tryTypedInterface.html">tryTypedInterface</a></span><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType extends <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="tryTypedInterface-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType</span>&gt;</span>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Tries to get an interface named <code>name</code> with concrete type <code>InterfaceType</code>.
+  
+
+</dd>
+
+        <dt id="tryTypedPort" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/tryTypedPort.html">tryTypedPort</a></span><span class="signature">&lt;<wbr><span class="type-parameter">PortType extends <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="tryTypedPort-param-portRefString"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">portRefString</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/TypedPortReference-extension-type.html">TypedPortReference</a><span class="signature">&lt;<wbr><span class="type-parameter">PortType</span>&gt;</span>?</span>
+  </span>
+  
+
+</dt>
+<dd>
+  Tries to create a typed port reference from <code>portRefString</code>.
+  
+
+</dd>
+
+        <dt id="typedInterface" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/typedInterface.html">typedInterface</a></span><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType extends <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="typedInterface-param-name"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">name</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter">InterfaceType</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Gets an interface named <code>name</code> with concrete type <code>InterfaceType</code>.
+  
+
+</dd>
+
+        <dt id="typedPort" class="callable">
+  <span class="name"><a href="../rohd_bridge/BridgeModule/typedPort.html">typedPort</a></span><span class="signature">&lt;<wbr><span class="type-parameter">PortType extends <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a></span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="typedPort-param-portRefString"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span> <span class="parameter-name">portRefString</span></span>)
+    <span class="returntype parameter">&#8594; <a href="../rohd_bridge/TypedPortReference-extension-type.html">TypedPortReference</a><span class="signature">&lt;<wbr><span class="type-parameter">PortType</span>&gt;</span></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Creates a typed port reference from <code>portRefString</code>.
   
 
 </dd>

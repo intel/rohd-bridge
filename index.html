@@ -189,6 +189,16 @@ final myIntf = myMod.interface('my_interface');
 // A reference to a slice of a port of `myIntf`
 myIntf.port('intf_port_a[8:3]');
 </code></pre>
+<p>Typed lookup APIs preserve concrete ROHD port and interface types when they are known:</p>
+<pre class="language-dart"><code class="language-dart">final TypedPortReference&lt;LogicArray&gt; arrayPort =
+    myMod.typedPort&lt;LogicArray&gt;('arr_port_b');
+final InterfaceReference&lt;MyIntf&gt; myTypedIntf =
+    myMod.typedInterface&lt;MyIntf&gt;('my_interface');
+
+final InterfaceReference&lt;MyIntf&gt; topIntf =
+    topMod.pullUpTypedInterface(myTypedIntf);
+</code></pre>
+<p><code>tryPort</code>, <code>tryTypedPort</code>, <code>tryInterface</code>, and <code>tryTypedInterface</code> provide nullable lookup variants. A <code>TypedPortReference</code> can be passed directly to APIs that accept <code>PortReference</code>. Slicing or indexing a typed port returns an untyped <code>PortReference</code> because the selected shape may differ from the root port type. Typed interface punching and pull-up APIs omit <code>exceptPorts</code> because removing ports changes the concrete interface type; use the existing untyped APIs when exclusions are needed.</p>
 <p>You can also do things like <code>slice</code> or index off a <code>PortReference</code>, similar to how you can in ROHD for normal <code>Logic</code>s.</p>
 <h4 id="making-connections">Making Connections</h4>
 <p>One of the key capabilities of ROHD Bridge is hierarchy-aware connection between endpoints.</p>
