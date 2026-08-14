@@ -349,12 +349,12 @@ endmodule : leaf'''));
     final consumer =
         leaf.addInterface(MyIntf(), name: 'consumer', role: PairRole.consumer);
 
+    connectInterfaces(provider, consumer,
+        sameModuleConnectionType: SameModuleConnectionType.loopback);
+
     final top = BridgeModule('top')
       ..addSubModule(leaf)
       ..pullUpPort(leaf.createPort('dummy', PortDirection.input));
-
-    connectInterfaces(provider, consumer,
-        sameModuleConnectionType: SameModuleConnectionType.loopback);
 
     await top.build();
 
@@ -372,12 +372,12 @@ endmodule : leaf'''));
     final consumer =
         leaf.addInterface(MyIntf(), name: 'consumer', role: PairRole.consumer);
 
+    connectInterfaces(provider, consumer,
+        sameModuleConnectionType: SameModuleConnectionType.passthrough);
+
     final top = BridgeModule('top')
       ..addSubModule(leaf)
       ..pullUpPort(leaf.createPort('dummy', PortDirection.input));
-
-    connectInterfaces(provider, consumer,
-        sameModuleConnectionType: SameModuleConnectionType.passthrough);
 
     await top.build();
 
@@ -391,42 +391,54 @@ endmodule : leaf'''));
     );
   });
 
-  for (final connectionType in SameModuleConnectionType.values) {
-    test('connect same-module inOut interfaces with ${connectionType.name}',
-        () async {
-      final leaf = BridgeModule('leaf');
-      final provider = leaf.addInterface(
-        PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
-        name: 'provider',
-        role: PairRole.provider,
-      );
-      final consumer = leaf.addInterface(
-        PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
-        name: 'consumer',
-        role: PairRole.consumer,
-      );
+  for (final parentBeforeConnection in [false, true]) {
+    for (final connectionType in SameModuleConnectionType.values) {
+      final parentingState =
+          parentBeforeConnection ? 'after parenting' : 'before parenting';
 
-      final top = BridgeModule('top')
-        ..addSubModule(leaf)
-        ..pullUpPort(leaf.createPort('dummy', PortDirection.input));
-
-      connectInterfaces(provider, consumer,
-          sameModuleConnectionType: connectionType);
-
-      await top.build();
-
-      if (connectionType == SameModuleConnectionType.loopback) {
-        expect(
-          consumer.interface.port('bus').srcConnections,
-          contains(provider.interface.port('bus')),
+      test(
+          'connect same-module inOut interfaces with ${connectionType.name} '
+          '$parentingState', () async {
+        final leaf = BridgeModule('leaf');
+        final provider = leaf.addInterface(
+          PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
+          name: 'provider',
+          role: PairRole.provider,
         );
-      } else {
-        expect(
-          provider.internalInterface!.port('bus').srcConnections,
-          contains(consumer.internalInterface!.port('bus')),
+        final consumer = leaf.addInterface(
+          PairInterface(commonInOutPorts: [LogicNet.port('bus')]),
+          name: 'consumer',
+          role: PairRole.consumer,
         );
-      }
-    });
+        final top = BridgeModule('top');
+
+        if (parentBeforeConnection) {
+          top.addSubModule(leaf);
+        }
+
+        connectInterfaces(provider, consumer,
+            sameModuleConnectionType: connectionType);
+
+        if (!parentBeforeConnection) {
+          top.addSubModule(leaf);
+        }
+        top.pullUpPort(leaf.createPort('dummy', PortDirection.input));
+
+        await top.build();
+
+        if (connectionType == SameModuleConnectionType.loopback) {
+          expect(
+            consumer.interface.port('bus').srcConnections,
+            contains(provider.interface.port('bus')),
+          );
+        } else {
+          expect(
+            provider.internalInterface!.port('bus').srcConnections,
+            contains(consumer.internalInterface!.port('bus')),
+          );
+        }
+      });
+    }
   }
 
   test('reject connection type for interfaces on different modules', () {

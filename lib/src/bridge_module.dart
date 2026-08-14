@@ -1473,6 +1473,15 @@ void connectInterfaces(
         '$intf2 is on $intf2Instance.');
   }
 
+  if (intf1Instance == intf2Instance) {
+    intf1.connectTo(
+      intf2,
+      sameModuleConnectionType: sameModuleConnectionType,
+      exceptPorts: exceptPorts,
+    );
+    return;
+  }
+
   if (intf1.role != intf2.role) {
     // up and down case
     final commonParent = findCommonParent(intf1Instance, intf2Instance);

@@ -232,6 +232,46 @@ void main() {
     });
 
     group('connectPorts()', () {
+      for (final parentBeforeConnection in [false, true]) {
+        for (final connectionType in SameModuleConnectionType.values) {
+          final parentingState =
+              parentBeforeConnection ? 'after parenting' : 'before parenting';
+
+          test(
+              'connects inOut ports with ${connectionType.name} '
+              '$parentingState', () async {
+            final mod = BridgeModule('testMod');
+            final driver =
+                mod.createPort('driver', PortDirection.inOut, width: 8);
+            final receiver =
+                mod.createPort('receiver', PortDirection.inOut, width: 8);
+            final top = BridgeModule('top');
+
+            if (parentBeforeConnection) {
+              top.addSubModule(mod);
+            }
+
+            connectPorts(driver, receiver,
+                sameModuleConnectionType: connectionType);
+
+            if (!parentBeforeConnection) {
+              top.addSubModule(mod);
+            }
+            top.pullUpPort(mod.createPort('dummyIn', PortDirection.input));
+
+            await top.build();
+
+            if (connectionType == SameModuleConnectionType.loopback) {
+              expect(mod.inOutSource('receiver').srcConnections,
+                  contains(mod.inOutSource('driver')));
+            } else {
+              expect(mod.inOut('receiver').srcConnections,
+                  contains(mod.inOut('driver')));
+            }
+          });
+        }
+      }
+
       for (final tc in _testCases) {
         // connectPorts does hierarchy punching; for same-module it passes
         // through to gets().
