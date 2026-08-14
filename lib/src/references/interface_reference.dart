@@ -225,6 +225,15 @@ class InterfaceReference<InterfaceType extends PairInterface>
     throw RohdBridgeException('Invalid port access string: $portRef');
   }
 
+  /// Tries to get a typed reference to [portRef] within this interface.
+  ///
+  /// Returns `null` if the port does not exist or its root port is not a
+  /// [PortType]. Parsing and interface-port behavior are delegated to
+  /// [tryPort].
+  TypedPortReference<PortType>? tryTypedPort<PortType extends Logic>(
+          String portRef) =>
+      tryPort(portRef)?.tryAsTyped<PortType>();
+
   /// Gets a reference to a specific port within this interface.
   ///
   /// The [portRef] can be either a simple port name (e.g., "data") or include
@@ -235,6 +244,15 @@ class InterfaceReference<InterfaceType extends PairInterface>
   InterfacePortReference port(String portRef) =>
       tryPort(portRef) ??
       (throw RohdBridgeException('Port $portRef not found on $this'));
+
+  /// Gets a typed reference to [portRef] within this interface.
+  ///
+  /// Throws a [RohdBridgeException] if the port does not exist or its root
+  /// port is not a [PortType]. Parsing and interface-port behavior are
+  /// delegated to [port].
+  TypedPortReference<PortType> typedPort<PortType extends Logic>(
+          String portRef) =>
+      port(portRef).asTyped<PortType>();
 
   /// Creates a copy of this interface in a parent module.
   ///
@@ -260,6 +278,53 @@ class InterfaceReference<InterfaceType extends PairInterface>
     Set<String>? exceptPorts,
     String Function(String logical)? portUniquify,
   }) {
+    if (exceptPorts == null || exceptPorts.isEmpty) {
+      return punchUpToTyped(
+        newModule,
+        newIntfName: newIntfName,
+        allowNameUniquification: allowNameUniquification,
+        portUniquify: portUniquify,
+      );
+    }
+
+    return _punchUpTo(
+      newModule,
+      interface._cloneExcept(exceptPorts: exceptPorts),
+      newIntfName: newIntfName,
+      allowNameUniquification: allowNameUniquification,
+      exceptPorts: exceptPorts,
+      portUniquify: portUniquify,
+    );
+  }
+
+  /// Creates a type-preserving copy of this interface in a parent module.
+  ///
+  /// Unlike [punchUpTo], this method does not accept port exclusions because
+  /// removing ports changes the concrete interface type.
+  InterfaceReference<InterfaceType> punchUpToTyped(
+    BridgeModule newModule, {
+    String? newIntfName,
+    bool allowNameUniquification = false,
+    String Function(String logical)? portUniquify,
+  }) =>
+      _punchUpTo(
+        newModule,
+        interface.clone() as InterfaceType,
+        newIntfName: newIntfName,
+        allowNameUniquification: allowNameUniquification,
+        exceptPorts: null,
+        portUniquify: portUniquify,
+      );
+
+  InterfaceReference<NewInterfaceType>
+      _punchUpTo<NewInterfaceType extends PairInterface>(
+    BridgeModule newModule,
+    NewInterfaceType clonedInterface, {
+    required String? newIntfName,
+    required bool allowNameUniquification,
+    required Set<String>? exceptPorts,
+    required String Function(String logical)? portUniquify,
+  }) {
     // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
     if (module.parent != newModule) {
       throw RohdBridgeException(
@@ -269,7 +334,7 @@ class InterfaceReference<InterfaceType extends PairInterface>
     _connectAllPortMaps(exceptPorts: exceptPorts);
 
     final newRef = newModule.addInterface(
-      interface._cloneExcept(exceptPorts: exceptPorts),
+      clonedInterface,
       name: newIntfName ?? name,
       role: role,
       allowNameUniquification: allowNameUniquification,
@@ -408,6 +473,53 @@ class InterfaceReference<InterfaceType extends PairInterface>
     Set<String>? exceptPorts,
     String Function(String logical)? portUniquify,
   }) {
+    if (exceptPorts == null || exceptPorts.isEmpty) {
+      return punchDownToTyped(
+        subModule,
+        newIntfName: newIntfName,
+        allowNameUniquification: allowNameUniquification,
+        portUniquify: portUniquify,
+      );
+    }
+
+    return _punchDownTo(
+      subModule,
+      interface._cloneExcept(exceptPorts: exceptPorts),
+      newIntfName: newIntfName,
+      allowNameUniquification: allowNameUniquification,
+      exceptPorts: exceptPorts,
+      portUniquify: portUniquify,
+    );
+  }
+
+  /// Creates a type-preserving copy of this interface in a submodule.
+  ///
+  /// Unlike [punchDownTo], this method does not accept port exclusions because
+  /// removing ports changes the concrete interface type.
+  InterfaceReference<InterfaceType> punchDownToTyped(
+    BridgeModule subModule, {
+    String? newIntfName,
+    bool allowNameUniquification = false,
+    String Function(String logical)? portUniquify,
+  }) =>
+      _punchDownTo(
+        subModule,
+        interface.clone() as InterfaceType,
+        newIntfName: newIntfName,
+        allowNameUniquification: allowNameUniquification,
+        exceptPorts: null,
+        portUniquify: portUniquify,
+      );
+
+  InterfaceReference<NewInterfaceType>
+      _punchDownTo<NewInterfaceType extends PairInterface>(
+    BridgeModule subModule,
+    NewInterfaceType clonedInterface, {
+    required String? newIntfName,
+    required bool allowNameUniquification,
+    required Set<String>? exceptPorts,
+    required String Function(String logical)? portUniquify,
+  }) {
     // TODO(mkorbel1): remove restriction that it must be adjacent (https://github.com/intel/rohd-bridge/issues/13)
     if (subModule.parent != module) {
       throw RohdBridgeException(
@@ -417,7 +529,7 @@ class InterfaceReference<InterfaceType extends PairInterface>
     _connectAllPortMaps(exceptPorts: exceptPorts);
 
     final newRef = subModule.addInterface(
-      interface._cloneExcept(exceptPorts: exceptPorts),
+      clonedInterface,
       name: newIntfName ?? name,
       role: role,
       allowNameUniquification: allowNameUniquification,

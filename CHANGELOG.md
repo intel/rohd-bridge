@@ -1,3 +1,9 @@
+## Next release
+
+- Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped` (<https://github.com/intel/rohd-bridge/pull/58>).
+- Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup (<https://github.com/intel/rohd-bridge/pull/58>).
+- Added type-preserving interface hierarchy APIs: `pullUpTypedInterface`, `punchUpToTyped`, and `punchDownToTyped`. These APIs intentionally omit port exclusions because a partial interface cannot retain its concrete type (<https://github.com/intel/rohd-bridge/pull/58>).
+
 ## 0.2.3
 
 - Added `SameModuleConnectionType` enum to disambiguate same-module connections involving `inOut` ports. When connecting two ports on the same module where at least one is `inOut` and neither is `input`, a `SameModuleConnectionType` (`loopback` or `passthrough`) must now be provided to `gets()` or `connectPorts()` to specify whether the connection should use external-facing or internal-facing ports. (<https://github.com/intel/rohd-bridge/pull/39>). This change is backwards compatible except for ambiguous scenarios.

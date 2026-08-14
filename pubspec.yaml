@@ -7,7 +7,7 @@ issue_tracker: https://github.com/intel/rohd-bridge/issues
 documentation: https://intel.github.io/rohd-bridge/rohd_bridge/rohd_bridge-library.html
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
   collection: ^1.15.0
