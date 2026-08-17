@@ -12,17 +12,19 @@
 
 part of 'references.dart';
 
-/// The type of connection to make between two ports on the same module.
+/// The type of connection to make between two ports or interfaces on the same
+/// module.
 ///
-/// When connecting two ports on the same [BridgeModule], the connection can
-/// either be a [loopback] (external, pin-to-pin) or a [passthrough] (internal,
-/// net-to-net).
+/// When connecting ports or interfaces on the same [BridgeModule], the
+/// connection can either be a [loopback] (external, pin-to-pin) or a
+/// [passthrough] (internal, net-to-net).
 ///
 /// For most direction combinations, the connection type is unambiguous and
 /// [PortReference.gets] can infer it automatically. However, when at least one
 /// port is [PortDirection.inOut] and neither port is [PortDirection.input], the
 /// connection type must be explicitly specified via [PortReference.gets] or
-/// `connectPorts`.
+/// [connectPorts]. Interface connections can select the type via
+/// [InterfaceReference.connectTo] or [connectInterfaces].
 enum SameModuleConnectionType {
   /// An external (loopback) connection between ports on the same module.
   ///

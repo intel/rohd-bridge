@@ -1,5 +1,6 @@
 ## Next release
 
+- Added `sameModuleConnectionType` to `connectInterfaces` and `InterfaceReference.connectTo` to select loopback or passthrough connections between interfaces on the same module (<https://github.com/intel/rohd-bridge/pull/59>).
 - Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped` (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added type-preserving interface hierarchy APIs: `pullUpTypedInterface`, `punchUpToTyped`, and `punchDownToTyped`. These APIs intentionally omit port exclusions because a partial interface cannot retain its concrete type (<https://github.com/intel/rohd-bridge/pull/58>).

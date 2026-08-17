@@ -1439,6 +1439,12 @@ void connectPorts(
 /// Uniquification also respects [BridgeModule.allowUniquification] at each
 /// level. The [exceptPorts] parameter is an optional set of strings
 /// representing the logical port names to be excluded.
+///
+/// When [intf1] and [intf2] are on the same module,
+/// [sameModuleConnectionType] selects whether their external-facing
+/// ([SameModuleConnectionType.loopback]) or internal-facing
+/// ([SameModuleConnectionType.passthrough]) interfaces are connected. If it is
+/// omitted, loopback behavior is used for backwards compatibility.
 void connectInterfaces(
   InterfaceReference intf1,
   InterfaceReference intf2, {
@@ -1446,6 +1452,7 @@ void connectInterfaces(
   String? intf2PathNewName,
   bool allowIntf1PathUniquification = true,
   bool allowIntf2PathUniquification = true,
+  SameModuleConnectionType? sameModuleConnectionType,
   Set<String>? exceptPorts,
   // TODO(mkorbel): finish these,
   //  possibly wont be needed for connectInterfaces
@@ -1458,6 +1465,22 @@ void connectInterfaces(
 
   final intf1Instance = intf1.module;
   final intf2Instance = intf2.module;
+
+  if (sameModuleConnectionType != null && intf1Instance != intf2Instance) {
+    throw RohdBridgeException(
+        'SameModuleConnectionType should only be provided when connecting '
+        'interfaces on the same module, but $intf1 is on $intf1Instance and '
+        '$intf2 is on $intf2Instance.');
+  }
+
+  if (intf1Instance == intf2Instance) {
+    intf1.connectTo(
+      intf2,
+      sameModuleConnectionType: sameModuleConnectionType,
+      exceptPorts: exceptPorts,
+    );
+    return;
+  }
 
   if (intf1.role != intf2.role) {
     // up and down case
@@ -1512,7 +1535,11 @@ void connectInterfaces(
       exceptPorts: exceptPorts,
     );
 
-    intf1Top.connectTo(intf2Top, exceptPorts: exceptPorts);
+    intf1Top.connectTo(
+      intf2Top,
+      sameModuleConnectionType: sameModuleConnectionType,
+      exceptPorts: exceptPorts,
+    );
   } else if (intf1.role == intf2.role) {
     final intf1ToIntf2Path = intf1Instance.getHierarchyDownTo(intf2Instance);
     final intf2ToIntf1Path = intf2Instance.getHierarchyDownTo(intf1Instance);
