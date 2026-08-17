@@ -1,9 +1,18 @@
-## Next release
+## 0.2.4
 
 - Added `sameModuleConnectionType` to `connectInterfaces` and `InterfaceReference.connectTo` to select loopback or passthrough connections between interfaces on the same module (<https://github.com/intel/rohd-bridge/pull/59>).
 - Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped` (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added type-preserving interface hierarchy APIs: `pullUpTypedInterface`, `punchUpToTyped`, and `punchDownToTyped`. These APIs intentionally omit port exclusions because a partial interface cannot retain its concrete type (<https://github.com/intel/rohd-bridge/pull/58>).
+- Added support for custom synthesizer configurations in `buildAndGenerateRTL` (<https://github.com/intel/rohd-bridge/pull/55>).
+- Fixed mapped interface port operations to resolve deferred `PortMap`s before use (<https://github.com/intel/rohd-bridge/pull/50>).
+- Added support for same-module connections involving mapped interface ports (<https://github.com/intel/rohd-bridge/pull/53>).
+- Added validation that rejects exact duplicate `PortMap` registrations (<https://github.com/intel/rohd-bridge/pull/54>).
+- Added `tryPort` for nullable port lookup (<https://github.com/intel/rohd-bridge/pull/43>).
+- Fixed output file naming in `buildAndGenerateRTL` for uniquified modules (<https://github.com/intel/rohd-bridge/pull/46>).
+- Simplified tie-off signal names in generated SystemVerilog (<https://github.com/intel/rohd-bridge/pull/44>).
+- Added `intermediateSignalName` support to `connectPorts` and related methods (<https://github.com/intel/rohd-bridge/pull/45>).
+- Fixed a type error in `ConnectionExtractor` equality checks when compared connections have mismatched types (<https://github.com/intel/rohd-bridge/pull/41>).
 
 ## 0.2.3
 
