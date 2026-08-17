@@ -56,6 +56,7 @@
       
 <span class="returntype">void</span>
 <span class="name ">connectTo</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="connectTo-param-other"><span class="type-annotation"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span> <span class="parameter-name">other</span>, {</span></li>
+<li><span class="parameter" id="connectTo-param-sameModuleConnectionType"><span class="type-annotation"><a href="../../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a>?</span> <span class="parameter-name">sameModuleConnectionType</span>, </span></li>
 <li><span class="parameter" id="connectTo-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">exceptPorts</span>, </span></li>
 </ol>})
 
@@ -71,6 +72,10 @@ ensure proper signal directionality.</p>
 <p>The <code>exceptPorts</code> parameter allows excluding specific ports from the
 connection. When ports are excluded, individual port connections are made
 rather than using bulk interface connection methods.</p>
+<p>When both interfaces are on the same module, <code>sameModuleConnectionType</code>
+selects whether the external-facing interfaces are connected for a
+loopback or the internal-facing interfaces are connected for a
+passthrough. It must not be provided for interfaces on different modules.</p>
 <p>Throws an exception if both interfaces have the same role.</p>
 </section>
 
@@ -78,11 +83,22 @@ rather than using bulk interface connection methods.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">void connectTo(InterfaceReference other, {Set&lt;String&gt;? exceptPorts}) {
+  <pre class="language-dart"><code class="language-dart">void connectTo(
+  InterfaceReference other, {
+  SameModuleConnectionType? sameModuleConnectionType,
+  Set&lt;String&gt;? exceptPorts,
+}) {
   &#47;&#47; TODO(mkorbel1): remove restriction that it must be adjacent (https:&#47;&#47;github.com&#47;intel&#47;rohd-bridge&#47;issues&#47;13)
   if (other.module.parent != module.parent) {
     throw RohdBridgeException(&#39;Both interfaces must be on modules that share&#39;
         &#39; the same parent module.&#39;);
+  }
+
+  if (sameModuleConnectionType != null &amp;&amp; other.module != module) {
+    throw RohdBridgeException(
+        &#39;SameModuleConnectionType should only be provided when connecting &#39;
+        &#39;interfaces on the same module, but $this is on $module and $other &#39;
+        &#39;is on ${other.module}.&#39;);
   }
 
   if (other.role == role) {
@@ -95,16 +111,43 @@ rather than using bulk interface connection methods.</p>
   final provider = role == PairRole.provider ? this : other;
   final consumer = role == PairRole.consumer ? this : other;
 
-  provider.interface._driveOtherExcept(
-      consumer.interface,
+  if (sameModuleConnectionType == SameModuleConnectionType.passthrough) {
+    if (provider.internalInterface == null) {
+      provider._introduceInternalInterface();
+    }
+    if (consumer.internalInterface == null) {
+      consumer._introduceInternalInterface();
+    }
+  }
+
+  final providerInterface =
+      sameModuleConnectionType == SameModuleConnectionType.passthrough
+          ? provider.internalInterface!
+          : provider.interface;
+  final consumerInterface =
+      sameModuleConnectionType == SameModuleConnectionType.passthrough
+          ? consumer.internalInterface!
+          : consumer.interface;
+
+  final fromProviderSource =
+      sameModuleConnectionType == SameModuleConnectionType.passthrough
+          ? consumerInterface
+          : providerInterface;
+  final fromProviderDestination =
+      sameModuleConnectionType == SameModuleConnectionType.passthrough
+          ? providerInterface
+          : consumerInterface;
+
+  fromProviderSource._driveOtherExcept(
+      fromProviderDestination,
       [
         PairDirection.fromProvider,
         PairDirection.commonInOuts,
       ],
       exceptPorts: exceptPorts);
 
-  consumer.interface._driveOtherExcept(
-      provider.interface,
+  fromProviderDestination._driveOtherExcept(
+      fromProviderSource,
       [
         PairDirection.fromConsumer,
       ],

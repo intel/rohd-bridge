@@ -61,6 +61,7 @@
 <li><span class="parameter" id="connectInterfaces-param-intf2PathNewName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intf2PathNewName</span>, </span></li>
 <li><span class="parameter" id="connectInterfaces-param-allowIntf1PathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntf1PathUniquification</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="connectInterfaces-param-allowIntf2PathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntf2PathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectInterfaces-param-sameModuleConnectionType"><span class="type-annotation"><a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a>?</span> <span class="parameter-name">sameModuleConnectionType</span>, </span></li>
 <li><span class="parameter" id="connectInterfaces-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.0/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.13.0/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">exceptPorts</span>, </span></li>
 </ol>})
 
@@ -78,6 +79,11 @@ prefer to name new interfaces with those names. If
 Uniquification also respects <a href="../rohd_bridge/BridgeModule/allowUniquification.html">BridgeModule.allowUniquification</a> at each
 level. The <code>exceptPorts</code> parameter is an optional set of strings
 representing the logical port names to be excluded.</p>
+<p>When <code>intf1</code> and <code>intf2</code> are on the same module,
+<code>sameModuleConnectionType</code> selects whether their external-facing
+(<a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType.loopback</a>) or internal-facing
+(<a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType.passthrough</a>) interfaces are connected. If it is
+omitted, loopback behavior is used for backwards compatibility.</p>
 </section>
 
 
@@ -91,6 +97,7 @@ representing the logical port names to be excluded.</p>
   String? intf2PathNewName,
   bool allowIntf1PathUniquification = true,
   bool allowIntf2PathUniquification = true,
+  SameModuleConnectionType? sameModuleConnectionType,
   Set&lt;String&gt;? exceptPorts,
   &#47;&#47; TODO(mkorbel): finish these,
   &#47;&#47;  possibly wont be needed for connectInterfaces
@@ -103,6 +110,22 @@ representing the logical port names to be excluded.</p>
 
   final intf1Instance = intf1.module;
   final intf2Instance = intf2.module;
+
+  if (sameModuleConnectionType != null &amp;&amp; intf1Instance != intf2Instance) {
+    throw RohdBridgeException(
+        &#39;SameModuleConnectionType should only be provided when connecting &#39;
+        &#39;interfaces on the same module, but $intf1 is on $intf1Instance and &#39;
+        &#39;$intf2 is on $intf2Instance.&#39;);
+  }
+
+  if (intf1Instance == intf2Instance) {
+    intf1.connectTo(
+      intf2,
+      sameModuleConnectionType: sameModuleConnectionType,
+      exceptPorts: exceptPorts,
+    );
+    return;
+  }
 
   if (intf1.role != intf2.role) {
     &#47;&#47; up and down case
@@ -157,7 +180,11 @@ representing the logical port names to be excluded.</p>
       exceptPorts: exceptPorts,
     );
 
-    intf1Top.connectTo(intf2Top, exceptPorts: exceptPorts);
+    intf1Top.connectTo(
+      intf2Top,
+      sameModuleConnectionType: sameModuleConnectionType,
+      exceptPorts: exceptPorts,
+    );
   } else if (intf1.role == intf2.role) {
     final intf1ToIntf2Path = intf1Instance.getHierarchyDownTo(intf2Instance);
     final intf2ToIntf1Path = intf2Instance.getHierarchyDownTo(intf1Instance);

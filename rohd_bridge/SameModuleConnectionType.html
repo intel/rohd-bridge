@@ -59,15 +59,17 @@
 
     
 <section class="desc markdown">
-  <p>The type of connection to make between two ports on the same module.</p>
-<p>When connecting two ports on the same <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>, the connection can
-either be a <a href="../rohd_bridge/SameModuleConnectionType.html">loopback</a> (external, pin-to-pin) or a <a href="../rohd_bridge/SameModuleConnectionType.html">passthrough</a> (internal,
-net-to-net).</p>
+  <p>The type of connection to make between two ports or interfaces on the same
+module.</p>
+<p>When connecting ports or interfaces on the same <a href="../rohd_bridge/BridgeModule-class.html">BridgeModule</a>, the
+connection can either be a <a href="../rohd_bridge/SameModuleConnectionType.html">loopback</a> (external, pin-to-pin) or a
+<a href="../rohd_bridge/SameModuleConnectionType.html">passthrough</a> (internal, net-to-net).</p>
 <p>For most direction combinations, the connection type is unambiguous and
 <a href="../rohd_bridge/PortReference/gets.html">PortReference.gets</a> can infer it automatically. However, when at least one
 port is <a href="../rohd_bridge/PortDirection.html">PortDirection.inOut</a> and neither port is <a href="../rohd_bridge/PortDirection.html">PortDirection.input</a>, the
 connection type must be explicitly specified via <a href="../rohd_bridge/PortReference/gets.html">PortReference.gets</a> or
-<code>connectPorts</code>.</p>
+<a href="../rohd_bridge/connectPorts.html">connectPorts</a>. Interface connections can select the type via
+<a href="../rohd_bridge/InterfaceReference/connectTo.html">InterfaceReference.connectTo</a> or <a href="../rohd_bridge/connectInterfaces.html">connectInterfaces</a>.</p>
 </section>
 
 
