@@ -26,6 +26,54 @@ class MyNetIntf extends PairInterface {
   MyNetIntf clone() => MyNetIntf();
 }
 
+class CompositeWord extends LogicStructure {
+  final Logic control;
+  final Logic payload;
+  final Logic checksum;
+
+  factory CompositeWord({String name = 'compositeWord'}) => CompositeWord._(
+        Logic(name: 'control', width: 4),
+        Logic(name: 'payload', width: 9),
+        Logic(name: 'checksum', width: 2),
+        name: name,
+      );
+
+  CompositeWord._(
+    this.control,
+    this.payload,
+    this.checksum, {
+    required String name,
+  }) : super([control, payload, checksum], name: name);
+
+  @override
+  CompositeWord clone({String? name}) => CompositeWord(name: name ?? this.name);
+}
+
+class ArrayBackedWord extends LogicStructure {
+  final Logic marker;
+  final LogicArray lanes;
+  final Logic status;
+
+  factory ArrayBackedWord({String name = 'arrayBackedWord'}) =>
+      ArrayBackedWord._(
+        Logic(name: 'marker', width: 2),
+        LogicArray([3], 4, name: 'lanes'),
+        Logic(name: 'status', width: 3),
+        name: name,
+      );
+
+  ArrayBackedWord._(
+    this.marker,
+    this.lanes,
+    this.status, {
+    required String name,
+  }) : super([marker, lanes, status], name: name);
+
+  @override
+  ArrayBackedWord clone({String? name}) =>
+      ArrayBackedWord(name: name ?? this.name);
+}
+
 void main() {
   test('simple port to port same hierarchy', () async {
     final sub1 = BridgeModule('sub1')
@@ -54,6 +102,78 @@ void main() {
     final connection = extractor.connections.first as AdHocConnection;
     expect(connection.src.portName, 'mySrc');
     expect(connection.dst.portName, 'myDst');
+  });
+
+  test('splits composite ports by packed fields', () async {
+    final encoder = BridgeModule('encoder')
+      ..addTypedOutput(
+        'frame',
+        ({name = 'frame'}) => CompositeWord(name: name),
+      )
+      ..createPort('clock', PortDirection.input);
+    final decoder = BridgeModule('decoder')
+      ..addTypedInput('sample', CompositeWord());
+    final top = BridgeModule('top')
+      ..addSubModule(encoder)
+      ..addSubModule(decoder);
+
+    encoder.port('clock').punchUpTo(top);
+    connectPorts(encoder.port('frame'), decoder.port('sample'));
+
+    await top.build();
+
+    final extractor = ConnectionExtractor(top.subBridgeModules);
+
+    expect(extractor.connections, {
+      AdHocConnection(
+        encoder.port('frame').slice(3, 0),
+        decoder.port('sample').slice(3, 0),
+      ),
+      AdHocConnection(
+        encoder.port('frame').slice(12, 4),
+        decoder.port('sample').slice(12, 4),
+      ),
+      AdHocConnection(
+        encoder.port('frame').slice(14, 13),
+        decoder.port('sample').slice(14, 13),
+      ),
+    });
+  });
+
+  test('treats nested arrays in composite ports as packed fields', () async {
+    final packer = BridgeModule('packer')
+      ..addTypedOutput(
+        'encoded',
+        ({name = 'encoded'}) => ArrayBackedWord(name: name),
+      )
+      ..createPort('clock', PortDirection.input);
+    final unpacker = BridgeModule('unpacker')
+      ..addTypedInput('decoded', ArrayBackedWord());
+    final top = BridgeModule('top')
+      ..addSubModule(packer)
+      ..addSubModule(unpacker);
+
+    packer.port('clock').punchUpTo(top);
+    connectPorts(packer.port('encoded'), unpacker.port('decoded'));
+
+    await top.build();
+
+    final extractor = ConnectionExtractor(top.subBridgeModules);
+    final expectedRanges = [
+      (high: 1, low: 0),
+      (high: 5, low: 2),
+      (high: 9, low: 6),
+      (high: 13, low: 10),
+      (high: 16, low: 14),
+    ];
+
+    expect(extractor.connections, {
+      for (final range in expectedRanges)
+        AdHocConnection(
+          packer.port('encoded').slice(range.high, range.low),
+          unpacker.port('decoded').slice(range.high, range.low),
+        ),
+    });
   });
 
   test('simple intf to intf same hierarchy', () async {

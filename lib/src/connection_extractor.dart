@@ -233,7 +233,9 @@ class _ConnectionSliceTracking {
                 dstLowIndex >= 0 &&
                 dstHighIndex < dst.width,
             'Indices must be within the bounds of the'
-            ' source and destination Logic.');
+            ' source and destination Logic: '
+            '${src.name}[$srcHighIndex:$srcLowIndex] width=${src.width}, '
+            '${dst.name}[$dstHighIndex:$dstLowIndex] width=${dst.width}.');
 
   /// Creates a copy of this [_ConnectionSliceTracking] with new values for some
   /// fields.
@@ -501,6 +503,28 @@ class ConnectionExtractor {
       return [
         for (final element in load.elements) ..._traceDriverForMappings(element)
       ];
+    } else if (load is LogicStructure) {
+      final mappings = <_ConnectionSliceTracking>[];
+      var dstLowIndex = 0;
+
+      for (final element in load.leafElements) {
+        mappings.addAll(
+          _traceDriverForSources(
+            _ConnectionSliceTracking(
+              dst: load,
+              src: element,
+              srcLowIndex: 0,
+              srcHighIndex: element.width - 1,
+              dstLowIndex: dstLowIndex,
+              dstHighIndex: dstLowIndex + element.width - 1,
+              dstDimensionAccess: const [],
+            ),
+          ).whereNot((tracking) => tracking.isSelfConnection()),
+        );
+        dstLowIndex += element.width;
+      }
+
+      return mappings;
     } else {
       return _traceDriverForSources(
         _ConnectionSliceTracking(
