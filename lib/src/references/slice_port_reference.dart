@@ -297,6 +297,18 @@ class SlicePortReference extends PortReference {
     otherDriver = _insertIntermediateSignalIfNeeded(
         otherDriver, intermediateSignalName, other);
 
+    if (receiverPort is LogicStructure && receiverPort is! LogicArray) {
+      final driver = otherDriver is Logic
+          ? otherDriver
+          : (otherDriver as List<Logic>).rswizzle();
+      _assignPackedStructureSubset(
+        receiverPort,
+        driver,
+        start: dimensionAccess?.single ?? sliceLowerIndex ?? 0,
+      );
+      return;
+    }
+
     if (otherDriver is Logic) {
       if (leafIndex != null) {
         receiverPort.assignSubset([otherDriver], start: leafIndex);
@@ -385,7 +397,8 @@ class SlicePortReference extends PortReference {
 
     if (dimensionAccess != null) {
       for (final index in dimensionAccess!) {
-        final elementWidth = portElement.elements.first.width;
+        final elementWidth =
+            portElement is LogicArray ? portElement.elements.first.width : 1;
         lower += index * elementWidth;
         upper = lower + elementWidth - 1;
 
@@ -396,7 +409,8 @@ class SlicePortReference extends PortReference {
     }
 
     if (hasSlicing) {
-      final elementWidth = portElement.elements.first.width;
+      final elementWidth =
+          portElement is LogicArray ? portElement.elements.first.width : 1;
       lower += sliceLowerIndex! * elementWidth;
       upper =
           lower + (sliceUpperIndex! - sliceLowerIndex! + 1) * elementWidth - 1;
@@ -412,7 +426,7 @@ class SlicePortReference extends PortReference {
 
     if (dimensionAccess != null) {
       for (final index in dimensionAccess!) {
-        d = d.elements[index];
+        d = d is LogicArray ? d.elements[index] : d[index];
       }
     }
 
@@ -540,6 +554,15 @@ class SlicePortReference extends PortReference {
     _connectOverlappingInterfacePortMaps();
 
     var receiver = _externalPort;
+    if (receiver is LogicStructure && receiver is! LogicArray) {
+      _assignPackedStructureSubset(
+        receiver,
+        other,
+        start: dimensionAccess?.single ?? sliceLowerIndex ?? 0,
+      );
+      return;
+    }
+
     // we must look at the *port* for dimension analysis
     int? leafIndex;
     var startIdx = 0;
@@ -632,6 +655,10 @@ class SlicePortReference extends PortReference {
 
   @override
   PortReference slice(int endIndex, int startIndex) {
+    if (startIndex == 0 && endIndex == width - 1) {
+      return this;
+    }
+
     final (newLowerIndex, newUpperIndex) =
         getUpdatedSliceIndices(endIndex, startIndex);
 
@@ -642,6 +669,44 @@ class SlicePortReference extends PortReference {
       sliceLowerIndex: newLowerIndex,
       sliceUpperIndex: newUpperIndex,
     );
+  }
+
+  static void _assignPackedStructureSubset(
+    LogicStructure receiver,
+    Logic driver, {
+    required int start,
+  }) {
+    final end = start + driver.width;
+    if (start < 0 || end > receiver.width) {
+      throw SignalWidthMismatchException.forWidthOverflow(
+        driver.width,
+        receiver.width - start,
+      );
+    }
+
+    var leafStart = 0;
+    for (final leaf in receiver.leafElements) {
+      final leafEnd = leafStart + leaf.width;
+      final overlapStart = start > leafStart ? start : leafStart;
+      final overlapEnd = end < leafEnd ? end : leafEnd;
+
+      if (overlapStart < overlapEnd) {
+        final driverSubset = driver.getRange(
+          overlapStart - start,
+          overlapEnd - start,
+        );
+        if (overlapStart == leafStart && overlapEnd == leafEnd) {
+          leaf <= driverSubset;
+        } else {
+          leaf.assignSubset(
+            driverSubset.elements,
+            start: overlapStart - leafStart,
+          );
+        }
+      }
+
+      leafStart = leafEnd;
+    }
   }
 
   /// The parent [PortReference] of this [SlicePortReference], with slicing or

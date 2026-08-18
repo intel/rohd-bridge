@@ -191,15 +191,22 @@ class _ConnectionSliceTracking {
   BridgeModule get dstModule => dst.parentModule! as BridgeModule;
 
   /// Converts the [src] to a [PortReference].
-  Reference toSrcRef() => src is Const
-      ? ConstReference(
-          src.value,
+  Reference toSrcRef() {
+    if (src is Const) {
+      return ConstReference(
+        src.value,
 
-          // use the `dstModule` since we haven't necessarily built yet and the
-          // source is a `Const`, not a port
-          module: dstModule,
-        )
-      : PortReference.fromPort(src).slice(srcHighIndex, srcLowIndex);
+        // use the `dstModule` since we haven't necessarily built yet and the
+        // source is a `Const`, not a port
+        module: dstModule,
+      );
+    }
+
+    final srcReference = PortReference.fromPort(src);
+    return srcLowIndex == 0 && srcHighIndex == src.width - 1
+        ? srcReference
+        : srcReference.slice(srcHighIndex, srcLowIndex);
+  }
 
   /// Converts the [dst] to a [PortReference].
   PortReference toDstRef() =>
@@ -209,11 +216,7 @@ class _ConnectionSliceTracking {
   int get width => srcHighIndex - srcLowIndex + 1;
 
   /// Nets can connect to themselves, but if its identical, then it's useless.
-  bool isSelfConnection() =>
-      src == dst &&
-      srcLowIndex == dstLowIndex &&
-      srcHighIndex == dstHighIndex &&
-      const ListEquality<int>().equals(dstDimensionAccess, const []);
+  bool isSelfConnection() => src is! Const && toSrcRef() == toDstRef();
 
   /// Creates a new [_ConnectionSliceTracking] instance.
   _ConnectionSliceTracking({
@@ -508,6 +511,10 @@ class ConnectionExtractor {
       var dstLowIndex = 0;
 
       for (final element in load.leafElements) {
+        if (element.width == 0) {
+          continue;
+        }
+
         mappings.addAll(
           _traceDriverForSources(
             _ConnectionSliceTracking(
@@ -778,6 +785,8 @@ class ConnectionExtractor {
     required List<Logic> components,
   }) {
     final foundTrackings = <_ConnectionSliceTracking>[];
+    final nonEmptyComponents =
+        components.where((component) => component.width > 0).toList();
 
     // we need to identify which portions of the dst overlap with which
     // portions of the collection of swizzle inputs, then split the
@@ -792,14 +801,14 @@ class ConnectionExtractor {
       swizzleBitIdx++;
       srcIdx++;
 
-      if (swizzleBitIdx >= components[swizzleIdx].width) {
+      if (swizzleBitIdx >= nonEmptyComponents[swizzleIdx].width) {
         // move to the next swizzle input
         swizzleIdx++;
         swizzleBitIdx = 0;
       }
     }
 
-    assert(swizzleIdx < components.length,
+    assert(swizzleIdx < nonEmptyComponents.length,
         'swizzleIdx should be within bounds of swizzleInputs');
 
     int? currNewDstHighIndex;
@@ -808,18 +817,18 @@ class ConnectionExtractor {
     int? currSwizzleInputLowIndex = swizzleBitIdx;
 
     void checkAndFlushCurrentTracking() {
-      assert(swizzleIdx < components.length,
+      assert(swizzleIdx < nonEmptyComponents.length,
           'swizzleIdx should be within bounds of swizzleInputs');
 
       final hitSwizzleInputEnd =
-          swizzleBitIdx >= components[swizzleIdx].width - 1;
+          swizzleBitIdx >= nonEmptyComponents[swizzleIdx].width - 1;
 
       final hitDstRangeEnd = currNewDstHighIndex != null &&
           currNewDstHighIndex! >= loadTracking.dstHighIndex;
 
       if (hitSwizzleInputEnd || hitDstRangeEnd) {
         if (currNewDstHighIndex != null && currNewDstLowIndex != null) {
-          final currSwizzleInput = components[swizzleIdx];
+          final currSwizzleInput = nonEmptyComponents[swizzleIdx];
 
           final newLoadTracking = loadTracking.copyWith(
             src: currSwizzleInput,

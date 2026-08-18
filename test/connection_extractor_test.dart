@@ -74,6 +74,77 @@ class ArrayBackedWord extends LogicStructure {
       ArrayBackedWord(name: name ?? this.name);
 }
 
+class NestedWordPart extends LogicStructure {
+  final Logic code;
+  final Logic count;
+
+  factory NestedWordPart({String name = 'nestedWordPart'}) => NestedWordPart._(
+        Logic(name: 'code', width: 2),
+        Logic(name: 'count', width: 3),
+        name: name,
+      );
+
+  NestedWordPart._(this.code, this.count, {required String name})
+      : super([code, count], name: name);
+
+  @override
+  NestedWordPart clone({String? name}) =>
+      NestedWordPart(name: name ?? this.name);
+}
+
+class NestedWord extends LogicStructure {
+  final Logic flag;
+  final NestedWordPart details;
+  final Logic data;
+
+  factory NestedWord({String name = 'nestedWord'}) => NestedWord._(
+        Logic(name: 'flag'),
+        NestedWordPart(),
+        Logic(name: 'data', width: 4),
+        name: name,
+      );
+
+  NestedWord._(this.flag, this.details, this.data, {required String name})
+      : super([flag, details, data], name: name);
+
+  @override
+  NestedWord clone({String? name}) => NestedWord(name: name ?? this.name);
+}
+
+class SparseWord extends LogicStructure {
+  final Logic empty;
+  final Logic data;
+
+  factory SparseWord({String name = 'sparseWord'}) => SparseWord._(
+        Logic(name: 'empty', width: 0),
+        Logic(name: 'data', width: 3),
+        name: name,
+      );
+
+  SparseWord._(this.empty, this.data, {required String name})
+      : super([empty, data], name: name);
+
+  @override
+  SparseWord clone({String? name}) => SparseWord(name: name ?? this.name);
+}
+
+class NetWord extends LogicStructure {
+  final LogicNet request;
+  final LogicNet response;
+
+  factory NetWord({String name = 'netWord'}) => NetWord._(
+        LogicNet(name: 'request', width: 2),
+        LogicNet(name: 'response', width: 3),
+        name: name,
+      );
+
+  NetWord._(this.request, this.response, {required String name})
+      : super([request, response], name: name);
+
+  @override
+  NetWord clone({String? name}) => NetWord(name: name ?? this.name);
+}
+
 void main() {
   test('simple port to port same hierarchy', () async {
     final sub1 = BridgeModule('sub1')
@@ -173,6 +244,137 @@ void main() {
           packer.port('encoded').slice(range.high, range.low),
           unpacker.port('decoded').slice(range.high, range.low),
         ),
+    });
+  });
+
+  test('extracts nested composite ports by packed leaves', () async {
+    final producer = BridgeModule('producer')
+      ..addTypedOutput(
+        'source',
+        ({name = 'source'}) => NestedWord(name: name),
+      )
+      ..createPort('clock', PortDirection.input);
+    final consumer = BridgeModule('consumer')
+      ..addTypedInput('destination', NestedWord());
+    final top = BridgeModule('top')
+      ..addSubModule(producer)
+      ..addSubModule(consumer);
+
+    producer.port('clock').punchUpTo(top);
+    connectPorts(producer.port('source'), consumer.port('destination'));
+
+    await top.build();
+
+    final extractor = ConnectionExtractor(top.subBridgeModules);
+    final expectedRanges = [
+      (high: 0, low: 0),
+      (high: 2, low: 1),
+      (high: 5, low: 3),
+      (high: 9, low: 6),
+    ];
+
+    expect(extractor.connections, {
+      for (final range in expectedRanges)
+        AdHocConnection(
+          producer.port('source').slice(range.high, range.low),
+          consumer.port('destination').slice(range.high, range.low),
+        ),
+    });
+  });
+
+  test('connects and ties off composite port members', () async {
+    final producer = BridgeModule('producer')
+      ..addTypedOutput(
+        'source',
+        ({name = 'source'}) => NestedWord(name: name),
+      )
+      ..createPort('clock', PortDirection.input);
+    final consumer = BridgeModule('consumer')
+      ..addTypedInput('destination', NestedWord());
+    final top = BridgeModule('top')
+      ..addSubModule(producer)
+      ..addSubModule(consumer);
+    final source = producer.output('source') as NestedWord;
+    final destination = consumer.input('destination') as NestedWord;
+
+    producer.port('clock').punchUpTo(top);
+    PortReference.fromPort(destination.details.code)
+        .gets(PortReference.fromPort(source.details.code));
+    PortReference.fromPort(destination.details.count).tieOff(value: 5);
+
+    await top.build();
+
+    final connections = ConnectionExtractor(top.subBridgeModules).connections;
+    final adHocConnection = connections.whereType<AdHocConnection>().single;
+    final tieOffConnection = connections.whereType<TieOffConnection>().single;
+
+    expect(
+      adHocConnection,
+      AdHocConnection(
+        producer.port('source').slice(2, 1),
+        consumer.port('destination').slice(2, 1),
+      ),
+    );
+    expect(
+      tieOffConnection.dst,
+      consumer.port('destination').slice(5, 3),
+    );
+    expect(tieOffConnection.src.value, LogicValue.ofInt(5, 3));
+  });
+
+  test('ignores zero-width composite port leaves', () async {
+    final producer = BridgeModule('producer')
+      ..addTypedOutput(
+        'source',
+        ({name = 'source'}) => SparseWord(name: name),
+      )
+      ..createPort('clock', PortDirection.input);
+    final consumer = BridgeModule('consumer')
+      ..addTypedInput('destination', SparseWord());
+    final top = BridgeModule('top')
+      ..addSubModule(producer)
+      ..addSubModule(consumer);
+
+    producer.port('clock').punchUpTo(top);
+    connectPorts(producer.port('source'), consumer.port('destination'));
+
+    await top.build();
+
+    final extractor = ConnectionExtractor(top.subBridgeModules);
+
+    expect(extractor.connections, {
+      AdHocConnection(
+        producer.port('source'),
+        consumer.port('destination'),
+      ),
+    });
+  });
+
+  test('extracts composite net ports without self-connections', () async {
+    final first = BridgeModule('first')
+      ..addTypedInOut('bus', NetWord())
+      ..createPort('clock', PortDirection.input);
+    final second = BridgeModule('second')..addTypedInOut('bus', NetWord());
+    final top = BridgeModule('top')
+      ..addSubModule(first)
+      ..addSubModule(second);
+
+    first.port('clock').punchUpTo(top);
+    connectPorts(first.port('bus'), second.port('bus'));
+
+    await top.build();
+
+    final extractor = ConnectionExtractor(top.subBridgeModules);
+
+    expect(extractor.connections, {
+      AdHocConnection(
+        first.port('bus').slice(1, 0),
+        second.port('bus').slice(1, 0),
+      ),
+      AdHocConnection(
+        first.port('bus').slice(4, 2),
+        second.port('bus').slice(4, 2),
+      ),
     });
   });
 
