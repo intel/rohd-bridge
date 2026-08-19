@@ -4,6 +4,7 @@
 - Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped` (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added type-preserving interface hierarchy APIs: `pullUpTypedInterface`, `punchUpToTyped`, and `punchDownToTyped`. These APIs intentionally omit port exclusions because a partial interface cannot retain its concrete type (<https://github.com/intel/rohd-bridge/pull/58>).
+- Fixed port references and `ConnectionExtractor` support for typed structure ports, including nested structures, packed field slices, tie-offs, zero-width leaves, and `inOut` nets (<https://github.com/intel/rohd-bridge/pull/61>).
 - Added support for custom synthesizer configurations in `buildAndGenerateRTL` (<https://github.com/intel/rohd-bridge/pull/55>).
 - Fixed mapped interface port operations to resolve deferred `PortMap`s before use (<https://github.com/intel/rohd-bridge/pull/50>).
 - Added support for same-module connections involving mapped interface ports (<https://github.com/intel/rohd-bridge/pull/53>).
