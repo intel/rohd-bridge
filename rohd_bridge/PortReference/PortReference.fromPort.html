@@ -60,9 +60,9 @@
     
 <section class="desc markdown">
   <p>Creates a <a href="../../rohd_bridge/PortReference-class.html">PortReference</a> from an existing <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic-class.html">Logic</a> port.</p>
-<p>The <code>port</code> must be a port of a <a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a>. If the <code>port</code> is an array
-member, this will create a <a href="../../rohd_bridge/PortReference-class.html">PortReference</a> that includes the appropriate
-array indexing to access that specific element.</p>
+<p>The <code>port</code> must be a port of a <a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a>. For members of a structured
+port, this creates a reference to the corresponding packed range or array
+element of the physical root port.</p>
 </section>
 
 
@@ -74,15 +74,56 @@ array indexing to access that specific element.</p>
     throw RohdBridgeException(&#39;$port is not a port&#39;);
   }
 
-  final dimAccesses = &lt;String&gt;[];
-  var currentPort = port;
-  while (currentPort.isArrayMember) {
-    dimAccesses.add(&#39;[${currentPort.arrayIndex!}]&#39;);
-    currentPort = currentPort.parentStructure!;
+  var rootPort = port;
+  while (rootPort.parentStructure != null) {
+    rootPort = rootPort.parentStructure!;
   }
 
-  return PortReference.fromString(currentPort.parentModule! as BridgeModule,
-      currentPort.name + dimAccesses.reversed.join());
+  bool isRootArrayDimension(LogicStructure structure) {
+    LogicStructure? ancestor = structure;
+    while (ancestor != null) {
+      if (ancestor is! LogicArray) {
+        return false;
+      }
+      ancestor = ancestor.parentStructure;
+    }
+    return true;
+  }
+
+  final dimensionAccesses = &lt;int&gt;[];
+  var packedLowIndex = 0;
+  var currentPort = port;
+  while (currentPort.parentStructure != null) {
+    final parent = currentPort.parentStructure!;
+
+    if (isRootArrayDimension(parent)) {
+      dimensionAccesses.add(currentPort.arrayIndex!);
+    } else {
+      for (final sibling in parent.elements) {
+        if (identical(sibling, currentPort)) {
+          break;
+        }
+        packedLowIndex += sibling.width;
+      }
+    }
+
+    currentPort = parent;
+  }
+
+  final reference = PortReference.fromString(
+    rootPort.parentModule! as BridgeModule,
+    rootPort.name +
+        dimensionAccesses.reversed.map((index) =&gt; &#39;[$index]&#39;).join(),
+  );
+
+  if (packedLowIndex == 0 &amp;&amp; port.width == reference.width) {
+    return reference;
+  }
+
+  return reference.slice(
+    packedLowIndex + port.width - 1,
+    packedLowIndex,
+  );
 }</code></pre>
 </section>
 
