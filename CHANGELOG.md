@@ -1,6 +1,6 @@
 ## Next release
 
-- Improved `ConnectionExtractor` performance by reducing trace-cache hash collisions and repeated interface-connection scans, and added a synthetic benchmark for regression measurement.
+- Improved `ConnectionExtractor` performance by reducing trace-cache hash collisions and repeated interface-connection scans, and added a synthetic benchmark for regression measurement (<https://github.com/intel/rohd-bridge/pull/62>).
 - Added `sameModuleConnectionType` to `connectInterfaces` and `InterfaceReference.connectTo` to select loopback or passthrough connections between interfaces on the same module (<https://github.com/intel/rohd-bridge/pull/59>).
 - Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped` (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup (<https://github.com/intel/rohd-bridge/pull/58>).
