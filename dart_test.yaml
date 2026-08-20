@@ -1,0 +1,12 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# dart_test.yaml
+# Test runner configuration.
+#
+# 2026 August 20
+# Author: Max Korbel <max.korbel@intel.com>
+
+tags:
+  benchmark:
+    timeout: 2x

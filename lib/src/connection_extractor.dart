@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // connection_extractor.dart
@@ -6,6 +6,8 @@
 //
 // 2025 June
 // Author: Max Korbel <max.korbel@intel.com>
+
+import 'dart:collection';
 
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
@@ -145,6 +147,7 @@ class AdHocConnection extends Connection<PortReference>
   /// Creates a new [AdHocConnection] between two [PortReference]s.
   const AdHocConnection(super.point1, super.point2);
 
+  /// The visual connector representing this connection's directionality.
   String get _connectorString => isNet ? '<-->' : '--->';
 
   @override
@@ -157,6 +160,9 @@ class AdHocConnection extends Connection<PortReference>
       // TODO(mkorbel1): implement simplification of connections
       complex;
 }
+
+/// Resolves the canonical [PortReference] for a physical [Logic] port.
+typedef _PortReferenceResolver = PortReference Function(Logic port);
 
 /// A structure for tracking slicing information during tracing.
 @immutable
@@ -190,8 +196,8 @@ class _ConnectionSliceTracking {
   /// The module of the [dst].
   BridgeModule get dstModule => dst.parentModule! as BridgeModule;
 
-  /// Converts the [src] to a [PortReference].
-  Reference toSrcRef() {
+  /// Converts the [src] using [fullPortReference].
+  Reference toSrcRef(_PortReferenceResolver fullPortReference) {
     if (src is Const) {
       return ConstReference(
         src.value,
@@ -202,21 +208,23 @@ class _ConnectionSliceTracking {
       );
     }
 
-    final srcReference = PortReference.fromPort(src);
+    final srcReference = fullPortReference(src);
     return srcLowIndex == 0 && srcHighIndex == src.width - 1
         ? srcReference
         : srcReference.slice(srcHighIndex, srcLowIndex);
   }
 
-  /// Converts the [dst] to a [PortReference].
-  PortReference toDstRef() =>
-      PortReference.fromPort(dst).slice(dstHighIndex, dstLowIndex);
+  /// Converts the [dst] using [fullPortReference].
+  PortReference toDstRef(_PortReferenceResolver fullPortReference) =>
+      fullPortReference(dst).slice(dstHighIndex, dstLowIndex);
 
   /// The width of the tracking currently.
   int get width => srcHighIndex - srcLowIndex + 1;
 
-  /// Nets can connect to themselves, but if its identical, then it's useless.
-  bool isSelfConnection() => src is! Const && toSrcRef() == toDstRef();
+  /// Whether this describes a net connected to the identical reference.
+  bool isSelfConnection(_PortReferenceResolver fullPortReference) =>
+      src is! Const &&
+      toSrcRef(fullPortReference) == toDstRef(fullPortReference);
 
   /// Creates a new [_ConnectionSliceTracking] instance.
   _ConnectionSliceTracking({
@@ -278,14 +286,15 @@ class _ConnectionSliceTracking {
           .equals(other.dstDimensionAccess, dstDimensionAccess);
 
   @override
-  int get hashCode =>
-      src.hashCode ^
-      srcLowIndex.hashCode ^
-      srcHighIndex.hashCode ^
-      dst.hashCode ^
-      dstLowIndex.hashCode ^
-      dstHighIndex.hashCode ^
-      const ListEquality<int>().hash(dstDimensionAccess);
+  int get hashCode => Object.hash(
+        src,
+        srcLowIndex,
+        srcHighIndex,
+        dst,
+        dstLowIndex,
+        dstHighIndex,
+        Object.hashAll(dstDimensionAccess),
+      );
 }
 
 /// Analyzes a set of modules and provides connection information between them.
@@ -297,6 +306,8 @@ class ConnectionExtractor {
   /// extractor, so if the modules change, you will need to create a new
   /// extractor to get the updated connections.
   Set<Connection> get connections => UnmodifiableSetView(_connections);
+
+  /// The mutable backing set for [connections].
   final Set<Connection> _connections = {};
 
   /// The set of modules to analyze for connections.
@@ -306,6 +317,32 @@ class ConnectionExtractor {
   /// [InterfaceConnection]s. Set this to `false` if you want only ad-hoc
   /// connections (and tie-offs).
   final bool includeInterfaceConnections;
+
+  /// Interface port references cached for the lifetime of this extractor.
+  final Map<InterfaceReference, List<InterfacePortReference>> _interfacePorts =
+      {};
+
+  /// Interface completeness results cached for the lifetime of this
+  /// extractor.
+  final Map<InterfaceReference, bool> _fullyConnectedInterfaces = {};
+
+  /// Canonical port references cached by [Logic] identity for this extraction.
+  final HashMap<Logic, PortReference> _portReferences = HashMap.identity();
+
+  /// Returns the port references captured for [interface] during extraction.
+  List<InterfacePortReference> _portsFor(InterfaceReference interface) =>
+      _interfacePorts.putIfAbsent(interface, () => interface.ports);
+
+  /// Returns whether [interface] was fully connected when first inspected.
+  bool _isFullyConnected(InterfaceReference interface) =>
+      _fullyConnectedInterfaces.putIfAbsent(
+        interface,
+        () => interface.isFullyConnected,
+      );
+
+  /// Returns the canonical reference captured for [port] during extraction.
+  PortReference _fullPortReference(Logic port) =>
+      _portReferences.putIfAbsent(port, () => PortReference.fromPort(port));
 
   /// Creates a new [ConnectionExtractor] for the given [modules] which will
   /// then identify [connections] between them.
@@ -325,11 +362,11 @@ class ConnectionExtractor {
   void _findInterfaceConnections() {
     for (final module in modules) {
       for (final intf in module.interfaces.values) {
-        if (!intf.isFullyConnected) {
+        if (!_isFullyConnected(intf)) {
           continue;
         }
 
-        if (intf.ports
+        if (_portsFor(intf)
             .where((p) =>
                 p.direction == PortDirection.input ||
                 p.direction == PortDirection.inOut)
@@ -344,7 +381,7 @@ class ConnectionExtractor {
         // find all the InterfaceReferences connected to *any* ports of this one
         final modulesConnectedToIntf = <BridgeModule>{};
 
-        for (final intfPort in intf.ports) {
+        for (final intfPort in _portsFor(intf)) {
           final portsOnMod = intf.portMaps
               .where((e) => e.interfacePort == intfPort)
               .map((e) => e.port);
@@ -363,7 +400,7 @@ class ConnectionExtractor {
               continue; // don't connect to self
             }
 
-            if (!otherIntf.isFullyConnected) {
+            if (!_isFullyConnected(otherIntf)) {
               continue; // skip if not fully connected
             }
 
@@ -378,7 +415,7 @@ class ConnectionExtractor {
 
             // check if *every* port of otherIntf is connected FULLY to intf
             // and in both directions
-            final allOtherIntfInpsDriven = otherIntf.ports
+            final allOtherIntfInpsDriven = _portsFor(otherIntf)
                 .where((p) =>
                     p.direction == PortDirection.input ||
                     p.direction == PortDirection.inOut)
@@ -395,12 +432,13 @@ class ConnectionExtractor {
                       (testIntf) =>
                           testIntf == intf &&
                           testIntf.portMaps.any((pm) =>
-                              pm.isConnected && pm.port == mapping.toSrcRef()),
+                              pm.isConnected &&
+                              pm.port == mapping.toSrcRef(_fullPortReference)),
                     ),
               );
             });
 
-            final allThisIntfInpsDriven = intf.ports
+            final allThisIntfInpsDriven = _portsFor(intf)
                 .where((p) =>
                     p.direction == PortDirection.input ||
                     p.direction == PortDirection.inOut)
@@ -417,7 +455,8 @@ class ConnectionExtractor {
                       (testIntf) =>
                           testIntf == otherIntf &&
                           testIntf.portMaps.any((pm) =>
-                              pm.isConnected && pm.port == mapping.toSrcRef()),
+                              pm.isConnected &&
+                              pm.port == mapping.toSrcRef(_fullPortReference)),
                     ),
               );
             });
@@ -435,6 +474,13 @@ class ConnectionExtractor {
   void _findAdHocConnections() {
     final adHocConnections = <AdHocConnection>[];
     final tieOffConnections = <TieOffConnection>[];
+    final portsCoveredByInterfaces = connections
+        .whereType<InterfaceConnection>()
+        .expand((connection) => [connection.point1, connection.point2])
+        .expand((interface) => interface.portMaps)
+        .map((portMap) => portMap.port)
+        .toSet();
+
     for (final module in modules) {
       for (final port in [
         ...module.inputs.values,
@@ -444,27 +490,11 @@ class ConnectionExtractor {
         final mappings = _traceDriverForMappings(port);
 
         for (final mapping in mappings) {
-          final srcRef = mapping.toSrcRef();
-          final dstRef = mapping.toDstRef();
+          final srcRef = mapping.toSrcRef(_fullPortReference);
+          final dstRef = mapping.toDstRef(_fullPortReference);
 
-          final thisModIsIntfConn = connections
-              .whereType<InterfaceConnection>()
-              .map((e) => e.pointForModule(module))
-              .nonNulls
-              .any((intfRef) => intfRef.portMaps.any(
-                    (pm) => pm.port == dstRef,
-                  ));
-
-          final otherModule = srcRef.module;
-          final otherModIsIntfConn = connections
-              .whereType<InterfaceConnection>()
-              .map((e) => e.pointForModule(otherModule))
-              .nonNulls
-              .any((intfRef) => intfRef.portMaps.any(
-                    (pm) => pm.port == srcRef,
-                  ));
-
-          if (thisModIsIntfConn && otherModIsIntfConn) {
+          if (portsCoveredByInterfaces.contains(dstRef) &&
+              portsCoveredByInterfaces.contains(srcRef)) {
             // if both modules are already connected via an interface, skip
             continue;
           }
@@ -526,7 +556,9 @@ class ConnectionExtractor {
               dstHighIndex: dstLowIndex + element.width - 1,
               dstDimensionAccess: const [],
             ),
-          ).whereNot((tracking) => tracking.isSelfConnection()),
+          ).whereNot(
+            (tracking) => tracking.isSelfConnection(_fullPortReference),
+          ),
         );
         dstLowIndex += element.width;
       }
@@ -542,7 +574,7 @@ class ConnectionExtractor {
             dstLowIndex: 0,
             dstHighIndex: load.width - 1,
             dstDimensionAccess: const []),
-      ).whereNot((e) => e.isSelfConnection()).toList();
+      ).whereNot((e) => e.isSelfConnection(_fullPortReference)).toList();
     }
   }
 
