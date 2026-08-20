@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // connection_extractor.dart
@@ -145,6 +145,7 @@ class AdHocConnection extends Connection<PortReference>
   /// Creates a new [AdHocConnection] between two [PortReference]s.
   const AdHocConnection(super.point1, super.point2);
 
+  /// The visual connector representing this connection's directionality.
   String get _connectorString => isNet ? '<-->' : '--->';
 
   @override
@@ -278,14 +279,15 @@ class _ConnectionSliceTracking {
           .equals(other.dstDimensionAccess, dstDimensionAccess);
 
   @override
-  int get hashCode =>
-      src.hashCode ^
-      srcLowIndex.hashCode ^
-      srcHighIndex.hashCode ^
-      dst.hashCode ^
-      dstLowIndex.hashCode ^
-      dstHighIndex.hashCode ^
-      const ListEquality<int>().hash(dstDimensionAccess);
+  int get hashCode => Object.hash(
+        src,
+        srcLowIndex,
+        srcHighIndex,
+        dst,
+        dstLowIndex,
+        dstHighIndex,
+        Object.hashAll(dstDimensionAccess),
+      );
 }
 
 /// Analyzes a set of modules and provides connection information between them.
@@ -297,6 +299,8 @@ class ConnectionExtractor {
   /// extractor, so if the modules change, you will need to create a new
   /// extractor to get the updated connections.
   Set<Connection> get connections => UnmodifiableSetView(_connections);
+
+  /// The mutable backing set for [connections].
   final Set<Connection> _connections = {};
 
   /// The set of modules to analyze for connections.
@@ -306,6 +310,25 @@ class ConnectionExtractor {
   /// [InterfaceConnection]s. Set this to `false` if you want only ad-hoc
   /// connections (and tie-offs).
   final bool includeInterfaceConnections;
+
+  /// Interface port references cached for the lifetime of this extractor.
+  final Map<InterfaceReference, List<InterfacePortReference>> _interfacePorts =
+      {};
+
+  /// Interface completeness results cached for the lifetime of this
+  /// extractor.
+  final Map<InterfaceReference, bool> _fullyConnectedInterfaces = {};
+
+  /// Returns the port references captured for [interface] during extraction.
+  List<InterfacePortReference> _portsFor(InterfaceReference interface) =>
+      _interfacePorts.putIfAbsent(interface, () => interface.ports);
+
+  /// Returns whether [interface] was fully connected when first inspected.
+  bool _isFullyConnected(InterfaceReference interface) =>
+      _fullyConnectedInterfaces.putIfAbsent(
+        interface,
+        () => interface.isFullyConnected,
+      );
 
   /// Creates a new [ConnectionExtractor] for the given [modules] which will
   /// then identify [connections] between them.
@@ -325,11 +348,11 @@ class ConnectionExtractor {
   void _findInterfaceConnections() {
     for (final module in modules) {
       for (final intf in module.interfaces.values) {
-        if (!intf.isFullyConnected) {
+        if (!_isFullyConnected(intf)) {
           continue;
         }
 
-        if (intf.ports
+        if (_portsFor(intf)
             .where((p) =>
                 p.direction == PortDirection.input ||
                 p.direction == PortDirection.inOut)
@@ -344,7 +367,7 @@ class ConnectionExtractor {
         // find all the InterfaceReferences connected to *any* ports of this one
         final modulesConnectedToIntf = <BridgeModule>{};
 
-        for (final intfPort in intf.ports) {
+        for (final intfPort in _portsFor(intf)) {
           final portsOnMod = intf.portMaps
               .where((e) => e.interfacePort == intfPort)
               .map((e) => e.port);
@@ -363,7 +386,7 @@ class ConnectionExtractor {
               continue; // don't connect to self
             }
 
-            if (!otherIntf.isFullyConnected) {
+            if (!_isFullyConnected(otherIntf)) {
               continue; // skip if not fully connected
             }
 
@@ -378,7 +401,7 @@ class ConnectionExtractor {
 
             // check if *every* port of otherIntf is connected FULLY to intf
             // and in both directions
-            final allOtherIntfInpsDriven = otherIntf.ports
+            final allOtherIntfInpsDriven = _portsFor(otherIntf)
                 .where((p) =>
                     p.direction == PortDirection.input ||
                     p.direction == PortDirection.inOut)
@@ -400,7 +423,7 @@ class ConnectionExtractor {
               );
             });
 
-            final allThisIntfInpsDriven = intf.ports
+            final allThisIntfInpsDriven = _portsFor(intf)
                 .where((p) =>
                     p.direction == PortDirection.input ||
                     p.direction == PortDirection.inOut)
@@ -435,6 +458,13 @@ class ConnectionExtractor {
   void _findAdHocConnections() {
     final adHocConnections = <AdHocConnection>[];
     final tieOffConnections = <TieOffConnection>[];
+    final portsCoveredByInterfaces = connections
+        .whereType<InterfaceConnection>()
+        .expand((connection) => [connection.point1, connection.point2])
+        .expand((interface) => interface.portMaps)
+        .map((portMap) => portMap.port)
+        .toSet();
+
     for (final module in modules) {
       for (final port in [
         ...module.inputs.values,
@@ -447,24 +477,8 @@ class ConnectionExtractor {
           final srcRef = mapping.toSrcRef();
           final dstRef = mapping.toDstRef();
 
-          final thisModIsIntfConn = connections
-              .whereType<InterfaceConnection>()
-              .map((e) => e.pointForModule(module))
-              .nonNulls
-              .any((intfRef) => intfRef.portMaps.any(
-                    (pm) => pm.port == dstRef,
-                  ));
-
-          final otherModule = srcRef.module;
-          final otherModIsIntfConn = connections
-              .whereType<InterfaceConnection>()
-              .map((e) => e.pointForModule(otherModule))
-              .nonNulls
-              .any((intfRef) => intfRef.portMaps.any(
-                    (pm) => pm.port == srcRef,
-                  ));
-
-          if (thisModIsIntfConn && otherModIsIntfConn) {
+          if (portsCoveredByInterfaces.contains(dstRef) &&
+              portsCoveredByInterfaces.contains(srcRef)) {
             // if both modules are already connected via an interface, skip
             continue;
           }
