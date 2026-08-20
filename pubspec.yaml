@@ -16,4 +16,5 @@ dependencies:
   rohd: ^0.6.10
 
 dev_dependencies:
+  benchmark_harness: ^2.2.0
   test: ^1.16.0
