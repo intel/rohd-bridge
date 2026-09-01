@@ -866,6 +866,11 @@ class BridgeModule extends Module with SystemVerilog {
   /// names are requested.
   final Map<PortReference, Map<String?, PortReference>> _punchedUpPorts = {};
 
+  /// Finds a route from [source] compatible with [requestedName].
+  ///
+  /// An unnamed request prefers an unnamed route, then any existing route. A
+  /// named request requires an exact entry or an unnamed route whose effective
+  /// port name matches [requestedName].
   PortReference? _findNamedRoute(
     Map<PortReference, Map<String?, PortReference>> routes,
     PortReference source,
@@ -892,6 +897,8 @@ class BridgeModule extends Module with SystemVerilog {
         : null;
   }
 
+  /// Whether [route] uses [name] logically, physically, or through a port
+  /// mapping.
   bool _routeUsesPortName(PortReference route, String name) =>
       route.portName == name ||
       route.port.name == name ||
@@ -901,6 +908,9 @@ class BridgeModule extends Module with SystemVerilog {
               (portMap.port.portName == name ||
                   portMap.port.port.name == name)));
 
+  /// Records a named route from [source] to [destination].
+  ///
+  /// Existing entries are retained unless [replace] is `true`.
   void _recordNamedRoute(
     Map<PortReference, Map<String?, PortReference>> routes,
     PortReference source,
@@ -916,19 +926,26 @@ class BridgeModule extends Module with SystemVerilog {
     }
   }
 
+  /// Finds a receiver-side port reached from [source] using [requestedName].
   PortReference? _findUpperSourcePort(
           PortReference source, String? requestedName) =>
       _findNamedRoute(_upperSourceMap, source, requestedName);
 
+  /// Records the current receiver-side port reached from [source].
+  ///
+  /// A later registration replaces the previous destination for the same
+  /// source and requested name as the receiver path is extended.
   void _recordUpperSourcePort(PortReference source, PortReference destination,
           {String? requestedName}) =>
       _recordNamedRoute(_upperSourceMap, source, destination,
           requestedName: requestedName, replace: true);
 
+  /// Finds a driver-side port punched up from [source].
   PortReference? _findPunchedUpPort(
           PortReference source, String? requestedName) =>
       _findNamedRoute(_punchedUpPorts, source, requestedName);
 
+  /// Records the first driver-side port punched up from [source] for a name.
   void _recordPunchedUpPort(PortReference source, PortReference destination,
           {String? requestedName}) =>
       _recordNamedRoute(_punchedUpPorts, source, destination,
