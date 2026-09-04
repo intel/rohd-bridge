@@ -62,6 +62,13 @@ class PortMap {
   bool maps(PortReference port, InterfacePortReference interfacePort) =>
       this.port == port && this.interfacePort == interfacePort;
 
+  /// Validates that both endpoints of this port map resolve without connecting
+  /// them.
+  void validate() {
+    port.validate();
+    interfacePort.validate();
+  }
+
   /// Resolves a port map by connecting the [port] to the [interfacePort] in
   /// the appropriate direction.
   ///

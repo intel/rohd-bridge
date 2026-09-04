@@ -24,4 +24,10 @@ class Reference {
 
   /// Creates a new [Reference] for the given [module].
   const Reference(this.module);
+
+  /// Validates that this reference resolves to an existing boundary element.
+  ///
+  /// Throws an [Exception] if the referenced element does not exist or the
+  /// reference is otherwise invalid.
+  void validate() {}
 }

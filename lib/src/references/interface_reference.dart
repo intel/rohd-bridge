@@ -59,6 +59,14 @@ class InterfaceReference<InterfaceType extends PairInterface>
   late final List<PortMap> portMaps = UnmodifiableListView(_portMaps);
   final List<PortMap> _portMaps = [];
 
+  /// Validates all port maps owned by this interface without connecting them.
+  @override
+  void validate() {
+    for (final portMap in portMaps) {
+      portMap.validate();
+    }
+  }
+
   /// All port references that belong to this interface.
   ///
   /// Returns a list of [InterfacePortReference]s for every port defined in the

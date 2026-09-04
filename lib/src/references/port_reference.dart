@@ -71,6 +71,10 @@ sealed class PortReference extends Reference {
 
   PortReference._(super.module, this.portName);
 
+  /// Validates that this reference resolves to an existing port and subset.
+  @override
+  void validate() => portSubset;
+
   /// Creates a [PortReference] from a [BridgeModule] and a port reference
   /// string.
   ///
