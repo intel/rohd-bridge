@@ -110,6 +110,123 @@ void main() {
       expect(portMap.isConnected, isFalse);
     });
 
+    test('requires endpoints to have the same width', () {
+      final module = BridgeModule('dut')
+        ..createPort('physical', PortDirection.input, width: 2);
+      final interfaceReference = module.addInterface(
+        PairInterface(portsFromProvider: [Logic.port('logical', 4)]),
+        name: 'interface',
+        role: PairRole.consumer,
+        connect: false,
+      );
+      final portMap = module.addPortMap(
+        module.port('physical'),
+        interfaceReference.port('logical'),
+      );
+
+      expect(portMap.validate, throwsA(isA<RohdBridgeException>()));
+      expect(portMap.isConnected, isFalse);
+    });
+
+    test('compares selected subset widths', () {
+      final module = BridgeModule('dut')
+        ..createPort('physical', PortDirection.input, width: 8);
+      final interfaceReference = module.addInterface(
+        PairInterface(portsFromProvider: [Logic.port('logical', 4)]),
+        name: 'interface',
+        role: PairRole.consumer,
+        connect: false,
+      );
+      final portMap = module.addPortMap(
+        module.port('physical[5:2]'),
+        interfaceReference.port('logical'),
+      );
+
+      expect(portMap.validate, returnsNormally);
+      expect(portMap.isConnected, isFalse);
+    });
+
+    test('rejects a physical input receiver with a source', () {
+      final module = BridgeModule('dut')
+        ..createPort('physical', PortDirection.input);
+      final interfaceReference = module.addInterface(
+        PairInterface(portsFromProvider: [Logic.port('logical')]),
+        name: 'interface',
+        role: PairRole.consumer,
+        connect: false,
+      );
+      final portMap = module.addPortMap(
+        module.port('physical'),
+        interfaceReference.port('logical'),
+      );
+
+      module.inputSource('physical') <= Logic();
+
+      expect(portMap.validate, throwsA(isA<RohdBridgeException>()));
+      expect(portMap.isConnected, isFalse);
+    });
+
+    test('rejects an interface output receiver with a source', () {
+      final module = BridgeModule('dut')
+        ..createPort('physical', PortDirection.output);
+      final interfaceReference = module.addInterface(
+        PairInterface(portsFromProvider: [Logic.port('logical')]),
+        name: 'interface',
+        role: PairRole.provider,
+        connect: false,
+      );
+      final portMap = module.addPortMap(
+        module.port('physical'),
+        interfaceReference.port('logical'),
+      );
+
+      interfaceReference.interface.port('logical') <= Logic();
+
+      expect(portMap.validate, throwsA(isA<RohdBridgeException>()));
+      expect(portMap.isConnected, isFalse);
+    });
+
+    test('allows source connections for inout maps', () {
+      final module = BridgeModule('dut')
+        ..createPort('physical', PortDirection.inOut);
+      final interfaceReference = module.addInterface(
+        PairInterface(commonInOutPorts: [LogicNet.port('logical')]),
+        name: 'interface',
+        role: PairRole.provider,
+        connect: false,
+      );
+      final portMap = module.addPortMap(
+        module.port('physical'),
+        interfaceReference.port('logical'),
+      );
+
+      module.inOutSource('physical') <= LogicNet();
+
+      expect(module.inOutSource('physical').srcConnections, isNotEmpty);
+      expect(portMap.validate, returnsNormally);
+      expect(portMap.isConnected, isFalse);
+    });
+
+    test('allows the source from its own established connection', () {
+      final module = BridgeModule('dut')
+        ..createPort('physical', PortDirection.input);
+      final interfaceReference = module.addInterface(
+        PairInterface(portsFromProvider: [Logic.port('logical')]),
+        name: 'interface',
+        role: PairRole.consumer,
+        connect: false,
+      );
+      final portMap = module.addPortMap(
+        module.port('physical'),
+        interfaceReference.port('logical'),
+      )
+        ..connect()
+        ..validate();
+
+      expect(module.inputSource('physical').srcConnection, isNotNull);
+      expect(portMap.isConnected, isTrue);
+    });
+
     test('interface reference validates every port map', () {
       final module = BridgeModule('dut')
         ..createPort('physicalA', PortDirection.input)

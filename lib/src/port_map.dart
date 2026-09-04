@@ -62,11 +62,35 @@ class PortMap {
   bool maps(PortReference port, InterfacePortReference interfacePort) =>
       this.port == port && this.interfacePort == interfacePort;
 
-  /// Validates that both endpoints of this port map resolve without connecting
-  /// them.
+  /// Validates that both endpoints resolve with equal widths and an available
+  /// receiver without connecting them.
   void validate() {
     port.validate();
     interfacePort.validate();
+
+    if (port.width != interfacePort.width) {
+      throw RohdBridgeException(
+        'Port map width mismatch: $port has width ${port.width}, but '
+        '$interfacePort has width ${interfacePort.width}.',
+      );
+    }
+
+    final externalInterface = interfacePort.interfaceReference.interface;
+    final receiver = switch (port.direction) {
+      PortDirection.input when !_isConnected =>
+        port.module.inputSource(port.portName),
+      PortDirection.output when !_isConnected =>
+        externalInterface.port(interfacePort.portName),
+      PortDirection.input ||
+      PortDirection.output ||
+      PortDirection.inOut =>
+        null,
+    };
+
+    if (receiver?.srcConnection != null) {
+      throw RohdBridgeException(
+          'Port map receiver already has a source connection: $receiver');
+    }
   }
 
   /// Resolves a port map by connecting the [port] to the [interfacePort] in
