@@ -694,8 +694,10 @@ class BridgeModule extends Module with SystemVerilog {
           if (exceptPorts != null && exceptPorts.contains(portName)) {
             continue;
           }
-          createdInterface.module._upperSourceMap[newIntf.port(portName)] =
-              createdInterface.port(portName);
+          createdInterface.module._recordUpperSourcePort(
+            newIntf.port(portName),
+            createdInterface.port(portName),
+          );
         }
       }
     }
@@ -705,8 +707,10 @@ class BridgeModule extends Module with SystemVerilog {
 
       for (final createdInterface in createdInterfaces) {
         for (final portName in interfaceInputPortNames) {
-          createdInterface.module._upperSourceMap[topToConnect.port(portName)] =
-              createdInterface.port(portName);
+          createdInterface.module._recordUpperSourcePort(
+            topToConnect.port(portName),
+            createdInterface.port(portName),
+          );
         }
       }
     }
@@ -850,13 +854,102 @@ class BridgeModule extends Module with SystemVerilog {
 
   /// Internal tracking map for hierarchical port connectivity optimization.
   ///
-  /// This map maintains a lookup table from [PortReference] objects at parent
-  /// hierarchy levels to corresponding [PortReference] objects in this module
-  /// that are driven by them. It enables efficient path reuse during complex
-  /// hierarchical connections, avoiding redundant port creation when
-  /// connections to the same driver already exist at different hierarchy
-  /// levels.
-  final Map<PortReference, PortReference> _upperSourceMap = {};
+  /// Receiver-side routes from ports above this module to local ports.
+  ///
+  /// Each source can have multiple routes when different explicit path names
+  /// are requested.
+  final Map<PortReference, Map<String?, PortReference>> _upperSourceMap = {};
+
+  /// Driver-side ports punched onto this module from one level down.
+  ///
+  /// Each lower port can have multiple aliases when different explicit path
+  /// names are requested.
+  final Map<PortReference, Map<String?, PortReference>> _punchedUpPorts = {};
+
+  /// Finds a route from [source] compatible with [requestedName].
+  ///
+  /// An unnamed request prefers an unnamed route, then any existing route. A
+  /// named request requires an exact entry or an unnamed route whose effective
+  /// port name matches [requestedName].
+  PortReference? _findNamedRoute(
+    Map<PortReference, Map<String?, PortReference>> routes,
+    PortReference source,
+    String? requestedName,
+  ) {
+    final sourceRoutes = routes[source];
+    if (sourceRoutes == null || sourceRoutes.isEmpty) {
+      return null;
+    }
+
+    if (requestedName == null) {
+      return sourceRoutes[null] ?? sourceRoutes.values.first;
+    }
+
+    final exactRoute = sourceRoutes[requestedName];
+    if (exactRoute != null) {
+      return exactRoute;
+    }
+
+    final unnamedRoute = sourceRoutes[null];
+    return unnamedRoute != null &&
+            _routeUsesPortName(unnamedRoute, requestedName)
+        ? unnamedRoute
+        : null;
+  }
+
+  /// Whether [route] uses [name] logically, physically, or through a port
+  /// mapping.
+  bool _routeUsesPortName(PortReference route, String name) =>
+      route.portName == name ||
+      route.port.name == name ||
+      (route is InterfacePortReference &&
+          route.interfaceReference.portMaps.any((portMap) =>
+              portMap.interfacePort == route &&
+              (portMap.port.portName == name ||
+                  portMap.port.port.name == name)));
+
+  /// Records a named route from [source] to [destination].
+  ///
+  /// Existing entries are retained unless [replace] is `true`.
+  void _recordNamedRoute(
+    Map<PortReference, Map<String?, PortReference>> routes,
+    PortReference source,
+    PortReference destination, {
+    String? requestedName,
+    bool replace = false,
+  }) {
+    final sourceRoutes = routes.putIfAbsent(source, () => {});
+    if (replace) {
+      sourceRoutes[requestedName] = destination;
+    } else {
+      sourceRoutes.putIfAbsent(requestedName, () => destination);
+    }
+  }
+
+  /// Finds a receiver-side port reached from [source] using [requestedName].
+  PortReference? _findUpperSourcePort(
+          PortReference source, String? requestedName) =>
+      _findNamedRoute(_upperSourceMap, source, requestedName);
+
+  /// Records the current receiver-side port reached from [source].
+  ///
+  /// A later registration replaces the previous destination for the same
+  /// source and requested name as the receiver path is extended.
+  void _recordUpperSourcePort(PortReference source, PortReference destination,
+          {String? requestedName}) =>
+      _recordNamedRoute(_upperSourceMap, source, destination,
+          requestedName: requestedName, replace: true);
+
+  /// Finds a driver-side port punched up from [source].
+  PortReference? _findPunchedUpPort(
+          PortReference source, String? requestedName) =>
+      _findNamedRoute(_punchedUpPorts, source, requestedName);
+
+  /// Records the first driver-side port punched up from [source] for a name.
+  void _recordPunchedUpPort(PortReference source, PortReference destination,
+          {String? requestedName}) =>
+      _recordNamedRoute(_punchedUpPorts, source, destination,
+          requestedName: requestedName);
 
   /// Creates a new port with the specified characteristics.
   ///
@@ -1239,7 +1332,9 @@ class BridgeModule extends Module with SystemVerilog {
 /// [allowDriverPathUniquification] or [allowReceiverPathUniquification] are
 /// `false`, then the port names will not be uniquified on those paths.
 /// Uniquification also respects [BridgeModule.allowUniquification] at each
-/// level.
+/// level. Repeated connections for the same signal reuse compatible existing
+/// hierarchy routes. A different explicitly requested path name creates a
+/// distinct alias, while an omitted path name may reuse any existing route.
 ///
 /// When [driver] and [receiver] are on the same module and the connection is
 /// ambiguous (at least one port is [PortDirection.inOut] and neither is
@@ -1249,11 +1344,12 @@ class BridgeModule extends Module with SystemVerilog {
 /// (using internal-facing ports). See [PortReference.gets] for full details.
 ///
 /// If [intermediateSignalName] is provided, an intermediate signal with that
-/// name is inserted on the direct (sibling-level) segment of the connection.
-/// This gives control over the name of the net that appears in the generated
-/// SystemVerilog. When multiple receivers share the same driver and
-/// [intermediateSignalName], the same intermediate signal is reused. The name
-/// is ignored for array-typed drivers or vertical (parent/child) connections.
+/// name is inserted on the direct sibling-level segment or same-module
+/// connection. For a loopback it appears in the parent module; for a
+/// passthrough it appears inside the connected module. When connections with
+/// the same [intermediateSignalName] share a driver, or legally share a
+/// bidirectional receiver, the same intermediate signal is reused. The name is
+/// ignored for array-typed drivers or vertical (parent/child) connections.
 void connectPorts(
   PortReference driver,
   PortReference receiver, {
@@ -1267,6 +1363,9 @@ void connectPorts(
   if (driver.module.hasBuilt || receiver.module.hasBuilt) {
     throw RohdBridgeException('Cannot connect ports after build.');
   }
+
+  final explicitDriverPathName = driverPathNewPortName;
+  final explicitReceiverPathName = receiverPathNewPortName;
 
   final driverInstance = driver.module;
   final receiverInstance = receiver.module;
@@ -1335,15 +1434,30 @@ void connectPorts(
 
     for (var i = driverPath.length - 2; i >= 1; i--) {
       final driverPathI = driverPath[i] as BridgeModule;
+      final existingPort = driverPathI._findPunchedUpPort(
+        driverPortRef,
+        explicitDriverPathName,
+      );
+      if (existingPort != null) {
+        driverPortRef = existingPort;
+        continue;
+      }
+
       final uniqName = driverPathI._getUniquePortName(
         driverPortRef,
         initialName: driverPathNewPortName,
         allowNameUniquification: allowDriverPathUniquification,
       );
 
-      driverPortRef = driverPortRef.punchUpTo(
+      final lowerPortRef = driverPortRef;
+      driverPortRef = lowerPortRef.punchUpTo(
         driverPathI,
         newPortName: uniqName,
+      );
+      driverPathI._recordPunchedUpPort(
+        lowerPortRef,
+        driverPortRef,
+        requestedName: explicitDriverPathName,
       );
     }
   }
@@ -1354,6 +1468,16 @@ void connectPorts(
   // keep track of all created receiver ports so far so we can update
   // the corresponding modules' [_upperSourceMap]s
   final createdReceiverPorts = <PortReference>[];
+
+  void recordReceiverPathToDriver() {
+    for (final createdReceiverPort in [receiver, ...createdReceiverPorts]) {
+      createdReceiverPort.module._recordUpperSourcePort(
+        driverPortRef,
+        createdReceiverPort,
+        requestedName: explicitReceiverPathName,
+      );
+    }
+  }
 
   if (receiverInstance != commonParent) {
     // we need to punch upwards from the receiver to the common parent
@@ -1376,17 +1500,21 @@ void connectPorts(
         final upperTarg = upperTargets[upperTargIdx];
         final upperTargTargs = receiverPath
             .getRange(1, i + 1)
-            .map((receiverPathMod) =>
-                (receiverPathMod as BridgeModule)._upperSourceMap[upperTarg])
+            .map((receiverPathMod) => (receiverPathMod as BridgeModule)
+                ._findUpperSourcePort(upperTarg, explicitReceiverPathName))
             .nonNulls;
 
         for (final iterUpperTargi in upperTargTargs) {
-          if (receiverPathI._upperSourceMap.containsKey(iterUpperTargi)) {
+          final existingPort = receiverPathI._findUpperSourcePort(
+            iterUpperTargi,
+            explicitReceiverPathName,
+          );
+          if (existingPort != null) {
             // if we already have a known connection up to the driver from
             // here, then we can just connect to the existing port and exit
             // immediately
-            receiverPortRef
-                .gets(receiverPathI._upperSourceMap[iterUpperTargi]!);
+            receiverPortRef.gets(existingPort);
+            recordReceiverPathToDriver();
             return;
           }
 
@@ -1409,24 +1537,37 @@ void connectPorts(
       // receiver port via the port that was created.
       for (final createdReceiverPort in createdReceiverPorts) {
         final receiverPortModule = createdReceiverPort.module;
-        assert(!receiverPortModule._upperSourceMap.containsKey(receiverPortRef),
+        assert(
+            receiverPortModule._findUpperSourcePort(
+                    receiverPortRef, explicitReceiverPathName) ==
+                null,
             'should not be recreating a path if one already exists.');
-        receiverPortModule._upperSourceMap[receiverPortRef] =
-            createdReceiverPort;
+        receiverPortModule._recordUpperSourcePort(
+          receiverPortRef,
+          createdReceiverPort,
+          requestedName: explicitReceiverPathName,
+        );
       }
     }
   }
 
   // also notify about the top-level driver
-  for (final createdReceiverPort in [receiver, ...createdReceiverPorts]) {
-    final receiverPortModule = createdReceiverPort.module;
-
-    receiverPortModule._upperSourceMap[driverPortRef] = createdReceiverPort;
-  }
+  recordReceiverPathToDriver();
 
   receiverPortRef.gets(driverPortRef,
       sameModuleConnectionType: sameModuleConnectionType,
       intermediateSignalName: intermediateSignalName);
+
+  if (receiverInstance == commonParent &&
+      driverPortRef.module != commonParent &&
+      driverPortRef.direction == receiverPortRef.direction &&
+      driverPortRef.width == receiverPortRef.width) {
+    commonParent._recordPunchedUpPort(
+      driverPortRef,
+      receiverPortRef,
+      requestedName: explicitDriverPathName,
+    );
+  }
 }
 
 /// Connects [intf1] to [intf2], creating all necessary ports through the

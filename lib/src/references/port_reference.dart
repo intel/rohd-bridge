@@ -71,6 +71,10 @@ sealed class PortReference extends Reference {
 
   PortReference._(super.module, this.portName);
 
+  /// Validates that this reference resolves to an existing port and subset.
+  @override
+  void validate() => portSubset;
+
   /// Creates a [PortReference] from a [BridgeModule] and a port reference
   /// string.
   ///
@@ -168,7 +172,7 @@ sealed class PortReference extends Reference {
   /// disambiguate.
   ///
   /// If [intermediateSignalName] is provided, an intermediate signal with that
-  /// name is inserted on sibling-level connections. See
+  /// name is inserted on sibling-level and same-module connections. See
   /// [_insertIntermediateSignalIfNeeded] for details on when the name is
   /// applied and when it is silently ignored.
   void gets(PortReference other,
@@ -351,7 +355,7 @@ sealed class PortReference extends Reference {
   ///
   /// The [intermediateSignalName], if provided, is forwarded to
   /// [_insertIntermediateSignalIfNeeded] so that a named intermediate signal
-  /// can be inserted on sibling-level connections.
+  /// can be inserted on sibling-level or same-module connections.
   @internal
   void getsInternal(PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType,
@@ -360,27 +364,35 @@ sealed class PortReference extends Reference {
   /// Returns the value that should drive the receiver for a connection sourced
   /// from [driverValue], inserting a named intermediate signal when requested.
   ///
-  /// When [intermediateSignalName] is provided and this is a sibling-level
-  /// connection whose [driverValue] is a simple (non-array) [Logic], this
-  /// creates a [Naming.renameable] intermediate signal (a [LogicNet] for
-  /// bidirectional connections, otherwise a [Logic]) driven by [driverValue]
-  /// and returns it, so the requested name appears in the generated
-  /// SystemVerilog. The width of the signal matches [driverValue], which for a
-  /// sliced driver is the width of the slice.
+  /// When [intermediateSignalName] is provided and this is a sibling-level or
+  /// same-module connection whose [driverValue] is a simple (non-array)
+  /// [Logic], this creates a [Naming.renameable] intermediate signal (a
+  /// [LogicNet] for bidirectional connections, otherwise a [Logic]) driven by
+  /// [driverValue] and returns it, so the requested name appears in the
+  /// generated SystemVerilog. The width of the signal matches [driverValue],
+  /// which for a sliced driver is the width of the slice.
   ///
   /// If a signal with the same name already exists on the same [driverValue]
-  /// (fan-out), it is reused so multiple receivers share a single signal.
+  /// (fan-out), it is reused so multiple receivers share a single signal. A
+  /// named [LogicNet] already connected to [receiverValue] is also reused for
+  /// legal fan-in connections.
   ///
   /// For cases that cannot be cleanly represented by a single named signal
   /// (structured/array or list-typed drivers, or vertical connections),
   /// [driverValue] is returned unchanged and the connection remains unnamed.
-  dynamic _insertIntermediateSignalIfNeeded(dynamic driverValue,
-      String? intermediateSignalName, PortReference other) {
+  dynamic _insertIntermediateSignalIfNeeded(
+      dynamic driverValue, String? intermediateSignalName, PortReference other,
+      {Logic? receiverValue}) {
+    final relativeLocation = _relativeLocationOf(other);
+    final supportsIntermediateSignal =
+        relativeLocation == _RelativePortLocation.sameLevel ||
+            relativeLocation == _RelativePortLocation.sameModule;
+
     if (intermediateSignalName == null ||
         driverValue is! Logic ||
         driverValue is LogicArray ||
         driverValue is LogicStructure ||
-        _relativeLocationOf(other) != _RelativePortLocation.sameLevel) {
+        !supportsIntermediateSignal) {
       return driverValue;
     }
 
@@ -390,6 +402,16 @@ sealed class PortReference extends Reference {
         .firstWhereOrNull((s) => !s.isPort && s.name == intermediateSignalName);
     if (existingNet != null) {
       return existingNet;
+    }
+
+    final existingReceiverNet = receiverValue?.srcConnections.firstWhereOrNull(
+        (signal) =>
+            signal is LogicNet &&
+            signal.name == intermediateSignalName &&
+            signal.width == driverValue.width);
+    if (existingReceiverNet != null && driverValue.isNet) {
+      existingReceiverNet <= driverValue;
+      return existingReceiverNet;
     }
 
     final net = (driverValue.isNet || port.isNet)

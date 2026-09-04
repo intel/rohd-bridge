@@ -52,8 +52,11 @@ class StandardPortReference extends PortReference {
           other,
           sameModuleConnectionType: sameModuleConnectionType);
       final effectiveDriver = _insertIntermediateSignalIfNeeded(
-          driver, intermediateSignalName, other);
-      receiver <= (effectiveDriver as Logic);
+          driver, intermediateSignalName, other,
+          receiverValue: receiver);
+      if (!receiver.srcConnections.contains(effectiveDriver)) {
+        receiver <= (effectiveDriver as Logic);
+      }
     } else if (other is SlicePortReference) {
       final otherDriver = _insertIntermediateSignalIfNeeded(
           _relativeDriverSubset(other,
