@@ -1,13 +1,14 @@
 ## 0.2.4
 
 - Added non-connecting `validate` methods for references and port maps so deferred mappings can be checked before use (<https://github.com/intel/rohd-bridge/pull/66>).
-- Improved `ConnectionExtractor` performance by reducing trace-cache hash collisions, caching repeated interface and canonical port-reference lookups, and indexing interface-covered ports. Added a synthetic benchmark for regression measurement (<https://github.com/intel/rohd-bridge/pull/62>).
+- Improved `ConnectionExtractor` performance for large designs (<https://github.com/intel/rohd-bridge/pull/62>).
 - Added `sameModuleConnectionType` to `connectInterfaces` and `InterfaceReference.connectTo` to select loopback or passthrough connections between interfaces on the same module (<https://github.com/intel/rohd-bridge/pull/59>).
 - Added typed port lookup and conversion through `TypedPortReference`, `typedPort`, `tryTypedPort`, `asTyped`, and `tryAsTyped` (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added `tryInterface`, `typedInterface`, and `tryTypedInterface` for nullable and type-preserving interface lookup (<https://github.com/intel/rohd-bridge/pull/58>).
 - Added type-preserving interface hierarchy APIs: `pullUpTypedInterface`, `punchUpToTyped`, and `punchDownToTyped`. These APIs intentionally omit port exclusions because a partial interface cannot retain its concrete type (<https://github.com/intel/rohd-bridge/pull/58>).
+- Breaking: Raised the minimum supported Dart SDK from 3.0 to 3.3 for extension type support (<https://github.com/intel/rohd-bridge/pull/58>).
 - Fixed port references and `ConnectionExtractor` support for typed structure ports, including nested structures, packed field slices, tie-offs, zero-width leaves, and `inOut` nets (<https://github.com/intel/rohd-bridge/pull/61>).
-- Added support for custom synthesizer configurations in `buildAndGenerateRTL` (<https://github.com/intel/rohd-bridge/pull/55>).
+- Added support for custom synthesizer configurations in `buildAndGenerateRTL` and raised the minimum ROHD dependency from 0.6.9 to 0.6.10 (<https://github.com/intel/rohd-bridge/pull/55>).
 - Fixed mapped interface port operations to resolve deferred `PortMap`s before use (<https://github.com/intel/rohd-bridge/pull/50>).
 - Added support for same-module connections involving mapped interface ports (<https://github.com/intel/rohd-bridge/pull/53>).
 - Added validation that rejects exact duplicate `PortMap` registrations (<https://github.com/intel/rohd-bridge/pull/54>).
