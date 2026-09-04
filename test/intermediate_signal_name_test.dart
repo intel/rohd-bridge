@@ -53,6 +53,48 @@ void main() {
       expect(dst.input('myPortIn').value.toInt(), equals(0xAB));
     });
 
+    test('same-module loopback uses the requested net name', () async {
+      final child = BridgeModule('child')
+        ..createPort('myPortOut', PortDirection.output, width: 8)
+        ..createPort('myPortIn', PortDirection.input, width: 8);
+      final top = BridgeModule('top')
+        ..addSubModule(child)
+        ..pullUpPort(child.createPort('dummy', PortDirection.output));
+
+      connectPorts(child.port('myPortOut'), child.port('myPortIn'),
+          intermediateSignalName: 'myLoopbackNet');
+
+      await top.build();
+      final sv = top.generateSynth();
+
+      expect(sv, matches(RegExp(r'logic\s*\[7:0\]\s*myLoopbackNet')));
+      expect(sv, matches(RegExp(r'\.myPortOut\s*\(\s*myLoopbackNet\s*\)')));
+      expect(sv, matches(RegExp(r'\.myPortIn\s*\(\s*myLoopbackNet\s*\)')));
+    });
+
+    test('same-module passthrough uses the requested net name', () async {
+      final child = BridgeModule('child')
+        ..createPort('myPortIn', PortDirection.input, width: 8)
+        ..createPort('myPortOut', PortDirection.output, width: 8);
+      final top = BridgeModule('top')
+        ..addSubModule(child)
+        ..pullUpPort(child.createPort('dummy', PortDirection.output));
+
+      connectPorts(child.port('myPortIn'), child.port('myPortOut'),
+          sameModuleConnectionType: SameModuleConnectionType.passthrough,
+          intermediateSignalName: 'myPassthroughNet');
+
+      await top.build();
+      final sv = top.generateSynth();
+
+      expect(child.internalSignals.map((signal) => signal.name),
+          contains('myPassthroughNet'));
+      expect(sv, matches(RegExp(r'logic\s*\[7:0\]\s*myPassthroughNet')));
+
+      child.input('myPortIn').put(0xAB);
+      expect(child.output('myPortOut').value.toInt(), equals(0xAB));
+    });
+
     test('net name appears in portmap for both submodules', () async {
       final (:top, :src, :dst) = _buildRig(width: 4);
 
@@ -207,6 +249,73 @@ void main() {
       expect(dst1.input('myPortIn_a').value.toInt(), equals(1));
       expect(dst2.input('myPortIn_b').value.toInt(), equals(1));
       expect(dst3.input('myPortIn_c').value.toInt(), equals(1));
+    });
+
+    test('nested fan-out reuses one named net', () async {
+      final src = BridgeModule('src');
+      final branch = BridgeModule('branch');
+      final dst1 = branch.addSubModule(BridgeModule('dst1'));
+      final dst2 = branch.addSubModule(BridgeModule('dst2'));
+
+      src.createPort('myPortOut', PortDirection.output);
+      dst1.createPort('myPortIn', PortDirection.input);
+      dst2.createPort('myPortIn', PortDirection.input);
+
+      final top = BridgeModule('top')
+        ..addSubModule(src)
+        ..addSubModule(branch)
+        ..pullUpPort(src.createPort('dummy', PortDirection.output))
+        ..pullUpPort(branch.pullUpPort(
+            dst1.createPort('dummy', PortDirection.output),
+            newPortName: 'dst1Dummy'))
+        ..pullUpPort(branch.pullUpPort(
+            dst2.createPort('dummy', PortDirection.output),
+            newPortName: 'dst2Dummy'));
+
+      connectPorts(src.port('myPortOut'), dst1.port('myPortIn'),
+          intermediateSignalName: 'myNestedSharedNet');
+      connectPorts(src.port('myPortOut'), dst2.port('myPortIn'),
+          intermediateSignalName: 'myNestedSharedNet');
+
+      await top.build();
+      final sv = top.generateSynth();
+
+      expect(sv, contains('myNestedSharedNet'));
+      expect(sv, isNot(contains('myNestedSharedNet_0')));
+
+      src.output('myPortOut').put(1);
+      expect(dst1.input('myPortIn').value.toInt(), equals(1));
+      expect(dst2.input('myPortIn').value.toInt(), equals(1));
+    });
+
+    test('fan-in: multiple inOut drivers share one named net', () async {
+      final top = BridgeModule('top');
+      final src1 = top.addSubModule(BridgeModule('src1'));
+      final src2 = top.addSubModule(BridgeModule('src2'));
+      final dst = top.addSubModule(BridgeModule('dst'));
+
+      src1.createPort('bus1', PortDirection.inOut, width: 4);
+      src2.createPort('bus2', PortDirection.inOut, width: 4);
+      dst.createPort('busIn', PortDirection.inOut, width: 4);
+
+      top
+        ..pullUpPort(src1.createPort('dummy', PortDirection.output))
+        ..pullUpPort(src2.createPort('dummy', PortDirection.output))
+        ..pullUpPort(dst.createPort('dummy', PortDirection.output));
+
+      connectPorts(src1.port('bus1'), dst.port('busIn'),
+          intermediateSignalName: 'mySharedInOutNet');
+      connectPorts(src2.port('bus2'), dst.port('busIn'),
+          intermediateSignalName: 'mySharedInOutNet');
+
+      await top.build();
+      final sv = top.generateSynth();
+
+      expect(sv, contains('mySharedInOutNet'));
+      expect(sv, isNot(contains('mySharedInOutNet_0')));
+      expect(sv, matches(RegExp(r'\.bus1\s*\(\s*mySharedInOutNet\s*\)')));
+      expect(sv, matches(RegExp(r'\.bus2\s*\(\s*mySharedInOutNet\s*\)')));
+      expect(sv, matches(RegExp(r'\.busIn\s*\(\s*mySharedInOutNet\s*\)')));
     });
 
     test('name collision auto-uniquifies (Naming.renameable)', () async {
