@@ -13,8 +13,9 @@
 - Added validation that rejects exact duplicate `PortMap` registrations (<https://github.com/intel/rohd-bridge/pull/54>).
 - Added `tryPort` for nullable port lookup (<https://github.com/intel/rohd-bridge/pull/43>).
 - Fixed output file naming in `buildAndGenerateRTL` for uniquified modules (<https://github.com/intel/rohd-bridge/pull/46>).
+- Fixed hierarchical port reuse for repeated `connectPorts` fan-out, including explicitly named paths, partial routes, slices, and `inOut` ports (<https://github.com/intel/rohd-bridge/pull/64>).
 - Simplified tie-off signal names in generated SystemVerilog (<https://github.com/intel/rohd-bridge/pull/44>).
-- Added `intermediateSignalName` support to `connectPorts` and related methods (<https://github.com/intel/rohd-bridge/pull/45>).
+- Added `intermediateSignalName` support to `connectPorts` and related methods, including same-module loopback and passthrough connections and named-net reuse for fan-out and fan-in (<https://github.com/intel/rohd-bridge/pull/45>, <https://github.com/intel/rohd-bridge/pull/65>).
 - Fixed a type error in `ConnectionExtractor` equality checks when compared connections have mismatched types (<https://github.com/intel/rohd-bridge/pull/41>).
 
 ## 0.2.3
