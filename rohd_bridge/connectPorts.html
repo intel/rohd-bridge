@@ -57,12 +57,12 @@
 <span class="returntype">void</span>
 <span class="name ">connectPorts</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="connectPorts-param-driver"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">driver</span>, </span></li>
 <li><span class="parameter" id="connectPorts-param-receiver"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">receiver</span>, {</span></li>
-<li><span class="parameter" id="connectPorts-param-driverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.1/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">driverPathNewPortName</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-receiverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.1/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">receiverPathNewPortName</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-allowDriverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.1/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowDriverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-allowReceiverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.1/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowReceiverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-driverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">driverPathNewPortName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-receiverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">receiverPathNewPortName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-allowDriverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowDriverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-allowReceiverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowReceiverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="connectPorts-param-sameModuleConnectionType"><span class="type-annotation"><a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a>?</span> <span class="parameter-name">sameModuleConnectionType</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-intermediateSignalName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.1/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intermediateSignalName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-intermediateSignalName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intermediateSignalName</span>, </span></li>
 </ol>})
 
         
@@ -77,7 +77,9 @@ it will prefer to name new ports with those names. If
 <code>allowDriverPathUniquification</code> or <code>allowReceiverPathUniquification</code> are
 <code>false</code>, then the port names will not be uniquified on those paths.
 Uniquification also respects <a href="../rohd_bridge/BridgeModule/allowUniquification.html">BridgeModule.allowUniquification</a> at each
-level.</p>
+level. Repeated connections for the same signal reuse compatible existing
+hierarchy routes. A different explicitly requested path name creates a
+distinct alias, while an omitted path name may reuse any existing route.</p>
 <p>When <code>driver</code> and <code>receiver</code> are on the same module and the connection is
 ambiguous (at least one port is <a href="../rohd_bridge/PortDirection.html">PortDirection.inOut</a> and neither is
 <a href="../rohd_bridge/PortDirection.html">PortDirection.input</a>), <code>sameModuleConnectionType</code> must be provided to
@@ -109,6 +111,9 @@ is ignored for array-typed drivers or vertical (parent/child) connections.</p>
   if (driver.module.hasBuilt || receiver.module.hasBuilt) {
     throw RohdBridgeException(&#39;Cannot connect ports after build.&#39;);
   }
+
+  final explicitDriverPathName = driverPathNewPortName;
+  final explicitReceiverPathName = receiverPathNewPortName;
 
   final driverInstance = driver.module;
   final receiverInstance = receiver.module;
@@ -177,15 +182,30 @@ is ignored for array-typed drivers or vertical (parent/child) connections.</p>
 
     for (var i = driverPath.length - 2; i &gt;= 1; i--) {
       final driverPathI = driverPath[i] as BridgeModule;
+      final existingPort = driverPathI._findPunchedUpPort(
+        driverPortRef,
+        explicitDriverPathName,
+      );
+      if (existingPort != null) {
+        driverPortRef = existingPort;
+        continue;
+      }
+
       final uniqName = driverPathI._getUniquePortName(
         driverPortRef,
         initialName: driverPathNewPortName,
         allowNameUniquification: allowDriverPathUniquification,
       );
 
-      driverPortRef = driverPortRef.punchUpTo(
+      final lowerPortRef = driverPortRef;
+      driverPortRef = lowerPortRef.punchUpTo(
         driverPathI,
         newPortName: uniqName,
+      );
+      driverPathI._recordPunchedUpPort(
+        lowerPortRef,
+        driverPortRef,
+        requestedName: explicitDriverPathName,
       );
     }
   }
@@ -196,6 +216,16 @@ is ignored for array-typed drivers or vertical (parent/child) connections.</p>
   &#47;&#47; keep track of all created receiver ports so far so we can update
   &#47;&#47; the corresponding modules&#39; [_upperSourceMap]s
   final createdReceiverPorts = &lt;PortReference&gt;[];
+
+  void recordReceiverPathToDriver() {
+    for (final createdReceiverPort in [receiver, ...createdReceiverPorts]) {
+      createdReceiverPort.module._recordUpperSourcePort(
+        driverPortRef,
+        createdReceiverPort,
+        requestedName: explicitReceiverPathName,
+      );
+    }
+  }
 
   if (receiverInstance != commonParent) {
     &#47;&#47; we need to punch upwards from the receiver to the common parent
@@ -218,17 +248,21 @@ is ignored for array-typed drivers or vertical (parent/child) connections.</p>
         final upperTarg = upperTargets[upperTargIdx];
         final upperTargTargs = receiverPath
             .getRange(1, i + 1)
-            .map((receiverPathMod) =&gt;
-                (receiverPathMod as BridgeModule)._upperSourceMap[upperTarg])
+            .map((receiverPathMod) =&gt; (receiverPathMod as BridgeModule)
+                ._findUpperSourcePort(upperTarg, explicitReceiverPathName))
             .nonNulls;
 
         for (final iterUpperTargi in upperTargTargs) {
-          if (receiverPathI._upperSourceMap.containsKey(iterUpperTargi)) {
+          final existingPort = receiverPathI._findUpperSourcePort(
+            iterUpperTargi,
+            explicitReceiverPathName,
+          );
+          if (existingPort != null) {
             &#47;&#47; if we already have a known connection up to the driver from
             &#47;&#47; here, then we can just connect to the existing port and exit
             &#47;&#47; immediately
-            receiverPortRef
-                .gets(receiverPathI._upperSourceMap[iterUpperTargi]!);
+            receiverPortRef.gets(existingPort);
+            recordReceiverPathToDriver();
             return;
           }
 
@@ -251,24 +285,37 @@ is ignored for array-typed drivers or vertical (parent/child) connections.</p>
       &#47;&#47; receiver port via the port that was created.
       for (final createdReceiverPort in createdReceiverPorts) {
         final receiverPortModule = createdReceiverPort.module;
-        assert(!receiverPortModule._upperSourceMap.containsKey(receiverPortRef),
+        assert(
+            receiverPortModule._findUpperSourcePort(
+                    receiverPortRef, explicitReceiverPathName) ==
+                null,
             &#39;should not be recreating a path if one already exists.&#39;);
-        receiverPortModule._upperSourceMap[receiverPortRef] =
-            createdReceiverPort;
+        receiverPortModule._recordUpperSourcePort(
+          receiverPortRef,
+          createdReceiverPort,
+          requestedName: explicitReceiverPathName,
+        );
       }
     }
   }
 
   &#47;&#47; also notify about the top-level driver
-  for (final createdReceiverPort in [receiver, ...createdReceiverPorts]) {
-    final receiverPortModule = createdReceiverPort.module;
-
-    receiverPortModule._upperSourceMap[driverPortRef] = createdReceiverPort;
-  }
+  recordReceiverPathToDriver();
 
   receiverPortRef.gets(driverPortRef,
       sameModuleConnectionType: sameModuleConnectionType,
       intermediateSignalName: intermediateSignalName);
+
+  if (receiverInstance == commonParent &amp;&amp;
+      driverPortRef.module != commonParent &amp;&amp;
+      driverPortRef.direction == receiverPortRef.direction &amp;&amp;
+      driverPortRef.width == receiverPortRef.width) {
+    commonParent._recordPunchedUpPort(
+      driverPortRef,
+      receiverPortRef,
+      requestedName: explicitDriverPathName,
+    );
+  }
 }</code></pre>
 </section>
 
