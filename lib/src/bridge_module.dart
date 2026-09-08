@@ -1343,13 +1343,17 @@ class BridgeModule extends Module with SystemVerilog {
 /// (using external-facing ports) or a [SameModuleConnectionType.passthrough]
 /// (using internal-facing ports). See [PortReference.gets] for full details.
 ///
-/// If [intermediateSignalName] is provided, an intermediate signal with that
-/// name is inserted on the direct sibling-level segment or same-module
-/// connection. For a loopback it appears in the parent module; for a
-/// passthrough it appears inside the connected module. When connections with
-/// the same [intermediateSignalName] share a driver, or legally share a
-/// bidirectional receiver, the same intermediate signal is reused. The name is
-/// ignored for array-typed drivers or vertical (parent/child) connections.
+/// The intermediate signal name defaults to the explicitly supplied
+/// [receiverPathNewPortName], then [driverPathNewPortName], unless overridden
+/// by [intermediateSignalName]. If all three are omitted, naming is automatic.
+/// When a name is selected, an intermediate signal with that name is inserted
+/// on the direct sibling-level segment or same-module connection. For a
+/// loopback it appears in the parent module; for a passthrough it appears
+/// inside the connected module. When connections with the same resolved name
+/// share a driver, or legally share a bidirectional receiver, the same
+/// intermediate signal is reused. Names may be uniquified on collision and
+/// are ignored for structured/array-typed drivers or vertical (parent/child)
+/// connections.
 void connectPorts(
   PortReference driver,
   PortReference receiver, {
@@ -1366,6 +1370,9 @@ void connectPorts(
 
   final explicitDriverPathName = driverPathNewPortName;
   final explicitReceiverPathName = receiverPathNewPortName;
+  final resolvedIntermediateSignalName = intermediateSignalName ??
+      explicitReceiverPathName ??
+      explicitDriverPathName;
 
   final driverInstance = driver.module;
   final receiverInstance = receiver.module;
@@ -1513,7 +1520,8 @@ void connectPorts(
             // if we already have a known connection up to the driver from
             // here, then we can just connect to the existing port and exit
             // immediately
-            receiverPortRef.gets(existingPort);
+            receiverPortRef.gets(existingPort,
+                intermediateSignalName: resolvedIntermediateSignalName);
             recordReceiverPathToDriver();
             return;
           }
@@ -1556,7 +1564,7 @@ void connectPorts(
 
   receiverPortRef.gets(driverPortRef,
       sameModuleConnectionType: sameModuleConnectionType,
-      intermediateSignalName: intermediateSignalName);
+      intermediateSignalName: resolvedIntermediateSignalName);
 
   if (receiverInstance == commonParent &&
       driverPortRef.module != commonParent &&
