@@ -1,5 +1,6 @@
 ## Next release
 
+- Changed `connectPorts` to default intermediate signal names to the explicitly supplied receiver path name, then driver path name, when `intermediateSignalName` is omitted. Generated RTL net names may change for explicitly named paths.
 - Added non-connecting `validate` methods for references and port maps so deferred mappings can be checked before use (<https://github.com/intel/rohd-bridge/pull/66>).
 - Improved `ConnectionExtractor` performance by reducing trace-cache hash collisions, caching repeated interface and canonical port-reference lookups, and indexing interface-covered ports. Added a synthetic benchmark for regression measurement (<https://github.com/intel/rohd-bridge/pull/62>).
 - Added `sameModuleConnectionType` to `connectInterfaces` and `InterfaceReference.connectTo` to select loopback or passthrough connections between interfaces on the same module (<https://github.com/intel/rohd-bridge/pull/59>).

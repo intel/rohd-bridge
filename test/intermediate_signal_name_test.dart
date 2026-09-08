@@ -28,6 +28,149 @@ import 'package:test/test.dart';
 
 void main() {
   group('intermediateSignalName on connectPorts', () {
+    for (final names in [
+      (
+        description: 'receiver path only',
+        driver: null,
+        receiver: 'receiverWire',
+        intermediate: null,
+        expected: 'receiverWire',
+      ),
+      (
+        description: 'driver path only',
+        driver: 'driverWire',
+        receiver: null,
+        intermediate: null,
+        expected: 'driverWire',
+      ),
+      (
+        description: 'receiver path overrides driver path',
+        driver: 'driverWire',
+        receiver: 'receiverWire',
+        intermediate: null,
+        expected: 'receiverWire',
+      ),
+      (
+        description: 'explicit intermediate overrides both paths',
+        driver: 'driverWire',
+        receiver: 'receiverWire',
+        intermediate: 'explicitWire',
+        expected: 'explicitWire',
+      ),
+      (
+        description: 'no supplied names keeps the direct connection',
+        driver: null,
+        receiver: null,
+        intermediate: null,
+        expected: null,
+      ),
+    ]) {
+      test('path name fallback: ${names.description}', () async {
+        final (:top, :src, :dst) = _buildRig();
+        src.createPort('myPortOut', PortDirection.output, width: 8);
+        dst.createPort('myPortIn', PortDirection.input, width: 8);
+
+        connectPorts(src.port('myPortOut'), dst.port('myPortIn'),
+            driverPathNewPortName: names.driver,
+            receiverPathNewPortName: names.receiver,
+            intermediateSignalName: names.intermediate);
+
+        await top.build();
+        final sv = top.generateSynth();
+        if (names.expected == null) {
+          expect(dst.inputSource('myPortIn').srcConnections,
+              contains(src.output('myPortOut')));
+        } else {
+          expect(
+              sv,
+              matches(
+                  RegExp('\\.myPortOut\\s*\\(\\s*${names.expected}\\s*\\)')));
+          expect(
+              sv,
+              matches(
+                  RegExp('\\.myPortIn\\s*\\(\\s*${names.expected}\\s*\\)')));
+        }
+        expect(src.outputs.keys, contains('myPortOut'));
+        expect(dst.inputs.keys, contains('myPortIn'));
+
+        src.output('myPortOut').put(0xAB);
+        expect(dst.input('myPortIn').value.toInt(), 0xAB);
+      });
+    }
+
+    test('path name fallback: nested fan-out reuses the named route', () async {
+      final source = BridgeModule('source')
+        ..createPort('dataOut', PortDirection.output, width: 8);
+      final first = BridgeModule('first')
+        ..createPort('dataIn', PortDirection.input, width: 8);
+      final second = BridgeModule('second')
+        ..createPort('dataIn', PortDirection.input, width: 8);
+      final sourceParent = BridgeModule('sourceParent')..addSubModule(source);
+      final receiverParent = BridgeModule('receiverParent')
+        ..addSubModule(first)
+        ..addSubModule(second);
+      final top = BridgeModule('top')
+        ..addSubModule(sourceParent)
+        ..addSubModule(receiverParent)
+        ..pullUpPort(sourceParent.createPort('dummy', PortDirection.output));
+
+      for (final receiver in [first, first, second]) {
+        connectPorts(source.port('dataOut'), receiver.port('dataIn'),
+            driverPathNewPortName: 'driverRoute',
+            receiverPathNewPortName: 'receiverRoute');
+      }
+
+      await top.build();
+      final sv = top.generateSynth();
+      expect(receiverParent.inputs.keys, ['receiverRoute']);
+      expect(
+          sourceParent
+              .output('driverRoute')
+              .dstConnections
+              .where((signal) => signal.name == 'receiverRoute'),
+          hasLength(1));
+      expect(sv, isNot(contains('receiverRoute_0')));
+      expect(sv, matches(RegExp(r'\.driverRoute\s*\(\s*receiverRoute\s*\)')));
+      expect(sv, matches(RegExp(r'\.receiverRoute\s*\(\s*receiverRoute\s*\)')));
+
+      source.output('dataOut').put(0xAB);
+      expect(first.input('dataIn').value.toInt(), 0xAB);
+      expect(second.input('dataIn').value.toInt(), 0xAB);
+    });
+
+    test('path name fallback: collisions keep independent nets distinct',
+        () async {
+      final (:top, :src, :dst) = _buildRig();
+      src
+        ..createPort('firstOut', PortDirection.output, width: 8)
+        ..createPort('secondOut', PortDirection.output, width: 8);
+      dst
+        ..createPort('firstIn', PortDirection.input, width: 8)
+        ..createPort('secondIn', PortDirection.input, width: 8);
+
+      connectPorts(src.port('firstOut'), dst.port('firstIn'),
+          receiverPathNewPortName: 'sharedWire');
+      connectPorts(src.port('secondOut'), dst.port('secondIn'),
+          receiverPathNewPortName: 'sharedWire');
+
+      await top.build();
+      final sv = top.generateSynth();
+      final firstNet = RegExp(r'\.firstIn\s*\(\s*(sharedWire(?:_\d+)?)\s*\)')
+          .firstMatch(sv)!
+          .group(1)!;
+      final secondNet = RegExp(r'\.secondIn\s*\(\s*(sharedWire(?:_\d+)?)\s*\)')
+          .firstMatch(sv)!
+          .group(1)!;
+      expect(firstNet, isNot(secondNet));
+      expect(sv, matches(RegExp('\\.firstOut\\s*\\(\\s*$firstNet\\s*\\)')));
+      expect(sv, matches(RegExp('\\.secondOut\\s*\\(\\s*$secondNet\\s*\\)')));
+
+      src.output('firstOut').put(0xAB);
+      src.output('secondOut').put(0xCD);
+      expect(dst.input('firstIn').value.toInt(), 0xAB);
+      expect(dst.input('secondIn').value.toInt(), 0xCD);
+    });
+
     test('sibling logic ports: net appears by name in generated SV', () async {
       final (:top, :src, :dst) = _buildRig();
 
