@@ -258,6 +258,85 @@ void main() {
       expect(dst.input('myPortIn').value.toInt(), equals(0xA));
     });
 
+    for (final exportFirst in [true, false]) {
+      test(
+          'exported top port is reused as the named sibling signal '
+          '${exportFirst ? 'before' : 'after'} the sibling connection',
+          () async {
+        final top = BridgeModule('top');
+        final src = top.addSubModule(BridgeModule('src'))
+          ..createPort('myPortOut', PortDirection.output, width: 8);
+        final dst = top.addSubModule(BridgeModule('dst'))
+          ..createPort('myPortIn', PortDirection.input, width: 8);
+
+        void exportSignal() =>
+            top.pullUpPort(src.port('myPortOut'), newPortName: 'explicit_name');
+        void connectSiblings() =>
+            connectPorts(src.port('myPortOut'), dst.port('myPortIn'),
+                intermediateSignalName: 'explicit_name');
+
+        if (exportFirst) {
+          exportSignal();
+          connectSiblings();
+        } else {
+          connectSiblings();
+          exportSignal();
+        }
+
+        await top.build();
+        final sv = top.generateSynth();
+
+        expect(sv, isNot(contains('explicit_name_0')));
+        expect(sv, matches(RegExp(r'\.myPortOut\s*\(\s*explicit_name\s*\)')));
+        expect(sv, matches(RegExp(r'\.myPortIn\s*\(\s*explicit_name\s*\)')));
+
+        src.output('myPortOut').put(0xAB);
+        expect(top.output('explicit_name').value.toInt(), equals(0xAB));
+        expect(dst.input('myPortIn').value.toInt(), equals(0xAB));
+      },
+          skip: 'Pending release of ROHD PR '
+              'https://github.com/intel/rohd/pull/712');
+    }
+
+    for (final exportFirst in [true, false]) {
+      test(
+          'exported top inout is reused as the named sibling signal '
+          '${exportFirst ? 'before' : 'after'} the sibling connection',
+          () async {
+        final top = BridgeModule('top');
+        final src = top.addSubModule(BridgeModule('src'))
+          ..createPort('myPort', PortDirection.inOut, width: 8);
+        final dst = top.addSubModule(BridgeModule('dst'))
+          ..createPort('myPort', PortDirection.inOut, width: 8);
+
+        void exportSignal() =>
+            top.pullUpPort(src.port('myPort'), newPortName: 'explicit_name');
+        void connectSiblings() =>
+            connectPorts(src.port('myPort'), dst.port('myPort'),
+                intermediateSignalName: 'explicit_name');
+
+        if (exportFirst) {
+          exportSignal();
+          connectSiblings();
+        } else {
+          connectSiblings();
+          exportSignal();
+        }
+
+        await top.build();
+        final sv = top.generateSynth();
+
+        expect(sv, isNot(contains('explicit_name_0')));
+        expect(sv, matches(RegExp(r'\.myPort\s*\(\s*explicit_name\s*\)')));
+
+        src.inOut('myPort').put(0xAB);
+        expect(top.inOut('explicit_name').value.toInt(), equals(0xAB));
+        expect(dst.inOut('myPort').value.toInt(), equals(0xAB));
+      },
+          skip: 'Pending release of ROHD PR '
+              'https://github.com/intel/rohd/pull/712');
+    }
+
     test('without intermediateSignalName: connection works normally', () async {
       final (:top, :src, :dst) = _buildRig(width: 4);
 
