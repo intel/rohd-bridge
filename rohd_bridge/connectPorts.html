@@ -86,13 +86,17 @@ ambiguous (at least one port is <a href="../rohd_bridge/PortDirection.html">Port
 disambiguate whether the connection is a <a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType.loopback</a>
 (using external-facing ports) or a <a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType.passthrough</a>
 (using internal-facing ports). See <a href="../rohd_bridge/PortReference/gets.html">PortReference.gets</a> for full details.</p>
-<p>If <code>intermediateSignalName</code> is provided, an intermediate signal with that
-name is inserted on the direct sibling-level segment or same-module
-connection. For a loopback it appears in the parent module; for a
-passthrough it appears inside the connected module. When connections with
-the same <code>intermediateSignalName</code> share a driver, or legally share a
-bidirectional receiver, the same intermediate signal is reused. The name is
-ignored for array-typed drivers or vertical (parent/child) connections.</p>
+<p>The intermediate signal name defaults to the explicitly supplied
+<code>receiverPathNewPortName</code>, then <code>driverPathNewPortName</code>, unless overridden
+by <code>intermediateSignalName</code>. If all three are omitted, naming is automatic.
+When a name is selected, an intermediate signal with that name is inserted
+on the direct sibling-level segment or same-module connection. For a
+loopback it appears in the parent module; for a passthrough it appears
+inside the connected module. When connections with the same resolved name
+share a driver, or legally share a bidirectional receiver, the same
+intermediate signal is reused. Names may be uniquified on collision and
+are ignored for structured/array-typed drivers or vertical (parent/child)
+connections.</p>
 </section>
 
 
@@ -115,6 +119,9 @@ ignored for array-typed drivers or vertical (parent/child) connections.</p>
 
   final explicitDriverPathName = driverPathNewPortName;
   final explicitReceiverPathName = receiverPathNewPortName;
+  final resolvedIntermediateSignalName = intermediateSignalName ??
+      explicitReceiverPathName ??
+      explicitDriverPathName;
 
   final driverInstance = driver.module;
   final receiverInstance = receiver.module;
@@ -262,7 +269,8 @@ ignored for array-typed drivers or vertical (parent/child) connections.</p>
             &#47;&#47; if we already have a known connection up to the driver from
             &#47;&#47; here, then we can just connect to the existing port and exit
             &#47;&#47; immediately
-            receiverPortRef.gets(existingPort);
+            receiverPortRef.gets(existingPort,
+                intermediateSignalName: resolvedIntermediateSignalName);
             recordReceiverPathToDriver();
             return;
           }
@@ -305,7 +313,7 @@ ignored for array-typed drivers or vertical (parent/child) connections.</p>
 
   receiverPortRef.gets(driverPortRef,
       sameModuleConnectionType: sameModuleConnectionType,
-      intermediateSignalName: intermediateSignalName);
+      intermediateSignalName: resolvedIntermediateSignalName);
 
   if (receiverInstance == commonParent &amp;&amp;
       driverPortRef.module != commonParent &amp;&amp;
