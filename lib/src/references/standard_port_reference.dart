@@ -52,21 +52,23 @@ class StandardPortReference extends PortReference {
       final (receiver: receiver, driver: driver, isInternal: isInternal) =
           _relativeReceiverAndDriver(other,
               sameModuleConnectionType: sameModuleConnectionType);
-      final effectiveDriver = _insertIntermediateSignalIfNeeded(
+      final intermediate = _insertIntermediateSignalIfNeeded(
           driver, intermediateSignalName, other,
           driverRoot: driver,
           receiverRoot: receiver,
           isInternal: isInternal,
           allowIntermediateSignalNameUniquification:
               allowIntermediateSignalNameUniquification);
-      if (!receiver.srcConnections.contains(effectiveDriver)) {
-        receiver <= (effectiveDriver as Logic);
+      if (!intermediate.alreadyConnected &&
+          !receiver.srcConnections.contains(intermediate.driver)) {
+        receiver <= (intermediate.driver as Logic);
       }
+      intermediate.onConnected?.call();
     } else if (other is SlicePortReference) {
       final (receiver: receiver, driver: driver, isInternal: isInternal) =
           _relativeReceiverAndDriver(other,
               sameModuleConnectionType: sameModuleConnectionType);
-      final otherDriver = _insertIntermediateSignalIfNeeded(
+      final intermediate = _insertIntermediateSignalIfNeeded(
           _relativeDriverSubset(other,
               sameModuleConnectionType: sameModuleConnectionType),
           intermediateSignalName,
@@ -77,6 +79,10 @@ class StandardPortReference extends PortReference {
           allowIntermediateSignalNameUniquification:
               allowIntermediateSignalNameUniquification);
 
+      if (intermediate.alreadyConnected) {
+        return;
+      }
+      final otherDriver = intermediate.driver;
       if (otherDriver is Logic) {
         receiver <= otherDriver;
       } else if (otherDriver is List<Logic>) {
@@ -89,6 +95,7 @@ class StandardPortReference extends PortReference {
       } else {
         throw RohdBridgeException('Invalid driver type $otherDriver');
       }
+      intermediate.onConnected?.call();
     } else {
       throw RohdBridgeException('Invalid driver type $other');
     }

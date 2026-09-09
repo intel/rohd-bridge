@@ -285,23 +285,28 @@ class SlicePortReference extends PortReference {
         }
       }
     } else {
-      otherDriver = _insertIntermediateSignalIfNeeded(
+      final intermediate = _insertIntermediateSignalIfNeeded(
           otherDriver, intermediateSignalName, other,
           driverRoot: driverRoot,
           receiverRoot: receiverRoot,
           isInternal: isInternal,
           allowIntermediateSignalNameUniquification:
               allowIntermediateSignalNameUniquification);
+      if (intermediate.alreadyConnected) {
+        return;
+      }
+      otherDriver = intermediate.driver;
       getsLogic(otherDriver is Logic
           ? otherDriver
           : (otherDriver as List<Logic>).rswizzle());
+      intermediate.onConnected?.call();
       return;
     }
 
     assert(!((leafIndex != null) && hasSlicing),
         'cannot have both slicing and a leaf index');
 
-    otherDriver = _insertIntermediateSignalIfNeeded(
+    final intermediate = _insertIntermediateSignalIfNeeded(
         otherDriver, intermediateSignalName, other,
         driverRoot: driverRoot,
         receiverRoot: receiverRoot,
@@ -309,6 +314,10 @@ class SlicePortReference extends PortReference {
         allowIntermediateSignalNameUniquification:
             allowIntermediateSignalNameUniquification);
 
+    if (intermediate.alreadyConnected) {
+      return;
+    }
+    otherDriver = intermediate.driver;
     if (receiverPort is LogicStructure && receiverPort is! LogicArray) {
       final driver = otherDriver is Logic
           ? otherDriver
@@ -318,6 +327,7 @@ class SlicePortReference extends PortReference {
         driver,
         start: dimensionAccess?.single ?? sliceLowerIndex ?? 0,
       );
+      intermediate.onConnected?.call();
       return;
     }
 
@@ -385,6 +395,7 @@ class SlicePortReference extends PortReference {
     } else {
       throw RohdBridgeException('Invalid driver type: $otherDriver');
     }
+    intermediate.onConnected?.call();
   }
 
   @override

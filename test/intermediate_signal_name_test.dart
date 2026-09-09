@@ -117,27 +117,37 @@ void main() {
             .singleWhere((signal) => signal.name == 'sharedExact');
         final connections = intermediate.dstConnections.toSet();
 
+        second.gets(driver,
+            intermediateSignalName: 'sharedExact',
+            allowIntermediateSignalNameUniquification: false);
+        final strictIntermediate = driver.port.dstConnections.singleWhere(
+            (signal) =>
+                signal.name == 'sharedExact' &&
+                signal.naming == Naming.reserved);
+        first.gets(driver, intermediateSignalName: 'sharedExact');
+        second.gets(driver, intermediateSignalName: 'sharedExact');
+
         if (!firstStrict) {
+          expect(strictIntermediate, isNot(same(intermediate)));
+          expect(intermediate.dstConnections.toSet(), connections);
           expect(
-              () => second.gets(driver,
+              () => first.gets(driver,
                   intermediateSignalName: 'sharedExact',
                   allowIntermediateSignalNameUniquification: false),
               throwsA(isA<RohdBridgeException>()));
           expect(intermediate.dstConnections.toSet(), connections);
         } else {
-          second.gets(driver,
-              intermediateSignalName: 'sharedExact',
-              allowIntermediateSignalNameUniquification: false);
+          expect(strictIntermediate, same(intermediate));
         }
-        second.gets(driver, intermediateSignalName: 'sharedExact');
 
         await top.build();
         expect(
             top.internalSignals.where((signal) => signal.name == 'sharedExact'),
-            [intermediate]);
+            unorderedEquals({intermediate, strictIntermediate}));
         expect(intermediate.naming,
             firstStrict ? Naming.reserved : Naming.renameable);
-        expect(top.generateSynth(), isNot(contains('sharedExact_0')));
+        expect(top.generateSynth(),
+            matches(RegExp(r'\.second\s*\(\s*sharedExact\s*\)')));
         driver.port.put(0xAB);
         expect(first.port.value.toInt(), 0xAB);
         expect(second.port.value.toInt(), 0xAB);
@@ -149,36 +159,55 @@ void main() {
         final second = src.createPort('second', PortDirection.inOut, width: 8);
         final receiver =
             dst.createPort('dataIn', PortDirection.inOut, width: 8);
+        final firstDrive = Logic(name: 'firstDrive', width: 8)
+          ..put(LogicValue.z, fill: true);
+        final secondDrive = Logic(name: 'secondDrive', width: 8)
+          ..put(LogicValue.z, fill: true);
+        first.port <= firstDrive;
+        second.port <= secondDrive;
         connectPorts(first, receiver,
             intermediateSignalName: 'sharedExact',
             allowIntermediateSignalNameUniquification: !firstStrict);
-        final connections = second.port.dstConnections.toSet();
 
-        if (!firstStrict) {
-          expect(
-              () => connectPorts(second, receiver,
-                  intermediateSignalName: 'sharedExact',
-                  allowIntermediateSignalNameUniquification: false),
-              throwsA(isA<RohdBridgeException>()));
-          expect(second.port.dstConnections.toSet(), connections);
-        } else {
+        for (var repeat = 0; repeat < 2; repeat++) {
           connectPorts(second, receiver,
               intermediateSignalName: 'sharedExact',
               allowIntermediateSignalNameUniquification: false);
         }
+        connectPorts(first, receiver, intermediateSignalName: 'sharedExact');
         connectPorts(second, receiver, intermediateSignalName: 'sharedExact');
 
         await top.build();
-        final intermediate = top.internalSignals
-            .singleWhere((signal) => signal.name == 'sharedExact');
-        expect(intermediate.naming,
-            firstStrict ? Naming.reserved : Naming.renameable);
-        expect(top.generateSynth(), isNot(contains('sharedExact_0')));
-        first.port.put(0xAB);
-        second.port.put(0xAB);
+        final intermediates =
+            top.internalSignals.where((signal) => signal.name == 'sharedExact');
+        expect(intermediates, hasLength(firstStrict ? 1 : 2));
+        expect(
+            intermediates.where((signal) => signal.naming == Naming.reserved),
+            hasLength(1));
+        expect(
+            intermediates.where((signal) => signal.naming == Naming.renameable),
+            hasLength(firstStrict ? 0 : 1));
+        expect(top.generateSynth(), contains('sharedExact'));
+        firstDrive.put(0xAB);
         expect(receiver.port.value.toInt(), 0xAB);
+        firstDrive.put(LogicValue.z, fill: true);
+        secondDrive.put(0xCD);
+        expect(receiver.port.value.toInt(), 0xCD);
+        firstDrive.put(0xAB);
+        expect(receiver.port.value.isValid, isFalse);
       });
     }
+
+    test('failed named connections are not recorded as completed', () {
+      final (:src, :dst, top: _) = _buildRig();
+      final driver = src.createPort('dataOut', PortDirection.output, width: 8);
+      final receiver = dst.createPort('dataIn', PortDirection.input, width: 4);
+      for (var repeat = 0; repeat < 2; repeat++) {
+        expect(
+            () => receiver.gets(driver, intermediateSignalName: 'wrongWidth'),
+            throwsException);
+      }
+    });
 
     for (final reservedFields in [false, true]) {
       for (final name in ['', 'invalid-name']) {
@@ -728,42 +757,113 @@ void main() {
       expect(dst.input('dataIn').value.toInt(), 0xAB);
     });
 
-    for (final driverSelection in ['', '[2:1]']) {
-      for (final receiverSelection in ['', '[2:1]']) {
-        test(
-            'array fan-in: driver=$driverSelection receiver=$receiverSelection',
-            () async {
+    for (final isNet in [false, true]) {
+      for (final selection in ['', '[2:1]', '[1][5:2]']) {
+        test('strict alias fan-out selection=$selection, net=$isNet', () async {
           final (:top, :src, :dst) = _buildRig();
-          dst.createArrayPort('dataIn', PortDirection.inOut,
-              dimensions: [if (receiverSelection.isEmpty) 2 else 4, 3],
-              elementWidth: 4,
-              numUnpackedDimensions: 1);
-          for (final name in ['first', 'second']) {
-            src.createArrayPort(name, PortDirection.inOut,
-                dimensions: [if (driverSelection.isEmpty) 2 else 4, 3],
-                elementWidth: 4,
-                numUnpackedDimensions: 1);
-            connectPorts(src.port('$name$driverSelection'),
-                dst.port('dataIn$receiverSelection'),
-                intermediateSignalName: 'sharedBus');
+          final isBits = selection == '[1][5:2]';
+          final driver = src.createArrayPort(
+              'data', isNet ? PortDirection.inOut : PortDirection.output,
+              dimensions: [4], elementWidth: 8, numUnpackedDimensions: 1);
+          final driverRef = src.port('data$selection');
+          for (final name in ['first', 'second', 'third']) {
+            final direction = isNet ? PortDirection.inOut : PortDirection.input;
+            final receiver = isBits
+                ? dst.createPort(name, direction, width: 4)
+                : dst.createArrayPort(name, direction,
+                    dimensions: [if (selection.isEmpty) 4 else 2],
+                    elementWidth: 8,
+                    numUnpackedDimensions: 1);
+            connectPorts(driverRef, receiver,
+                intermediateSignalName: 'sharedSelection',
+                allowIntermediateSignalNameUniquification: name == 'first');
+          }
+          for (final name in ['first', 'second', 'third']) {
+            connectPorts(driverRef, dst.port(name),
+                intermediateSignalName: 'sharedSelection');
+          }
+          if (isNet) {
+            connectPorts(driverRef, dst.port('first'),
+                intermediateSignalName: 'sharedSelection',
+                allowIntermediateSignalNameUniquification: false);
+          } else {
+            expect(
+                () => connectPorts(driverRef, dst.port('first'),
+                    intermediateSignalName: 'sharedSelection',
+                    allowIntermediateSignalNameUniquification: false),
+                throwsA(isA<RohdBridgeException>()));
           }
 
           await top.build();
-          expect(
-              top.internalSignals.where((signal) => signal.name == 'sharedBus'),
-              hasLength(1));
-          expect(top.generateSynth(), isNot(contains('sharedBus_0')));
-          src.inOut('first').put(0x123456);
-          final expected = driverSelection.isEmpty ? 0x123456 : 0x123;
-          final receiverStart = receiverSelection.isEmpty ? 0 : 12;
-          expect(
-              dst
-                  .inOut('dataIn')
-                  .value
-                  .getRange(receiverStart, receiverStart + 24)
-                  .toInt(),
-              expected);
+          final intermediates = top.internalSignals.where((signal) =>
+              signal.name == 'sharedSelection' &&
+              (isBits ? signal is! LogicStructure : signal is LogicArray));
+          expect(intermediates, hasLength(2));
+          expect(intermediates.map((signal) => signal.naming),
+              unorderedEquals([Naming.renameable, Naming.reserved]));
+          expect(top.generateSynth(), contains('sharedSelection'));
+          driver.port.put(0x12345678);
+          final expected = selection.isEmpty
+              ? 0x12345678
+              : isBits
+                  ? 5
+                  : 0x3456;
+          for (final name in ['first', 'second', 'third']) {
+            expect(dst.port(name).port.value.toInt(), expected);
+          }
         });
+      }
+    }
+
+    for (final driverSelection in ['', '[2:1]']) {
+      for (final receiverSelection in ['', '[2:1]']) {
+        for (final strictSecond in [false, true]) {
+          test(
+              'array fan-in: driver=$driverSelection '
+              'receiver=$receiverSelection '
+              'strictSecond=$strictSecond', () async {
+            final (:top, :src, :dst) = _buildRig();
+            dst.createArrayPort('dataIn', PortDirection.inOut,
+                dimensions: [if (receiverSelection.isEmpty) 2 else 4, 3],
+                elementWidth: 4,
+                numUnpackedDimensions: 1);
+            for (final name in ['first', 'second']) {
+              src.createArrayPort(name, PortDirection.inOut,
+                  dimensions: [if (driverSelection.isEmpty) 2 else 4, 3],
+                  elementWidth: 4,
+                  numUnpackedDimensions: 1);
+              connectPorts(src.port('$name$driverSelection'),
+                  dst.port('dataIn$receiverSelection'),
+                  intermediateSignalName: 'sharedBus',
+                  allowIntermediateSignalNameUniquification:
+                      name == 'first' || !strictSecond);
+            }
+            for (final name in ['first', 'second']) {
+              connectPorts(src.port('$name$driverSelection'),
+                  dst.port('dataIn$receiverSelection'),
+                  intermediateSignalName: 'sharedBus',
+                  allowIntermediateSignalNameUniquification:
+                      name == 'first' || !strictSecond);
+            }
+
+            await top.build();
+            expect(
+                top.internalSignals
+                    .where((signal) => signal.name == 'sharedBus'),
+                hasLength(strictSecond ? 2 : 1));
+            expect(top.generateSynth(), contains('sharedBus'));
+            src.inOut('first').put(0x123456);
+            final expected = driverSelection.isEmpty ? 0x123456 : 0x123;
+            final receiverStart = receiverSelection.isEmpty ? 0 : 12;
+            expect(
+                dst
+                    .inOut('dataIn')
+                    .value
+                    .getRange(receiverStart, receiverStart + 24)
+                    .toInt(),
+                expected);
+          });
+        }
       }
     }
 
