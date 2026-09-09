@@ -46,26 +46,36 @@ class StandardPortReference extends PortReference {
   @internal
   void getsInternal(PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType,
-      String? intermediateSignalName}) {
+      String? intermediateSignalName,
+      bool allowIntermediateSignalNameUniquification = true}) {
     if (other is StandardPortReference) {
-      final (receiver: receiver, driver: driver) = _relativeReceiverAndDriver(
-          other,
-          sameModuleConnectionType: sameModuleConnectionType);
+      final (receiver: receiver, driver: driver, isInternal: isInternal) =
+          _relativeReceiverAndDriver(other,
+              sameModuleConnectionType: sameModuleConnectionType);
       final effectiveDriver = _insertIntermediateSignalIfNeeded(
           driver, intermediateSignalName, other,
-          receiverValue: receiver);
+          driverRoot: driver,
+          receiverRoot: receiver,
+          isInternal: isInternal,
+          allowIntermediateSignalNameUniquification:
+              allowIntermediateSignalNameUniquification);
       if (!receiver.srcConnections.contains(effectiveDriver)) {
         receiver <= (effectiveDriver as Logic);
       }
     } else if (other is SlicePortReference) {
+      final (receiver: receiver, driver: driver, isInternal: isInternal) =
+          _relativeReceiverAndDriver(other,
+              sameModuleConnectionType: sameModuleConnectionType);
       final otherDriver = _insertIntermediateSignalIfNeeded(
           _relativeDriverSubset(other,
               sameModuleConnectionType: sameModuleConnectionType),
           intermediateSignalName,
-          other);
-      final receiver = _relativeReceiverAndDriver(other,
-              sameModuleConnectionType: sameModuleConnectionType)
-          .receiver;
+          other,
+          driverRoot: driver,
+          receiverRoot: receiver,
+          isInternal: isInternal,
+          allowIntermediateSignalNameUniquification:
+              allowIntermediateSignalNameUniquification);
 
       if (otherDriver is Logic) {
         receiver <= otherDriver;

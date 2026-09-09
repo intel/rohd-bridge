@@ -1350,10 +1350,33 @@ class BridgeModule extends Module with SystemVerilog {
 /// on the direct sibling-level segment or same-module connection. For a
 /// loopback it appears in the parent module; for a passthrough it appears
 /// inside the connected module. When connections with the same resolved name
-/// share a driver, or legally share a bidirectional receiver, the same
-/// intermediate signal is reused. Names may be uniquified on collision and
-/// are ignored for structured/array-typed drivers or vertical (parent/child)
-/// connections.
+/// share a driver, or legally share a bidirectional receiver with a compatible
+/// shape, the same intermediate signal is reused. Names may be uniquified on
+/// collision. Reuse is tracked for Bridge-created intermediates only; manually
+/// connected signals are not adopted based on their names.
+/// Whole arrays and structures preserve type and shape with the requested name,
+/// using [Logic.clone] except for strict base [LogicArray] construction.
+/// Regular array selections
+/// retain their selected dimensions and packed/unpacked layout; bit selections
+/// use packed intermediates. Structure names appear through their emitted field
+/// names. These intermediates do not change the existing representation of
+/// hierarchy ports, including flattened structures. The name is ignored for
+/// vertical (parent/child) connections.
+///
+/// [allowIntermediateSignalNameUniquification] defaults to `true`. Setting it
+/// to `false` reserves the resolved intermediate name, including a name taken
+/// from either path-name fallback. Incompatible reserved-name collisions fail
+/// during synthesis rather than being renamed. This flag is independent of
+/// path-port uniquification and has no effect when no intermediate is named.
+///
+/// A renameable cached intermediate cannot be upgraded to reserved naming;
+/// request strict naming on its first connection. Custom array clones must
+/// reserve their declaration name. Other custom structure clones must reserve
+/// each emitted field or array name, explicitly prefixed with the requested
+/// structure name and an underscore. Their concrete type is preserved; Bridge
+/// does not replace fields to change their naming policy. Unsupported clones
+/// and cache upgrades throw [RohdBridgeException] before connecting the
+/// intermediate. Hierarchy routes may already have been created by that point.
 void connectPorts(
   PortReference driver,
   PortReference receiver, {
@@ -1363,6 +1386,7 @@ void connectPorts(
   bool allowReceiverPathUniquification = true,
   SameModuleConnectionType? sameModuleConnectionType,
   String? intermediateSignalName,
+  bool allowIntermediateSignalNameUniquification = true,
 }) {
   if (driver.module.hasBuilt || receiver.module.hasBuilt) {
     throw RohdBridgeException('Cannot connect ports after build.');
@@ -1564,7 +1588,9 @@ void connectPorts(
 
   receiverPortRef.gets(driverPortRef,
       sameModuleConnectionType: sameModuleConnectionType,
-      intermediateSignalName: resolvedIntermediateSignalName);
+      intermediateSignalName: resolvedIntermediateSignalName,
+      allowIntermediateSignalNameUniquification:
+          allowIntermediateSignalNameUniquification);
 
   if (receiverInstance == commonParent &&
       driverPortRef.module != commonParent &&
