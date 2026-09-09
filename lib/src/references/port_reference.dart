@@ -78,10 +78,10 @@ typedef _IntermediateEndpoint = ({
 /// Multiple candidates preserve existing connections when a stricter naming
 /// request requires a separate alias.
 class _IntermediateSignals {
-  /// Source endpoints indexed for repeated connections and fan-out reuse.
+  /// Connected source candidates, even after a failed receiver attempt.
   final drivers = <_IntermediateEndpoint, Set<Logic>>{};
 
-  /// Destination endpoints indexed for compatible bidirectional fan-in reuse.
+  /// Completed receiver connections indexed for repeats and net fan-in reuse.
   final receivers = <_IntermediateEndpoint, Set<Logic>>{};
 }
 
@@ -487,23 +487,23 @@ sealed class PortReference extends Reference {
       }
     }
 
-    /// Defers endpoint registration until receiver assignment succeeds.
+    /// Records an available driver candidate and defers receiver registration.
     ///
-    /// Updating both indexes allows fan-out and fan-in to be interleaved.
-    ({
-      Logic driver,
-      bool alreadyConnected,
-      void Function()? onConnected
-    }) connection(Logic signal, {bool alreadyConnected = false}) => (
-          driver: signal,
-          alreadyConnected: alreadyConnected,
-          onConnected: alreadyConnected
-              ? null
-              : () {
-                  (driverRegistry.drivers[driverKey] ??= {}).add(signal);
-                  (receiverRegistry.receivers[receiverKey] ??= {}).add(signal);
-                },
-        );
+    /// A failed receiver assignment must not hide an already-connected driver
+    /// candidate, nor may it be treated as a completed connection on retry.
+    ({Logic driver, bool alreadyConnected, void Function()? onConnected})
+        connection(Logic signal, {bool alreadyConnected = false}) {
+      (driverRegistry.drivers[driverKey] ??= {}).add(signal);
+      return (
+        driver: signal,
+        alreadyConnected: alreadyConnected,
+        onConnected: alreadyConnected
+            ? null
+            : () {
+                (receiverRegistry.receivers[receiverKey] ??= {}).add(signal);
+              },
+      );
+    }
 
     final driverSignals =
         driverValue is Logic ? [driverValue] : driverValue as List<Logic>;
@@ -566,9 +566,7 @@ sealed class PortReference extends Reference {
 
     final driver = driverValue as Logic;
     final Logic net;
-    if (!allowIntermediateSignalNameUniquification &&
-        driver is LogicArray &&
-        driver.runtimeType == LogicArray) {
+    if (driver is LogicArray && driver.runtimeType == LogicArray) {
       final arrayBuilder = driver.isNet ? LogicArray.net : LogicArray.new;
       net = arrayBuilder(driver.dimensions, driver.elementWidth,
           numUnpackedDimensions: driver.numUnpackedDimensions,
@@ -594,8 +592,8 @@ sealed class PortReference extends Reference {
 
   /// Whether every independently emitted name in [signal] is reserved.
   ///
-  /// Arrays reserve their declaration name, while non-array structures emit
-  /// their fields separately. Those fields must explicitly reserve names
+  /// Strict naming requires a reserved array declaration name. Non-array
+  /// structures emit their fields separately and must explicitly reserve names
   /// prefixed with [structureName], since ROHD emits reserved names literally.
   static bool _hasReservedIntermediateNames(Logic signal,
           {String? structureName}) =>

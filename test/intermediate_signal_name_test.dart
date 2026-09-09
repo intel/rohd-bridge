@@ -36,6 +36,25 @@ class _Packet extends LogicStructure {
       _Packet(name: name ?? this.name, naming: _fieldNaming);
 }
 
+/// A custom structure with nested fields and a separate footer.
+class _Envelope extends LogicStructure {
+  /// The naming policy retained by nested fields on cloning.
+  final Naming _fieldNaming;
+
+  /// Creates a nested packet and an eight-bit footer.
+  _Envelope({String name = 'envelope', Naming naming = Naming.renameable})
+      : _fieldNaming = naming,
+        super([
+          _Packet(name: '${name}_packet', naming: naming),
+          Logic(name: '${name}_footer', width: 8, naming: naming),
+        ], name: name);
+
+  /// Preserves the nested representation and policy with the requested name.
+  @override
+  _Envelope clone({String? name}) =>
+      _Envelope(name: name ?? this.name, naming: _fieldNaming);
+}
+
 /// A structure whose reserved field name omits its aggregate's name.
 class _UnprefixedStructure extends LogicStructure {
   /// Creates a structure with a literal, unprefixed reserved field.
@@ -208,6 +227,121 @@ void main() {
             throwsException);
       }
     });
+
+    for (final kind in ['scalar', 'array', 'array slice']) {
+      for (final isNet in [false, true]) {
+        for (final strict in [false, true]) {
+          test('failed connection recovery: $kind, net=$isNet, strict=$strict',
+              () async {
+            final (:top, :src, :dst) = _buildRig();
+            final driverDirection =
+                isNet ? PortDirection.inOut : PortDirection.output;
+            final receiverDirection =
+                isNet ? PortDirection.inOut : PortDirection.input;
+            final driver = kind == 'scalar'
+                ? src.createPort('dataOut', driverDirection, width: 8)
+                : src.createArrayPort('dataOut', driverDirection,
+                    dimensions: [if (kind == 'array slice') 4 else 2],
+                    elementWidth: 4);
+            final selectedDriver =
+                kind == 'array slice' ? src.port('dataOut[3:2]') : driver;
+            final wrong = dst.createPort('wrong', receiverDirection, width: 4);
+            final correct = kind == 'scalar'
+                ? dst.createPort('correct', receiverDirection, width: 8)
+                : dst.createArrayPort('correct', receiverDirection,
+                    dimensions: [2], elementWidth: 4);
+
+            for (var repeat = 0; repeat < 2; repeat++) {
+              expect(
+                  () => wrong.gets(selectedDriver,
+                      intermediateSignalName: 'recovered',
+                      allowIntermediateSignalNameUniquification: !strict),
+                  throwsException);
+            }
+            correct
+              ..gets(selectedDriver,
+                  intermediateSignalName: 'recovered',
+                  allowIntermediateSignalNameUniquification: !strict)
+              ..gets(selectedDriver,
+                  intermediateSignalName: 'recovered',
+                  allowIntermediateSignalNameUniquification: !strict);
+            expect(
+                () => wrong.gets(selectedDriver,
+                    intermediateSignalName: 'recovered',
+                    allowIntermediateSignalNameUniquification: !strict),
+                throwsException);
+
+            await top.build();
+            final intermediates = top.internalSignals.where((signal) =>
+                signal.name == 'recovered' &&
+                (kind == 'scalar' || signal is LogicArray));
+            expect(intermediates, hasLength(1));
+            expect(top.generateSynth(),
+                matches(RegExp(r'\.correct\s*\(\s*recovered\s*\)')));
+            driver.port.put(kind == 'array slice' ? 0xAB00 : 0xAB);
+            expect(correct.port.value.toInt(), 0xAB);
+          });
+        }
+      }
+    }
+
+    for (final isNet in [false, true]) {
+      for (final unpacked in [0, 1, 2]) {
+        test('underscore array name, unpacked=$unpacked, net=$isNet', () async {
+          final (:top, :src, :dst) = _buildRig();
+          final driver = src.createArrayPort(
+              'dataOut', isNet ? PortDirection.inOut : PortDirection.output,
+              dimensions: [2, 3],
+              elementWidth: 4,
+              numUnpackedDimensions: unpacked);
+          final receiver = dst.createArrayPort(
+              'dataIn', isNet ? PortDirection.inOut : PortDirection.input,
+              dimensions: [2, 3],
+              elementWidth: 4,
+              numUnpackedDimensions: unpacked);
+          connectPorts(driver, receiver, intermediateSignalName: '_requested');
+          await top.build();
+          final intermediate = top.internalSignals
+              .whereType<LogicArray>()
+              .singleWhere((signal) => signal.name == '_requested');
+          expect(intermediate.naming, Naming.renameable);
+          expect(top.generateSynth(),
+              matches(RegExp(r'\.dataIn\s*\(\s*_requested\s*\)')));
+          driver.port.put(0xABCDEF);
+          expect(receiver.port.value.toInt(), 0xABCDEF);
+        });
+      }
+    }
+
+    for (final strict in [false, true]) {
+      test('nested structure clone, strict=$strict', () async {
+        final (:top, :src, :dst) = _buildRig();
+        final naming = strict ? Naming.reserved : Naming.renameable;
+        src.addTypedOutput('dataOut',
+            ({name = 'envelope'}) => _Envelope(name: name, naming: naming));
+        dst.addTypedInput('dataIn', _Envelope());
+        final driver = src.port('dataOut');
+        final receiver = dst.port('dataIn');
+        for (var repeat = 0; repeat < 2; repeat++) {
+          connectPorts(driver, receiver,
+              intermediateSignalName: 'namedEnvelope',
+              allowIntermediateSignalNameUniquification: !strict);
+        }
+        await top.build();
+        final intermediate = top.internalSignals
+            .whereType<_Envelope>()
+            .singleWhere((signal) => signal.name == 'namedEnvelope');
+        expect(intermediate.elements.first, isA<_Packet>());
+        expect(
+            intermediate.leafElements.every((field) => field.naming == naming),
+            isTrue);
+        final sv = top.generateSynth();
+        expect(sv, contains('namedEnvelope_packet_header'));
+        expect(sv, contains('namedEnvelope_footer'));
+        driver.port.put(0xABCD);
+        expect(receiver.port.value.toInt(), 0xABCD);
+      });
+    }
 
     for (final reservedFields in [false, true]) {
       for (final name in ['', 'invalid-name']) {
