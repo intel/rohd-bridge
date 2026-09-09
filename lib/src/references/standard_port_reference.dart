@@ -46,27 +46,43 @@ class StandardPortReference extends PortReference {
   @internal
   void getsInternal(PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType,
-      String? intermediateSignalName}) {
+      String? intermediateSignalName,
+      bool allowIntermediateSignalNameUniquification = true}) {
     if (other is StandardPortReference) {
-      final (receiver: receiver, driver: driver) = _relativeReceiverAndDriver(
-          other,
-          sameModuleConnectionType: sameModuleConnectionType);
-      final effectiveDriver = _insertIntermediateSignalIfNeeded(
+      final (receiver: receiver, driver: driver, isInternal: isInternal) =
+          _relativeReceiverAndDriver(other,
+              sameModuleConnectionType: sameModuleConnectionType);
+      final intermediate = _insertIntermediateSignalIfNeeded(
           driver, intermediateSignalName, other,
-          receiverValue: receiver);
-      if (!receiver.srcConnections.contains(effectiveDriver)) {
-        receiver <= (effectiveDriver as Logic);
+          driverRoot: driver,
+          receiverRoot: receiver,
+          isInternal: isInternal,
+          allowIntermediateSignalNameUniquification:
+              allowIntermediateSignalNameUniquification);
+      if (!intermediate.alreadyConnected &&
+          !receiver.srcConnections.contains(intermediate.driver)) {
+        receiver <= (intermediate.driver as Logic);
       }
+      intermediate.onConnected?.call();
     } else if (other is SlicePortReference) {
-      final otherDriver = _insertIntermediateSignalIfNeeded(
+      final (receiver: receiver, driver: driver, isInternal: isInternal) =
+          _relativeReceiverAndDriver(other,
+              sameModuleConnectionType: sameModuleConnectionType);
+      final intermediate = _insertIntermediateSignalIfNeeded(
           _relativeDriverSubset(other,
               sameModuleConnectionType: sameModuleConnectionType),
           intermediateSignalName,
-          other);
-      final receiver = _relativeReceiverAndDriver(other,
-              sameModuleConnectionType: sameModuleConnectionType)
-          .receiver;
+          other,
+          driverRoot: driver,
+          receiverRoot: receiver,
+          isInternal: isInternal,
+          allowIntermediateSignalNameUniquification:
+              allowIntermediateSignalNameUniquification);
 
+      if (intermediate.alreadyConnected) {
+        return;
+      }
+      final otherDriver = intermediate.driver;
       if (otherDriver is Logic) {
         receiver <= otherDriver;
       } else if (otherDriver is List<Logic>) {
@@ -79,6 +95,7 @@ class StandardPortReference extends PortReference {
       } else {
         throw RohdBridgeException('Invalid driver type $otherDriver');
       }
+      intermediate.onConnected?.call();
     } else {
       throw RohdBridgeException('Invalid driver type $other');
     }

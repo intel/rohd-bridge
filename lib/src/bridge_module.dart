@@ -1350,10 +1350,36 @@ class BridgeModule extends Module with SystemVerilog {
 /// on the direct sibling-level segment or same-module connection. For a
 /// loopback it appears in the parent module; for a passthrough it appears
 /// inside the connected module. When connections with the same resolved name
-/// share a driver, or legally share a bidirectional receiver, the same
-/// intermediate signal is reused. Names may be uniquified on collision and
-/// are ignored for structured/array-typed drivers or vertical (parent/child)
-/// connections.
+/// share a driver, or legally share a bidirectional receiver with a compatible
+/// shape and naming policy, an existing intermediate is reused. Names may be
+/// uniquified on collision. Only Bridge-created intermediates are tracked for
+/// reuse; manually connected signals are not adopted by name. Whole arrays and
+/// structures preserve type and shape with the requested name. Custom
+/// aggregates use their [Logic.clone] contract. Regular array selections retain
+/// their dimensions and packed/unpacked layout; bit selections use packed
+/// intermediates. Structure names appear
+/// through their emitted field names. These intermediates do not change the
+/// existing representation of hierarchy ports, including flattened structures.
+/// The name is ignored for vertical (parent/child) connections.
+///
+/// [allowIntermediateSignalNameUniquification] defaults to `true`. Setting it
+/// to `false` reserves the resolved intermediate name, including a name taken
+/// from either path-name fallback. Incompatible reserved-name collisions fail
+/// during synthesis rather than being renamed. This flag is independent of
+/// path-port uniquification and has no effect when no intermediate is named.
+/// Allowing uniquification does not weaken an existing or custom clone's
+/// reserved naming policy.
+///
+/// A stricter naming request can create a separate alias for a new fan-out
+/// receiver or a bidirectional net without changing existing intermediates.
+/// An already-connected non-net receiver cannot be rewired this way.
+/// In strict mode, custom structure clones must reserve each emitted field or
+/// array name with the requested structure name and an underscore as a prefix.
+/// Bridge preserves the concrete type and does not replace fields to change
+/// their naming policy or extend ROHD's synthesis support for that type.
+/// Unsupported clones and attempts to rewire non-net receivers throw
+/// [RohdBridgeException] before connecting the intermediate. Hierarchy routes
+/// may already have been created by that point.
 void connectPorts(
   PortReference driver,
   PortReference receiver, {
@@ -1363,6 +1389,7 @@ void connectPorts(
   bool allowReceiverPathUniquification = true,
   SameModuleConnectionType? sameModuleConnectionType,
   String? intermediateSignalName,
+  bool allowIntermediateSignalNameUniquification = true,
 }) {
   if (driver.module.hasBuilt || receiver.module.hasBuilt) {
     throw RohdBridgeException('Cannot connect ports after build.');
@@ -1564,7 +1591,9 @@ void connectPorts(
 
   receiverPortRef.gets(driverPortRef,
       sameModuleConnectionType: sameModuleConnectionType,
-      intermediateSignalName: resolvedIntermediateSignalName);
+      intermediateSignalName: resolvedIntermediateSignalName,
+      allowIntermediateSignalNameUniquification:
+          allowIntermediateSignalNameUniquification);
 
   if (receiverInstance == commonParent &&
       driverPortRef.module != commonParent &&
