@@ -41,10 +41,48 @@ enum SameModuleConnectionType {
 
 /// An enumeration of the possible relative locations of two ports' modules.
 enum _RelativePortLocation {
+  /// This reference belongs to the parent of the other reference's module.
   thisAboveOther,
+
+  /// The other reference belongs to the parent of this reference's module.
   otherAboveThis,
+
+  /// The references belong to distinct modules with the same parent.
   sameLevel,
+
+  /// Both references belong to the same module.
   sameModule,
+}
+
+/// Identifies an endpoint and requested name for intermediate signal reuse.
+///
+/// `port` is the physical root port, while `side` is its resolved internal or
+/// external signal. `lower` and `upper` are inclusive flattened bit offsets.
+/// `arrayRank` distinguishes whole arrays from subarrays covering the same
+/// bits. `isInternal` separates internal and external connection scopes even
+/// when both sides use the same signal object, as with output ports.
+typedef _IntermediateEndpoint = ({
+  Logic port,
+  Logic side,
+  int lower,
+  int upper,
+  int arrayRank,
+  String name,
+  bool isInternal,
+});
+
+/// Named intermediates recorded for endpoints on a single [BridgeModule].
+///
+/// Only Bridge-created signals are indexed; existing connections are not
+/// searched for manually created signals with matching names.
+/// Multiple candidates preserve existing connections when a stricter naming
+/// request requires a separate alias.
+class _IntermediateSignals {
+  /// Connected source candidates, even after a failed receiver attempt.
+  final drivers = <_IntermediateEndpoint, Set<Logic>>{};
+
+  /// Completed receiver connections indexed for repeats and net fan-in reuse.
+  final receivers = <_IntermediateEndpoint, Set<Logic>>{};
 }
 
 /// A [Reference] to a port on a [BridgeModule].
@@ -69,6 +107,7 @@ sealed class PortReference extends Reference {
   /// The direction of the port (input, output, or inOut).
   late final PortDirection direction = PortDirection.ofPort(port);
 
+  /// Creates a reference to [portName] on the given module.
   PortReference._(super.module, this.portName);
 
   /// Validates that this reference resolves to an existing port and subset.
@@ -175,9 +214,18 @@ sealed class PortReference extends Reference {
   /// name is inserted on sibling-level and same-module connections. See
   /// [_insertIntermediateSignalIfNeeded] for details on when the name is
   /// applied and when it is silently ignored.
+  ///
+  /// Set [allowIntermediateSignalNameUniquification] to `false` to reserve the
+  /// exact name. Incompatible reserved-name collisions fail during synthesis.
+  /// This has no effect when no intermediate name is applied. An incompatible
+  /// cached intermediate is left intact; new fan-out receivers and net fan-in
+  /// can use a separate strict alias. Replacing an already-connected non-net
+  /// receiver's intermediate or using an unsupported custom clone throws
+  /// [RohdBridgeException]. See [connectPorts] for aggregate restrictions.
   void gets(PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType,
-      String? intermediateSignalName}) {
+      String? intermediateSignalName,
+      bool allowIntermediateSignalNameUniquification = true}) {
     final relativeLocation = _relativeLocationOf(other);
 
     if (relativeLocation == _RelativePortLocation.sameModule) {
@@ -278,7 +326,9 @@ sealed class PortReference extends Reference {
 
     getsInternal(other,
         sameModuleConnectionType: resolvedConnectionType,
-        intermediateSignalName: intermediateSignalName);
+        intermediateSignalName: intermediateSignalName,
+        allowIntermediateSignalNameUniquification:
+            allowIntermediateSignalNameUniquification);
   }
 
   /// Validates and resolves the [SameModuleConnectionType] for a same-module
@@ -359,72 +409,257 @@ sealed class PortReference extends Reference {
   @internal
   void getsInternal(PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType,
-      String? intermediateSignalName});
+      String? intermediateSignalName,
+      bool allowIntermediateSignalNameUniquification = true});
 
-  /// Returns the value that should drive the receiver for a connection sourced
-  /// from [driverValue], inserting a named intermediate signal when requested.
+  /// Inserts or reuses a named intermediate for sibling or same-module
+  /// connections, returning [driverValue] as the driver when none is needed.
+  /// The `alreadyConnected` result skips assignment on repeated connections.
+  /// Call `onConnected`, if provided, after successfully assigning the driver.
   ///
-  /// When [intermediateSignalName] is provided and this is a sibling-level or
-  /// same-module connection whose [driverValue] is a simple (non-array)
-  /// [Logic], this creates a [Naming.renameable] intermediate signal (a
-  /// [LogicNet] for bidirectional connections, otherwise a [Logic]) driven by
-  /// [driverValue] and returns it, so the requested name appears in the
-  /// generated SystemVerilog. The width of the signal matches [driverValue],
-  /// which for a sliced driver is the width of the slice.
+  /// Preserves aggregate shape and custom clone types; bit selections use
+  /// packed signals. Setting [allowIntermediateSignalNameUniquification] to
+  /// `false` requires reserved emitted names. See [gets] for restrictions.
   ///
-  /// If a signal with the same name already exists on the same [driverValue]
-  /// (fan-out), it is reused so multiple receivers share a single signal. A
-  /// named [LogicNet] already connected to [receiverValue] is also reused for
-  /// legal fan-in connections.
+  /// Reuses only Bridge-created intermediates, matching endpoints and requested
+  /// names for fan-out and compatible bidirectional fan-in.
   ///
-  /// For cases that cannot be cleanly represented by a single named signal
-  /// (structured/array or list-typed drivers, or vertical connections),
-  /// [driverValue] is returned unchanged and the connection remains unnamed.
-  dynamic _insertIntermediateSignalIfNeeded(
+  /// [driverRoot] and [receiverRoot] are the resolved port-side signals before
+  /// slicing. [isInternal] keeps internal and external connections separate.
+  ({
+    dynamic driver,
+    bool alreadyConnected,
+    void Function()? onConnected
+  }) _insertIntermediateSignalIfNeeded(
       dynamic driverValue, String? intermediateSignalName, PortReference other,
-      {Logic? receiverValue}) {
+      {required Logic driverRoot,
+      required Logic receiverRoot,
+      required bool isInternal,
+      required bool allowIntermediateSignalNameUniquification}) {
     final relativeLocation = _relativeLocationOf(other);
     final supportsIntermediateSignal =
         relativeLocation == _RelativePortLocation.sameLevel ||
             relativeLocation == _RelativePortLocation.sameModule;
 
-    if (intermediateSignalName == null ||
-        driverValue is! Logic ||
-        driverValue is LogicArray ||
-        driverValue is LogicStructure ||
-        !supportsIntermediateSignal) {
-      return driverValue;
+    if (intermediateSignalName == null || !supportsIntermediateSignal) {
+      return (driver: driverValue, alreadyConnected: false, onConnected: null);
     }
 
-    // Fan-out: reuse an existing net with this name already driven by the same
-    // driver, so multiple receivers can share a single net.
-    final existingNet = driverValue.dstConnections
-        .firstWhereOrNull((s) => !s.isPort && s.name == intermediateSignalName);
-    if (existingNet != null) {
-      return existingNet;
+    final driverSlice =
+        driverValue is List<Logic> && other is SlicePortReference
+            ? other
+            : null;
+    if (driverValue is! Logic && driverSlice?.subsetDimensions == null) {
+      return (driver: driverValue, alreadyConnected: false, onConnected: null);
     }
 
-    final existingReceiverNet = receiverValue?.srcConnections.firstWhereOrNull(
-        (signal) =>
-            signal is LogicNet &&
-            signal.name == intermediateSignalName &&
-            signal.width == driverValue.width);
-    if (existingReceiverNet != null && driverValue.isNet) {
-      existingReceiverNet <= driverValue;
-      return existingReceiverNet;
+    final naming = allowIntermediateSignalNameUniquification
+        ? Naming.renameable
+        : Naming.reserved;
+    Naming.validatedName(intermediateSignalName,
+        reserveName: !allowIntermediateSignalNameUniquification);
+
+    final driverRegistry =
+        _intermediateSignals[other.module] ??= _IntermediateSignals();
+    final receiverRegistry =
+        _intermediateSignals[module] ??= _IntermediateSignals();
+    final driverKey = other._intermediateEndpoint(
+        driverRoot, intermediateSignalName,
+        isInternal: isInternal);
+    final receiverKey = _intermediateEndpoint(
+        receiverRoot, intermediateSignalName,
+        isInternal: isInternal);
+
+    /// Whether [signal] satisfies the requested naming policy for reuse.
+    bool matchesName(Logic signal) =>
+        allowIntermediateSignalNameUniquification ||
+        (signal.name == intermediateSignalName &&
+            _hasReservedIntermediateNames(signal));
+
+    /// Rejects unsupported custom clones before connecting or recording.
+    void validateName(Logic signal) {
+      if (!matchesName(signal)) {
+        throw RohdBridgeException(
+            'Intermediate signal $intermediateSignalName must retain its exact '
+            'name and reserve its emitted names, including the structure name '
+            'prefix on fields. The custom clone does not support strict '
+            'naming.');
+      }
     }
 
-    final net = (driverValue.isNet || port.isNet)
-        ? LogicNet(
-            name: intermediateSignalName,
-            width: driverValue.width,
-            naming: Naming.renameable)
-        : Logic(
-            name: intermediateSignalName,
-            width: driverValue.width,
-            naming: Naming.renameable);
-    net <= driverValue;
-    return net;
+    /// Records an available driver candidate and defers receiver registration.
+    ///
+    /// A failed receiver assignment must not hide an already-connected driver
+    /// candidate, nor may it be treated as a completed connection on retry.
+    ({Logic driver, bool alreadyConnected, void Function()? onConnected})
+        connection(Logic signal, {bool alreadyConnected = false}) {
+      (driverRegistry.drivers[driverKey] ??= {}).add(signal);
+      return (
+        driver: signal,
+        alreadyConnected: alreadyConnected,
+        onConnected: alreadyConnected
+            ? null
+            : () {
+                (receiverRegistry.receivers[receiverKey] ??= {}).add(signal);
+              },
+      );
+    }
+
+    final driverSignals =
+        driverValue is Logic ? [driverValue] : driverValue as List<Logic>;
+    final existingDriverNets = driverRegistry.drivers[driverKey] ?? <Logic>{};
+    final existingReceiverNets =
+        receiverRegistry.receivers[receiverKey] ?? <Logic>{};
+    final sharedNets = existingDriverNets.where(existingReceiverNets.contains);
+    for (final existingNet in sharedNets) {
+      if (matchesName(existingNet)) {
+        return connection(existingNet, alreadyConnected: true);
+      }
+    }
+    if (sharedNets.any((signal) => !signal.isNet)) {
+      throw RohdBridgeException(
+          'Cannot replace the existing intermediate $intermediateSignalName '
+          'on an already-connected non-net receiver with a strict alias.');
+    }
+
+    for (final existingNet in existingDriverNets) {
+      if (matchesName(existingNet)) {
+        return connection(existingNet);
+      }
+    }
+
+    for (final existingReceiverNet in existingReceiverNets) {
+      if (matchesName(existingReceiverNet) &&
+          existingReceiverNet.isNet &&
+          driverSignals.every((signal) => signal.isNet) &&
+          (driverValue is Logic
+              ? _sameIntermediateShape(existingReceiverNet, driverValue)
+              : existingReceiverNet is LogicArray &&
+                  const ListEquality<int>().equals(
+                      existingReceiverNet.dimensions,
+                      driverSlice!.subsetDimensions) &&
+                  existingReceiverNet.elementWidth ==
+                      driverSlice.subsetElementWidth &&
+                  existingReceiverNet.numUnpackedDimensions ==
+                      driverSlice.subsetNumUnpackedDimensions)) {
+        if (driverValue is Logic) {
+          existingReceiverNet <= driverValue;
+        } else {
+          existingReceiverNet.assignSubset(driverSignals);
+        }
+        return connection(existingReceiverNet);
+      }
+    }
+
+    if (driverSlice != null) {
+      final arrayBuilder =
+          driverSignals.any((signal) => signal.isNet) || port.isNet
+              ? LogicArray.net
+              : LogicArray.new;
+      return connection(arrayBuilder(
+          driverSlice.subsetDimensions!, driverSlice.subsetElementWidth,
+          numUnpackedDimensions: driverSlice.subsetNumUnpackedDimensions!,
+          name: intermediateSignalName,
+          naming: naming)
+        ..assignSubset(driverSignals));
+    }
+
+    final driver = driverValue as Logic;
+    final Logic net;
+    if (driver is LogicArray && driver.runtimeType == LogicArray) {
+      final arrayBuilder = driver.isNet ? LogicArray.net : LogicArray.new;
+      net = arrayBuilder(driver.dimensions, driver.elementWidth,
+          numUnpackedDimensions: driver.numUnpackedDimensions,
+          name: intermediateSignalName,
+          naming: naming);
+    } else {
+      net = driver is LogicStructure
+          ? driver.clone(name: intermediateSignalName)
+          : (driver.isNet || port.isNet)
+              ? LogicNet(
+                  name: intermediateSignalName,
+                  width: driver.width,
+                  naming: naming)
+              : Logic(
+                  name: intermediateSignalName,
+                  width: driver.width,
+                  naming: naming);
+    }
+    validateName(net);
+    net <= driver;
+    return connection(net);
+  }
+
+  /// Whether every independently emitted name in [signal] is reserved.
+  ///
+  /// Strict naming requires a reserved array declaration name. Non-array
+  /// structures emit their fields separately and must explicitly reserve names
+  /// prefixed with [structureName], since ROHD emits reserved names literally.
+  static bool _hasReservedIntermediateNames(Logic signal,
+          {String? structureName}) =>
+      signal is LogicStructure && signal is! LogicArray
+          ? signal.elements.isNotEmpty &&
+              signal.elements.every((field) => _hasReservedIntermediateNames(
+                  field,
+                  structureName: structureName ?? signal.name))
+          : signal.naming == Naming.reserved &&
+              (structureName == null ||
+                  signal.name.startsWith('${structureName}_'));
+
+  /// Registries weakly associated with their endpoint modules.
+  ///
+  /// The [Expando] does not keep a module alive solely to retain its registry.
+  static final _intermediateSignals = Expando<_IntermediateSignals>();
+
+  /// Builds a key from this reference's normalized selection and port [side].
+  ///
+  /// Equivalent reference objects share a key, while different [name] requests,
+  /// array ranks, and [isInternal] scopes remain distinct.
+  _IntermediateEndpoint _intermediateEndpoint(Logic side, String name,
+      {required bool isInternal}) {
+    final reference = this;
+    final arrayRank = reference is SlicePortReference
+        ? reference.subsetDimensions?.length ?? 0
+        : port is LogicArray
+            ? (port as LogicArray).dimensions.length
+            : 0;
+    return (
+      port: port,
+      side: side,
+      lower: _flatRange.lower,
+      upper: _flatRange.upper,
+      arrayRank: arrayRank,
+      name: name,
+      isInternal: isInternal,
+    );
+  }
+
+  /// Whether two signals have compatible representations for fan-in reuse.
+  ///
+  /// Arrays must match dimensions, element width, and packed/unpacked layout.
+  /// Other structures must match concrete type and recursive element shapes.
+  /// Scalar signals need only match width; net eligibility is checked by the
+  /// caller, and signal names and existing connections are not compared here.
+  static bool _sameIntermediateShape(Logic first, Logic second) {
+    if (first.width != second.width) {
+      return false;
+    }
+    if (first is LogicArray && second is LogicArray) {
+      return const ListEquality<int>()
+              .equals(first.dimensions, second.dimensions) &&
+          first.elementWidth == second.elementWidth &&
+          first.numUnpackedDimensions == second.numUnpackedDimensions;
+    }
+    if (first is LogicStructure || second is LogicStructure) {
+      return first is LogicStructure &&
+          second is LogicStructure &&
+          first.runtimeType == second.runtimeType &&
+          first.elements.length == second.elements.length &&
+          Iterable<int>.generate(first.elements.length).every((index) =>
+              _sameIntermediateShape(
+                  first.elements[index], second.elements[index]));
+    }
+    return true;
   }
 
   /// Connects this port to be driven by a [Logic] [other].
@@ -548,9 +783,13 @@ sealed class PortReference extends Reference {
   ///
   /// It is assumed that [other] is driving `this` (part of a call to [gets]).
   ///
+  /// The returned `isInternal` flag identifies same-module connections using
+  /// internal-facing ports. Intermediate naming is disabled for vertical
+  /// connections, for which this flag is `false`.
+  ///
   /// When [sameModuleConnectionType] is provided for same-module connections,
   /// it overrides the default internal/external port selection.
-  ({Logic receiver, Logic driver}) _relativeReceiverAndDriver(
+  ({Logic receiver, Logic driver, bool isInternal}) _relativeReceiverAndDriver(
       PortReference other,
       {SameModuleConnectionType? sameModuleConnectionType}) {
     final loc = _relativeLocationOf(other);
@@ -559,10 +798,18 @@ sealed class PortReference extends Reference {
       case _RelativePortLocation.sameModule:
         // When an explicit connection type is provided, use it directly.
         if (sameModuleConnectionType == SameModuleConnectionType.loopback) {
-          return (driver: other._externalPort, receiver: _externalPort);
+          return (
+            driver: other._externalPort,
+            receiver: _externalPort,
+            isInternal: false
+          );
         } else if (sameModuleConnectionType ==
             SameModuleConnectionType.passthrough) {
-          return (driver: other._internalPort, receiver: _internalPort);
+          return (
+            driver: other._internalPort,
+            receiver: _internalPort,
+            isInternal: true
+          );
         }
 
         final includesOneIntfPortRef =
@@ -577,18 +824,34 @@ sealed class PortReference extends Reference {
             case PortDirection.input || PortDirection.inOut:
               if (other is InterfacePortReference) {
                 // this is the external side connection
-                return (receiver: _externalPort, driver: other._externalPort);
+                return (
+                  receiver: _externalPort,
+                  driver: other._externalPort,
+                  isInternal: false
+                );
               } else {
                 // this is the internal side connection
-                return (receiver: _internalPort, driver: other._internalPort);
+                return (
+                  receiver: _internalPort,
+                  driver: other._internalPort,
+                  isInternal: true
+                );
               }
             case PortDirection.output:
               if (other is InterfacePortReference) {
                 // this is the internal side connection
-                return (receiver: _internalPort, driver: other._internalPort);
+                return (
+                  receiver: _internalPort,
+                  driver: other._internalPort,
+                  isInternal: true
+                );
               } else {
                 // this is the external side connection
-                return (receiver: _externalPort, driver: other._externalPort);
+                return (
+                  receiver: _externalPort,
+                  driver: other._externalPort,
+                  isInternal: false
+                );
               }
           }
         }
@@ -596,17 +859,37 @@ sealed class PortReference extends Reference {
         if (direction == PortDirection.input &&
             other.direction == PortDirection.output) {
           // loop-back
-          return (driver: other._externalPort, receiver: _externalPort);
+          return (
+            driver: other._externalPort,
+            receiver: _externalPort,
+            isInternal: false
+          );
         } else {
-          return (driver: other._internalPort, receiver: _internalPort);
+          return (
+            driver: other._internalPort,
+            receiver: _internalPort,
+            isInternal: true
+          );
         }
 
       case _RelativePortLocation.sameLevel:
-        return (driver: other._externalPort, receiver: _externalPort);
+        return (
+          driver: other._externalPort,
+          receiver: _externalPort,
+          isInternal: false
+        );
       case _RelativePortLocation.thisAboveOther:
-        return (driver: other._externalPort, receiver: _internalPort);
+        return (
+          driver: other._externalPort,
+          receiver: _internalPort,
+          isInternal: false
+        );
       case _RelativePortLocation.otherAboveThis:
-        return (driver: other._internalPort, receiver: _externalPort);
+        return (
+          driver: other._internalPort,
+          receiver: _externalPort,
+          isInternal: false
+        );
     }
   }
 
