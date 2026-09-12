@@ -1,6 +1,6 @@
 ## 0.2.5
 
-- Added `hierarchyTree` to pretty-print module hierarchy from a given module down (<https://github.com/intel/rohd-bridge/issues/5>).
+- Added `hierarchyTree` to pretty-print module hierarchy from a given module down (<https://github.com/intel/rohd-bridge/pull/69>).
 
 ## 0.2.4
 
