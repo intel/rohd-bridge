@@ -10,6 +10,7 @@
 //   Shankar Sharma <shankar.sharma@intel.com>
 //   Suhas Virmani <suhas.virmani@intel.com>
 //   Max Korbel <max.korbel@intel.com>
+//   KayanoLiam <Kayano04@outlook.jp>
 
 import 'package:rohd/rohd.dart';
 import 'package:rohd_bridge/rohd_bridge.dart';
@@ -95,6 +96,78 @@ extension RohdBridgeModuleExtensions on Module {
 
   /// Provides a full hierarchical name based on [hierarchy].
   String get hierarchicalName => hierarchy().map((e) => e.name).join('.');
+
+  /// Returns a pretty-printed [String] of the hierarchy from this [Module]
+  /// down.
+  ///
+  /// Each line is an instance [name]. If [definitionName] differs from [name],
+  /// it is shown in parentheses. For [BridgeModule]s, only [BridgeModule]
+  /// children are included so the constructed design is shown both before and
+  /// after [Module.build].
+  ///
+  /// ```dart
+  /// final top = BridgeModule('top')
+  ///   ..addSubModule(
+  ///     BridgeModule('east')..addSubModule(BridgeModule('leaf')),
+  ///   )
+  ///   ..addSubModule(BridgeModule('west'));
+  /// print(top.hierarchyTree());
+  /// ```
+  ///
+  /// The example above produces:
+  ///
+  /// ```text
+  /// top
+  /// ├── east
+  /// │   └── leaf
+  /// └── west
+  /// ```
+  String hierarchyTree() {
+    final buffer = StringBuffer(_hierarchyTreeLabel);
+    final children = _hierarchyTreeChildren.toList(growable: false);
+    for (var i = 0; i < children.length; i++) {
+      buffer.writeln();
+      children[i]._writeHierarchyTree(
+        buffer,
+        prefix: '',
+        isLast: i == children.length - 1,
+      );
+    }
+    return buffer.toString();
+  }
+
+  /// Children included in [hierarchyTree].
+  Iterable<Module> get _hierarchyTreeChildren => switch (this) {
+        final BridgeModule bridgeModule => bridgeModule.subBridgeModules,
+        _ => subModules,
+      };
+
+  /// Instance label for [hierarchyTree], with [definitionName] when it differs.
+  String get _hierarchyTreeLabel =>
+      name == definitionName ? name : '$name ($definitionName)';
+
+  /// Writes this module as a tree node under [prefix] into [buffer].
+  void _writeHierarchyTree(
+    StringBuffer buffer, {
+    required String prefix,
+    required bool isLast,
+  }) {
+    buffer
+      ..write(prefix)
+      ..write(isLast ? '└── ' : '├── ')
+      ..write(_hierarchyTreeLabel);
+
+    final children = _hierarchyTreeChildren.toList(growable: false);
+    final childPrefix = '$prefix${isLast ? '    ' : '│   '}';
+    for (var i = 0; i < children.length; i++) {
+      buffer.writeln();
+      children[i]._writeHierarchyTree(
+        buffer,
+        prefix: childPrefix,
+        isLast: i == children.length - 1,
+      );
+    }
+  }
 
   /// Returns a list of instances between calling module `this` and the provided
   /// [instance], where the first element is `this` and the last element is

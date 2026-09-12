@@ -174,6 +174,9 @@ myTop.findSubModules(RegExp('myUpperMid/.*/?myLeaf$'));
 
 // Find one matching module, with an exception if more than 1 matches.
 myTop.findSubModule('myLeaf');
+
+// Pretty-print the constructed hierarchy from a module down
+print(myTop.hierarchyTree());
 ```
 
 #### Port and Interface References

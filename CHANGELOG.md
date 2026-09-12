@@ -1,3 +1,7 @@
+## 0.2.5
+
+- Added `hierarchyTree` to pretty-print module hierarchy from a given module down (<https://github.com/intel/rohd-bridge/pull/69>).
+
 ## 0.2.4
 
 - Added `allowIntermediateSignalNameUniquification` to `connectPorts` and port-reference connections, defaulting to `true`. Setting it to `false` reserves the resolved intermediate name. Stricter requests can create separate aliases for new fan-out receivers and bidirectional nets while preserving existing connections; unsupported custom clones and rewiring already-connected non-net receivers are rejected (<https://github.com/intel/rohd-bridge/pull/68>).
