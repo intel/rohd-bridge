@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Intel Corporation
+// Copyright (C) 2024-2026 Intel Corporation
 // SPDX-License-Identifier: BSD-3-Clause
 //
 // interfaces_exclude_test.dart
@@ -247,6 +247,54 @@ void main() {
 
     expect(top.interface('intf1').interface,
         isNot(equals(leaf.interface('intf1').interface)));
+  });
+
+  test('punchUpTo with exclusions and portUniquify', () async {
+    final top = BridgeModule('top');
+    final leaf = LM1();
+    top.addSubModule(leaf);
+
+    final ref = leaf.interface('intf1').punchUpTo(
+          top,
+          exceptPorts: {'fp', 'fc'},
+          portUniquify: (logical) => 'custom_$logical',
+        );
+
+    expect(ref.interface.ports.keys, unorderedEquals(['apple', 'orange']));
+    expect(top.inputs.keys, contains('custom_apple'));
+    expect(top.outputs.keys, contains('custom_orange'));
+    expect(top.hasPortWithSubstring('fc'), isFalse);
+    expect(top.hasPortWithSubstring('fp'), isFalse);
+
+    await top.build();
+    top.input('custom_apple').put(0xa);
+    leaf.output('orange').put(0x5);
+    expect(leaf.input('apple').value.toInt(), 0xa);
+    expect(top.output('custom_orange').value.toInt(), 0x5);
+  });
+
+  test('punchDownTo with exclusions and portUniquify', () async {
+    final top = LM1();
+    final leaf = BridgeModule('leaf');
+    top.addSubModule(leaf);
+
+    final ref = top.interface('intf1').punchDownTo(
+          leaf,
+          exceptPorts: {'fp', 'fc'},
+          portUniquify: (logical) => 'custom_$logical',
+        );
+
+    expect(ref.interface.ports.keys, unorderedEquals(['apple', 'orange']));
+    expect(leaf.inputs.keys, contains('custom_apple'));
+    expect(leaf.outputs.keys, contains('custom_orange'));
+    expect(leaf.hasPortWithSubstring('fc'), isFalse);
+    expect(leaf.hasPortWithSubstring('fp'), isFalse);
+
+    await top.build();
+    top.input('apple').put(0xa);
+    leaf.output('custom_orange').put(0x5);
+    expect(leaf.input('custom_apple').value.toInt(), 0xa);
+    expect(top.output('orange').value.toInt(), 0x5);
   });
 
   test('connectUpTo with exceptPorts', () async {

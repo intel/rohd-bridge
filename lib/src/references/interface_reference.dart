@@ -277,8 +277,10 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// - [portUniquify]: Function to generate unique port names
   ///
   /// If [exceptPorts] is provided, the resulting interface will exclude those
-  /// ports (and thus not be of the same type). Otherwise, the new interface
-  /// will be of the same type as this one.
+  /// ports (and thus not be of the same type). Legacy `PairInterface.modify`
+  /// callbacks are not copied to the resulting interface; use [portUniquify]
+  /// to name its module ports instead. Otherwise, the new interface will be of
+  /// the same type as this one.
   InterfaceReference punchUpTo(
     BridgeModule newModule, {
     String? newIntfName,
@@ -515,6 +517,10 @@ class InterfaceReference<InterfaceType extends PairInterface>
   ///
   /// This operation is intended for passing interfaces down the module
   /// hierarchy.
+  ///
+  /// When [exceptPorts] is provided, legacy `PairInterface.modify` callbacks
+  /// are not copied to the resulting interface; use [portUniquify] to name its
+  /// module ports instead.
   ///
   /// The [subModule] must be a child of this interface's [module].
   InterfaceReference punchDownTo(
@@ -785,11 +791,6 @@ extension _ExceptPairInterfaceExtensions on PairInterface {
       commonInOutPorts: _getMatchPortsExcept(PairDirection.commonInOuts,
               exceptPorts: exceptPorts)
           .toList(),
-
-      // since we're not actually cloning, just clone all we can, including
-      // deprecated APIs.
-      // ignore: deprecated_member_use
-      modify: modify,
     );
   }
 

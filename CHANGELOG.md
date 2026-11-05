@@ -1,3 +1,9 @@
+## Unreleased
+
+- Partial interface clones created with `exceptPorts` no longer propagate the
+  deprecated `PairInterface.modify` callback. Use `portUniquify` on
+  `punchUpTo`, `punchDownTo`, or `pullUpInterface` to name module ports instead.
+
 ## 0.2.4
 
 - Added `allowIntermediateSignalNameUniquification` to `connectPorts` and port-reference connections, defaulting to `true`. Setting it to `false` reserves the resolved intermediate name. Stricter requests can create separate aliases for new fan-out receivers and bidirectional nets while preserving existing connections; unsupported custom clones and rewiring already-connected non-net receivers are rejected (<https://github.com/intel/rohd-bridge/pull/68>).
