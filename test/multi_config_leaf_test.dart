@@ -58,7 +58,7 @@ void main() {
     final mod = TopModule();
     await mod.build();
 
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
 
     expect(sv, contains('module MyLeaf '));
     expect(sv, isNot(contains('module MyLeaf_0 ')));
@@ -76,7 +76,7 @@ void main() {
     final mod = TopModule(svLeaves: true);
     await mod.build();
 
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
 
     expect(sv, isNot(contains('module MyLeaf ')));
 

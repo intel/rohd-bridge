@@ -153,7 +153,7 @@ void main() {
     expect(mod.outputs['portB']!.width, equals(6));
 
     await mod.build();
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
     expect(sv, contains('input logic [5:0] portA [5:0]'));
     expect(sv, contains('output logic portB [5:0]'));
   });

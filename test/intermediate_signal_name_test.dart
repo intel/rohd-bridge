@@ -96,8 +96,8 @@ void main() {
       }
 
       await top.build();
-      expect(
-          top.generateSynth, throwsA(isA<UnavailableReservedNameException>()));
+      expect(top.dumpSystemVerilog,
+          throwsA(isA<UnavailableReservedNameException>()));
     });
 
     for (final selection in ['', '[2:1]']) {
@@ -117,7 +117,7 @@ void main() {
         }
 
         await top.build();
-        expect(top.generateSynth,
+        expect(top.dumpSystemVerilog,
             throwsA(isA<UnavailableReservedNameException>()));
       });
     }
@@ -165,7 +165,7 @@ void main() {
             unorderedEquals({intermediate, strictIntermediate}));
         expect(intermediate.naming,
             firstStrict ? Naming.reserved : Naming.renameable);
-        expect(top.generateSynth(),
+        expect(top.dumpSystemVerilog(),
             matches(RegExp(r'\.second\s*\(\s*sharedExact\s*\)')));
         driver.port.put(0xAB);
         expect(first.port.value.toInt(), 0xAB);
@@ -206,7 +206,7 @@ void main() {
         expect(
             intermediates.where((signal) => signal.naming == Naming.renameable),
             hasLength(firstStrict ? 0 : 1));
-        expect(top.generateSynth(), contains('sharedExact'));
+        expect(top.dumpSystemVerilog(), contains('sharedExact'));
         firstDrive.put(0xAB);
         expect(receiver.port.value.toInt(), 0xAB);
         firstDrive.put(LogicValue.z, fill: true);
@@ -276,7 +276,7 @@ void main() {
                 signal.name == 'recovered' &&
                 (kind == 'scalar' || signal is LogicArray));
             expect(intermediates, hasLength(1));
-            expect(top.generateSynth(),
+            expect(top.dumpSystemVerilog(),
                 matches(RegExp(r'\.correct\s*\(\s*recovered\s*\)')));
             driver.port.put(kind == 'array slice' ? 0xAB00 : 0xAB);
             expect(correct.port.value.toInt(), 0xAB);
@@ -305,7 +305,7 @@ void main() {
               .whereType<LogicArray>()
               .singleWhere((signal) => signal.name == '_requested');
           expect(intermediate.naming, Naming.renameable);
-          expect(top.generateSynth(),
+          expect(top.dumpSystemVerilog(),
               matches(RegExp(r'\.dataIn\s*\(\s*_requested\s*\)')));
           driver.port.put(0xABCDEF);
           expect(receiver.port.value.toInt(), 0xABCDEF);
@@ -335,7 +335,7 @@ void main() {
         expect(
             intermediate.leafElements.every((field) => field.naming == naming),
             isTrue);
-        final sv = top.generateSynth();
+        final sv = top.dumpSystemVerilog();
         expect(sv, contains('namedEnvelope_packet_header'));
         expect(sv, contains('namedEnvelope_footer'));
         driver.port.put(0xABCD);
@@ -395,10 +395,10 @@ void main() {
                 .every((field) => field.naming == Naming.reserved),
             isTrue);
         if (collision) {
-          expect(top.generateSynth,
+          expect(top.dumpSystemVerilog,
               throwsA(isA<UnavailableReservedNameException>()));
         } else {
-          final sv = top.generateSynth();
+          final sv = top.dumpSystemVerilog();
           expect(sv, contains('exactPacket_header'));
           expect(sv, contains('exactPacket_payload'));
           expect(sv, isNot(contains('exactPacket_header_0')));
@@ -437,7 +437,7 @@ void main() {
           expect(intermediate.numUnpackedDimensions, unpacked);
           expect(intermediate.isNet, isNet);
           expect(intermediate.naming, Naming.reserved);
-          final sv = top.generateSynth();
+          final sv = top.dumpSystemVerilog();
           expect(sv, matches(RegExp(r'\.dataOut\s*\(\s*exactArray\s*\)')));
           expect(sv, matches(RegExp(r'\.dataIn\s*\(\s*exactArray\s*\)')));
           driver.port.put(0xABCDEF);
@@ -466,7 +466,7 @@ void main() {
       connectPorts(src.port('dataOut'), dst.port('dataIn'),
           intermediateSignalName: 'exactPacket');
       await top.build();
-      expect(top.generateSynth(), contains('exactPacket_header'));
+      expect(top.dumpSystemVerilog(), contains('exactPacket_header'));
     });
 
     for (final names in [
@@ -521,7 +521,7 @@ void main() {
               allowIntermediateSignalNameUniquification: allowUniquification);
 
           await top.build();
-          final sv = top.generateSynth();
+          final sv = top.dumpSystemVerilog();
           if (names.expected == null) {
             expect(dst.inputSource('myPortIn').srcConnections,
                 contains(src.output('myPortOut')));
@@ -571,7 +571,7 @@ void main() {
       }
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       expect(receiverParent.inputs.keys, ['receiverRoute']);
       expect(
           sourceParent
@@ -604,7 +604,7 @@ void main() {
           receiverPathNewPortName: 'sharedWire');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       final firstNet = RegExp(r'\.firstIn\s*\(\s*(sharedWire(?:_\d+)?)\s*\)')
           .firstMatch(sv)!
           .group(1)!;
@@ -646,7 +646,7 @@ void main() {
           expect(intermediate.elementWidth, 4);
           expect(intermediate.numUnpackedDimensions, unpacked);
           expect(intermediate.isNet, isNet);
-          final sv = top.generateSynth();
+          final sv = top.dumpSystemVerilog();
           expect(sv, matches(RegExp(r'\.dataOut\s*\(\s*namedArray\s*\)')));
           expect(sv, matches(RegExp(r'\.dataIn\s*\(\s*namedArray\s*\)')));
 
@@ -684,7 +684,7 @@ void main() {
         expect(
             top.internalSignals.where((signal) => signal.name == 'sharedArray'),
             hasLength(1));
-        final sv = top.generateSynth();
+        final sv = top.dumpSystemVerilog();
         expect(sv, matches(RegExp(r'\.first\s*\(\s*sharedArray\s*\)')));
         expect(sv, matches(RegExp(r'\.second\s*\(\s*sharedArray\s*\)')));
         driver.port.put(0xABCDEF);
@@ -710,7 +710,7 @@ void main() {
           .whereType<_Packet>()
           .singleWhere((signal) => signal.name == 'namedPacket');
       expect(intermediate.elements.map((element) => element.width), [2, 6]);
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       expect(sv, contains('namedPacket_header'));
       expect(sv, contains('namedPacket_payload'));
       src.output('dataOut').put(0xAB);
@@ -756,7 +756,7 @@ void main() {
               expect(intermediate.isNet, isNet);
               expect(intermediate.naming,
                   allowUniquification ? Naming.renameable : Naming.reserved);
-              final sv = top.generateSynth();
+              final sv = top.dumpSystemVerilog();
               expect(sv, contains('selectedArray'));
               expect(sv, isNot(contains('selectedArray_0')));
               driver.port.put(0x123456789ABC);
@@ -786,7 +786,7 @@ void main() {
       expect(intermediate, isNot(isA<LogicStructure>()));
       expect(intermediate.width, 3);
       expect(intermediate.naming, Naming.reserved);
-      expect(top.generateSynth(), contains('selectedBits'));
+      expect(top.dumpSystemVerilog(), contains('selectedBits'));
       driver.port.put(0xABCDEF);
       expect(receiver.portSubsetLogic.value.toInt(), 5);
     });
@@ -810,7 +810,7 @@ void main() {
               .singleWhere((signal) => signal.name == 'packedSourceSelection')
               .naming,
           Naming.reserved);
-      expect(top.generateSynth(), contains('packedSourceSelection'));
+      expect(top.dumpSystemVerilog(), contains('packedSourceSelection'));
       driver.port.put(0x123456789ABC);
       expect(receiver.portSubsetLogic.value.toInt(), 0x456789);
     });
@@ -833,7 +833,7 @@ void main() {
       await top.build();
       expect(top.internalSignals.where((signal) => signal.name == 'sameName'),
           hasLength(2));
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       expect(sv, contains('sameName_0'));
       driver.port.put(0x123456789ABC);
       expect(dst.input('first').value.toInt(), 0x789ABC);
@@ -853,7 +853,7 @@ void main() {
       await top.build();
       expect(top.internalSignals.where((signal) => signal.name == 'sameName'),
           hasLength(2));
-      expect(top.generateSynth(), contains('sameName_0'));
+      expect(top.dumpSystemVerilog(), contains('sameName_0'));
       src.output('first').put(0x123456);
       src.output('second').put(0xABCDEF);
       expect(dst.input('first').value.toInt(), 0x123456);
@@ -884,7 +884,7 @@ void main() {
           .singleWhere((signal) => signal.name == 'packedPacket');
       expect(intermediate, isNot(isA<LogicStructure>()));
       expect(intermediate.width, 8);
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       expect(sv, matches(RegExp(r'\.driverPath\s*\(\s*packedPacket\s*\)')));
       expect(sv, matches(RegExp(r'\.receiverPath\s*\(\s*packedPacket\s*\)')));
       src.output('dataOut').put(0xAB);
@@ -935,7 +935,7 @@ void main() {
           expect(intermediates, hasLength(2));
           expect(intermediates.map((signal) => signal.naming),
               unorderedEquals([Naming.renameable, Naming.reserved]));
-          expect(top.generateSynth(), contains('sharedSelection'));
+          expect(top.dumpSystemVerilog(), contains('sharedSelection'));
           driver.port.put(0x12345678);
           final expected = selection.isEmpty
               ? 0x12345678
@@ -985,7 +985,7 @@ void main() {
                 top.internalSignals
                     .where((signal) => signal.name == 'sharedBus'),
                 hasLength(strictSecond ? 2 : 1));
-            expect(top.generateSynth(), contains('sharedBus'));
+            expect(top.dumpSystemVerilog(), contains('sharedBus'));
             src.inOut('first').put(0x123456);
             final expected = driverSelection.isEmpty ? 0x123456 : 0x123;
             final receiverStart = receiverSelection.isEmpty ? 0 : 12;
@@ -1013,7 +1013,7 @@ void main() {
       }
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       for (final name in ['firstBus', 'secondBus']) {
         expect(top.internalSignals.where((signal) => signal.name == name),
             hasLength(1));
@@ -1037,7 +1037,7 @@ void main() {
           .singleWhere((signal) => signal.name == 'packetBits');
       expect(intermediate, isNot(isA<LogicStructure>()));
       expect(intermediate.width, 5);
-      expect(top.generateSynth(), contains('packetBits'));
+      expect(top.dumpSystemVerilog(), contains('packetBits'));
       src.output('dataOut').put(0xAB);
       expect(dst.input('dataIn').value.getRange(2, 7).toInt(), 0x15);
     });
@@ -1057,7 +1057,7 @@ void main() {
           .toList();
       expect(intermediates, hasLength(2));
       expect(dst.inputSource('dataIn').srcConnections, isNot(contains(manual)));
-      expect(top.generateSynth(), contains('sharedName'));
+      expect(top.dumpSystemVerilog(), contains('sharedName'));
       driver.port.put(0xAB);
       expect(receiver.port.value.toInt(), 0xAB);
       expect(top.output('manualObserver').value.toInt(), 0xAB);
@@ -1139,7 +1139,7 @@ void main() {
       expect(
           dst.inputSource('dataIn').srcConnections, contains(externalSignal));
       await top.build();
-      expect(top.generateSynth(), contains('scopedName'));
+      expect(top.dumpSystemVerilog(), contains('scopedName'));
       driver.port.put(0xAB);
       expect(loopback.port.value.toInt(), 0xAB);
       expect(passthrough.port.value.toInt(), 0xAB);
@@ -1167,7 +1167,7 @@ void main() {
         expect(
             top.internalSignals.where((signal) => signal.name == 'sharedBus'),
             hasLength(1));
-        expect(top.generateSynth(), isNot(contains('sharedBus_0')));
+        expect(top.dumpSystemVerilog(), isNot(contains('sharedBus_0')));
         src.inOut('first').put(0xABCDEF);
         expect(src.inOut('second').value.toInt(), 0xABCDEF);
         expect(dst.inOut('first').value.toInt(), 0xABCDEF);
@@ -1185,7 +1185,7 @@ void main() {
           intermediateSignalName: 'myNamedNet');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       expect(sv, contains('myNamedNet'));
 
       // The intermediate signal should exist in top's internal signals,
@@ -1213,7 +1213,7 @@ void main() {
           allowIntermediateSignalNameUniquification: false);
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       expect(
           top.internalSignals
@@ -1239,7 +1239,7 @@ void main() {
           allowIntermediateSignalNameUniquification: false);
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       expect(child.internalSignals.map((signal) => signal.name),
           contains('myPassthroughNet'));
@@ -1264,7 +1264,7 @@ void main() {
           intermediateSignalName: 'sharedWire');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       expect(sv, contains('sharedWire'));
       // The net should appear in both submodules' portmaps.
       expect(sv, matches(RegExp(r'\.myPortOut\s*\(\s*sharedWire\s*\)')));
@@ -1300,7 +1300,7 @@ void main() {
         }
 
         await top.build();
-        final sv = top.generateSynth();
+        final sv = top.dumpSystemVerilog();
 
         expect(sv, isNot(contains('explicit_name_0')));
         expect(sv, matches(RegExp(r'\.myPortOut\s*\(\s*explicit_name\s*\)')));
@@ -1309,9 +1309,7 @@ void main() {
         src.output('myPortOut').put(0xAB);
         expect(top.output('explicit_name').value.toInt(), equals(0xAB));
         expect(dst.input('myPortIn').value.toInt(), equals(0xAB));
-      },
-          skip: 'Pending release of ROHD PR '
-              'https://github.com/intel/rohd/pull/712');
+      });
     }
 
     for (final exportFirst in [true, false]) {
@@ -1340,7 +1338,7 @@ void main() {
         }
 
         await top.build();
-        final sv = top.generateSynth();
+        final sv = top.dumpSystemVerilog();
 
         expect(sv, isNot(contains('explicit_name_0')));
         expect(sv, matches(RegExp(r'\.myPort\s*\(\s*explicit_name\s*\)')));
@@ -1348,9 +1346,7 @@ void main() {
         src.inOut('myPort').put(0xAB);
         expect(top.inOut('explicit_name').value.toInt(), equals(0xAB));
         expect(dst.inOut('myPort').value.toInt(), equals(0xAB));
-      },
-          skip: 'Pending release of ROHD PR '
-              'https://github.com/intel/rohd/pull/712');
+      });
     }
 
     test('without intermediateSignalName: connection works normally', () async {
@@ -1362,7 +1358,7 @@ void main() {
       connectPorts(src.port('myPortOut'), dst.port('myPortIn'));
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       // should compile, net name is auto-chosen
       expect(sv, isNotEmpty);
 
@@ -1385,15 +1381,21 @@ void main() {
           intermediateSignalName: 'myPortOutUpper');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       // Both named nets exist and are 16 bits wide.
       expect(sv, matches(RegExp(r'logic\s*\[15:0\]\s*myPortOutLower')));
       expect(sv, matches(RegExp(r'logic\s*\[15:0\]\s*myPortOutUpper')));
 
-      // Lower net driven by the low half, upper net by the high half.
-      expect(sv, matches(RegExp(r'myPortOutLower\s*=\s*myPortOut\[15:0\]')));
-      expect(sv, matches(RegExp(r'myPortOutUpper\s*=\s*myPortOut\[31:16\]')));
+      // The named halves are ordered consistently on both instance ports.
+      expect(
+          sv,
+          matches(RegExp(r'\.myPortOut\s*\(\s*\{\s*myPortOutUpper\s*,'
+              r'\s*myPortOutLower\s*\}\s*\)')));
+      expect(
+          sv,
+          matches(RegExp(r'\.myPortIn\s*\(\s*\(\s*\{[^}]*myPortOutUpper'
+              r'[^}]*myPortOutLower[^}]*\}\s*\)\s*\)')));
 
       // Verify all bits propagate correctly.
       mod1.output('myPortOut').put(0xDEADBEEF);
@@ -1410,7 +1412,7 @@ void main() {
           intermediateSignalName: 'lowNibble');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       // 4-bit named net driven by the low nibble of myPortOut.
       expect(sv, matches(RegExp(r'logic\s*\[3:0\]\s*lowNibble')));
@@ -1437,7 +1439,7 @@ void main() {
           intermediateSignalName: 'inoutBus');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
       expect(sv, contains('inoutBus'));
 
       modA.port('portA').port.put(0xA);
@@ -1471,7 +1473,7 @@ void main() {
           intermediateSignalName: 'mySharedNet');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       // Only one net declaration — not mySharedNet_0 or mySharedNet_1.
       expect(sv, contains('mySharedNet'));
@@ -1516,7 +1518,7 @@ void main() {
           intermediateSignalName: 'myNestedSharedNet');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       expect(sv, contains('myNestedSharedNet'));
       expect(sv, isNot(contains('myNestedSharedNet_0')));
@@ -1547,7 +1549,7 @@ void main() {
           intermediateSignalName: 'mySharedInOutNet');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       expect(sv, contains('mySharedInOutNet'));
       expect(sv, isNot(contains('mySharedInOutNet_0')));
@@ -1581,7 +1583,7 @@ void main() {
           intermediateSignalName: 'mySharedNet');
 
       await top.build();
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       // The first connection should keep the base name; the second should be
       // uniquified to mySharedNet_0, mySharedNet_1, etc.

@@ -982,7 +982,7 @@ sealed class PortReference extends Reference {
   /// within or outside of the [module].
   late final portSubsetLogic = portSubset is Logic
       ? portSubset as Logic
-      : (portSubset as List<Logic>).rswizzle();
+      : (portSubset as List<Logic>).rconcat();
 
   /// Creates a matching port in the parent module and connects them.
   ///

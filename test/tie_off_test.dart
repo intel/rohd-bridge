@@ -63,7 +63,7 @@ void main() {
       ..pullUpPort(mod.port('banana'));
 
     await top.build();
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
     expect(sv, contains("assign banana = 4'b10xz;"));
 
     expect(mod.output('banana').value, LogicValue.of('10xz'));
@@ -77,7 +77,7 @@ void main() {
     }
 
     await mod.build();
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
 
     expect(sv, isNot(contains('tieoff_const0')));
     expect(mod.output('banana').value, LogicValue.filled(8, LogicValue.zero));
@@ -92,10 +92,10 @@ void main() {
     mod.port('banana[7:0]').tieOff(value: 0x5a);
 
     await mod.build();
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
 
-    expect(sv, contains("assign apple[7:0] = 8'h5a;"));
-    expect(sv, contains("assign banana[7:0] = 8'h5a;"));
+    expect(sv, contains("assign apple = 8'h5a;"));
+    expect(sv, contains("assign banana = 8'h5a;"));
     expect(mod.output('apple').value, LogicValue.ofInt(0x5a, 8));
     expect(mod.output('banana').value, LogicValue.ofInt(0x5a, 8));
   });

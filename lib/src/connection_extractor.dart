@@ -610,10 +610,10 @@ class ConnectionExtractor {
         _analyzeSrc(
           src,
           loadTracking: loadTracking,
-          handleSwizzle: (handleSwizzle, swizzleInputs, swizzleOutput) =>
+          handleConcat: (handleConcat, concatInputs, concatOutput) =>
               _applyConcatenation(
             loadTracking,
-            components: swizzleInputs,
+            components: concatInputs,
           ),
           handleBusSubset: (handleBusSubset, busOrigInput, busSubsetOutput,
                   startIndex, endIndex) =>
@@ -637,25 +637,25 @@ class ConnectionExtractor {
       ]) {
         foundTrackings.addAll(
           _analyzeSrc(src, loadTracking: loadTracking,
-              handleSwizzle: (loadTracking, swizzleInputs, swizzleOutput) {
-            if (src == swizzleOutput) {
+              handleConcat: (loadTracking, concatInputs, concatOutput) {
+            if (src == concatOutput) {
               // this is the normal direction
               return _applyConcatenation(
                 loadTracking,
-                components: swizzleInputs,
+                components: concatInputs,
               );
             }
 
             // we're going backwards, so this looks like a busSubset sort of,
             // but we need to deduce the index
             var startIndex = 0;
-            assert(swizzleInputs.contains(src),
-                'Swizzle inputs must contain the source, got $swizzleInputs');
-            for (final swizIn in swizzleInputs) {
-              if (swizIn == src) {
+            assert(concatInputs.contains(src),
+                'Concat inputs must contain the source, got $concatInputs');
+            for (final concatIn in concatInputs) {
+              if (concatIn == src) {
                 break;
               }
-              startIndex += swizIn.width;
+              startIndex += concatIn.width;
             }
             final endIndex = startIndex + loadTracking.width - 1;
 
@@ -664,7 +664,7 @@ class ConnectionExtractor {
                 loadTracking,
                 startIndex: startIndex,
                 endIndex: endIndex,
-                superSet: swizzleOutput,
+                superSet: concatOutput,
               )
             ];
           }, handleBusSubset: (loadTracking, busOrigInput, busSubsetOutput,
@@ -682,7 +682,7 @@ class ConnectionExtractor {
             }
 
             // we're going backwards, so this sort of looks like a simpler
-            // version of a swizzle
+            // version of a concatenation
             return _applyConcatenation(
               loadTracking,
               components: [
@@ -713,9 +713,9 @@ class ConnectionExtractor {
     required _ConnectionSliceTracking loadTracking,
     required List<_ConnectionSliceTracking> Function(
             _ConnectionSliceTracking loadTracking,
-            List<Logic> swizzleInputs,
-            Logic swizzleOutput)
-        handleSwizzle,
+            List<Logic> concatInputs,
+            Logic concatOutput)
+        handleConcat,
     required List<_ConnectionSliceTracking> Function(
             _ConnectionSliceTracking loadTracking,
             Logic busOrigInput,
@@ -738,21 +738,21 @@ class ConnectionExtractor {
         if (srcMod != loadTracking.dstModule) {
           return foundTrackings;
         }
-      } else if (srcMod is Swizzle) {
+      } else if (srcMod is Concat) {
         // TODO(mkorbel1): eventually, use named ports here and for BusSubset
         //  too (https://github.com/intel/rohd/issues/609)
 
-        final swizzleInputs = [...srcMod.inputs.values, ...srcMod.inOuts.values]
+        final concatInputs = [...srcMod.inputs.values, ...srcMod.inOuts.values]
             .where((e) => e.name != srcMod.resultSignalName)
             .toList();
 
-        final swizzleOutput = srcMod.tryOutput(srcMod.resultSignalName) ??
+        final concatOutput = srcMod.tryOutput(srcMod.resultSignalName) ??
             srcMod.inOut(srcMod.resultSignalName);
 
-        final newTrackings = handleSwizzle(
+        final newTrackings = handleConcat(
           loadTracking,
-          swizzleInputs,
-          swizzleOutput,
+          concatInputs,
+          concatOutput,
         );
 
         for (final newTracking in newTrackings) {
@@ -821,51 +821,51 @@ class ConnectionExtractor {
         components.where((component) => component.width > 0).toList();
 
     // we need to identify which portions of the dst overlap with which
-    // portions of the collection of swizzle inputs, then split the
+    // portions of the collection of concatenation inputs, then split the
     // tracking into multiple on a per-dest-subset basis
 
-    var swizzleIdx = 0;
-    var swizzleBitIdx = 0;
+    var concatIdx = 0;
+    var concatBitIdx = 0;
 
-    // first, slide up the swizzleIdx until we get to the src we want
+    // first, slide up the concatIdx until we get to the src we want
     var srcIdx = 0;
     while (srcIdx < loadTracking.srcLowIndex) {
-      swizzleBitIdx++;
+      concatBitIdx++;
       srcIdx++;
 
-      if (swizzleBitIdx >= nonEmptyComponents[swizzleIdx].width) {
+      if (concatBitIdx >= nonEmptyComponents[concatIdx].width) {
         // move to the next swizzle input
-        swizzleIdx++;
-        swizzleBitIdx = 0;
+        concatIdx++;
+        concatBitIdx = 0;
       }
     }
 
-    assert(swizzleIdx < nonEmptyComponents.length,
-        'swizzleIdx should be within bounds of swizzleInputs');
+    assert(concatIdx < nonEmptyComponents.length,
+        'concatIdx should be within bounds of concatInputs');
 
     int? currNewDstHighIndex;
     int? currNewDstLowIndex;
-    int? currSwizzleInputHighIndex;
-    int? currSwizzleInputLowIndex = swizzleBitIdx;
+    int? currConcatInputHighIndex;
+    int? currConcatInputLowIndex = concatBitIdx;
 
     void checkAndFlushCurrentTracking() {
-      assert(swizzleIdx < nonEmptyComponents.length,
-          'swizzleIdx should be within bounds of swizzleInputs');
+      assert(concatIdx < nonEmptyComponents.length,
+          'concatIdx should be within bounds of concatInputs');
 
-      final hitSwizzleInputEnd =
-          swizzleBitIdx >= nonEmptyComponents[swizzleIdx].width - 1;
+      final hitConcatInputEnd =
+          concatBitIdx >= nonEmptyComponents[concatIdx].width - 1;
 
       final hitDstRangeEnd = currNewDstHighIndex != null &&
           currNewDstHighIndex! >= loadTracking.dstHighIndex;
 
-      if (hitSwizzleInputEnd || hitDstRangeEnd) {
+      if (hitConcatInputEnd || hitDstRangeEnd) {
         if (currNewDstHighIndex != null && currNewDstLowIndex != null) {
-          final currSwizzleInput = nonEmptyComponents[swizzleIdx];
+          final currConcatInput = nonEmptyComponents[concatIdx];
 
           final newLoadTracking = loadTracking.copyWith(
-            src: currSwizzleInput,
-            srcLowIndex: currSwizzleInputLowIndex,
-            srcHighIndex: currSwizzleInputHighIndex,
+            src: currConcatInput,
+            srcLowIndex: currConcatInputLowIndex,
+            srcHighIndex: currConcatInputHighIndex,
             dstLowIndex: currNewDstLowIndex,
             dstHighIndex: currNewDstHighIndex,
           );
@@ -873,10 +873,10 @@ class ConnectionExtractor {
           foundTrackings.add(newLoadTracking);
 
           // move to the next swizzle input
-          swizzleIdx++;
-          swizzleBitIdx = -1; // negative since we incr to 0 next!
-          currSwizzleInputLowIndex = null;
-          currSwizzleInputHighIndex = null;
+          concatIdx++;
+          concatBitIdx = -1; // negative since we incr to 0 next!
+          currConcatInputLowIndex = null;
+          currConcatInputHighIndex = null;
 
           // reset the current dst indices
           currNewDstLowIndex = null;
@@ -887,11 +887,11 @@ class ConnectionExtractor {
 
     for (var dstIdx = loadTracking.dstLowIndex;
         dstIdx <= loadTracking.dstHighIndex;
-        dstIdx++, swizzleBitIdx++) {
-      currSwizzleInputLowIndex ??= 0;
-      currSwizzleInputHighIndex = currSwizzleInputHighIndex == null
-          ? currSwizzleInputLowIndex
-          : currSwizzleInputHighIndex! + 1;
+        dstIdx++, concatBitIdx++) {
+      currConcatInputLowIndex ??= 0;
+      currConcatInputHighIndex = currConcatInputHighIndex == null
+          ? currConcatInputLowIndex
+          : currConcatInputHighIndex! + 1;
 
       currNewDstLowIndex ??= dstIdx;
       currNewDstHighIndex =

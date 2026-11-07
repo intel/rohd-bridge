@@ -298,7 +298,7 @@ class SlicePortReference extends PortReference {
       otherDriver = intermediate.driver;
       getsLogic(otherDriver is Logic
           ? otherDriver
-          : (otherDriver as List<Logic>).rswizzle());
+          : (otherDriver as List<Logic>).rconcat());
       intermediate.onConnected?.call();
       return;
     }
@@ -321,7 +321,7 @@ class SlicePortReference extends PortReference {
     if (receiverPort is LogicStructure && receiverPort is! LogicArray) {
       final driver = otherDriver is Logic
           ? otherDriver
-          : (otherDriver as List<Logic>).rswizzle();
+          : (otherDriver as List<Logic>).rconcat();
       _assignPackedStructureSubset(
         receiverPort,
         driver,
@@ -373,7 +373,7 @@ class SlicePortReference extends PortReference {
         } else {
           // elements don't line up, need to do some fanciness per-element
           var receiverSliceIndex = 0;
-          final swizzledOtherDriver = otherDriver.rswizzle();
+          final swizzledOtherDriver = otherDriver.rconcat();
           for (final element in receiverPort.elements
               .getRange(sliceLowerIndex!, sliceUpperIndex! + 1)) {
             final otherDriverRange = swizzledOtherDriver.getRange(
@@ -390,7 +390,7 @@ class SlicePortReference extends PortReference {
           }
         }
       } else {
-        receiverPort <= otherDriver.rswizzle();
+        receiverPort <= otherDriver.rconcat();
       }
     } else {
       throw RohdBridgeException('Invalid driver type: $otherDriver');

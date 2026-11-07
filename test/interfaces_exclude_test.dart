@@ -205,6 +205,32 @@ void main() {
     expect(mid2.hasPortWithSubstring('orange'), isTrue);
   });
 
+  test('pullUpInterface names and connects remaining ports across hierarchy',
+      () async {
+    final leaf = LM1();
+    final mid = BridgeModule('mid')..addSubModule(leaf);
+    final top = BridgeModule('top')
+      ..addSubModule(mid)
+      ..pullUpInterface(
+        leaf.interface('intf1'),
+        exceptPorts: {'fc', 'fp'},
+        portUniquify: (logical, physical) => '${logical}_from_$physical',
+      );
+
+    await top.build();
+    for (final module in [mid, top]) {
+      expect(module.interface('intf1').interface.ports.keys,
+          unorderedEquals(['apple', 'orange']));
+      expect(module.inputs.keys, unorderedEquals(['apple_from_apple']));
+      expect(module.outputs.keys, unorderedEquals(['orange_from_orange']));
+    }
+
+    top.input('apple_from_apple').put(0xA);
+    leaf.output('orange').put(0x5);
+    expect(leaf.input('apple').value.toInt(), 0xA);
+    expect(top.output('orange_from_orange').value.toInt(), 0x5);
+  });
+
   test('punchUpTo with exceptPorts', () async {
     //   - InterfaceReference.punchUpTo
     //     -> _connectAllPortMaps, cloneExcept, connectUpTo
@@ -247,6 +273,64 @@ void main() {
 
     expect(top.interface('intf1').interface,
         isNot(equals(leaf.interface('intf1').interface)));
+  });
+
+  test('punchUpTo names and connects remaining ports with portUniquify',
+      () async {
+    final top = BridgeModule('top');
+    final leaf = LM1();
+    top.addSubModule(leaf);
+
+    final partial = leaf.interface('intf1').punchUpTo(
+          top,
+          exceptPorts: {'fp', 'fc'},
+          portUniquify: (logical) => 'renamed_$logical',
+        );
+
+    await top.build();
+    expect(partial.interface.ports.keys, unorderedEquals(['apple', 'orange']));
+    expect(partial.interface.getPorts([PairDirection.fromProvider]).keys,
+        unorderedEquals(['apple']));
+    expect(partial.interface.getPorts([PairDirection.fromConsumer]).keys,
+        unorderedEquals(['orange']));
+    expect(top.inputs.keys, unorderedEquals(['renamed_apple']));
+    expect(top.outputs.keys, unorderedEquals(['renamed_orange']));
+    expect(top.input('renamed_apple').width, 4);
+    expect(top.output('renamed_orange').width, 4);
+
+    top.input('renamed_apple').put(0xA);
+    leaf.output('orange').put(0x5);
+    expect(leaf.input('apple').value.toInt(), 0xA);
+    expect(top.output('renamed_orange').value.toInt(), 0x5);
+  });
+
+  test('punchDownTo names and connects remaining ports with portUniquify',
+      () async {
+    final top = LM1();
+    final leaf = BridgeModule('leaf');
+    top.addSubModule(leaf);
+
+    final partial = top.interface('intf1').punchDownTo(
+          leaf,
+          exceptPorts: {'fp', 'fc'},
+          portUniquify: (logical) => 'renamed_$logical',
+        );
+
+    await top.build();
+    expect(partial.interface.ports.keys, unorderedEquals(['apple', 'orange']));
+    expect(partial.interface.getPorts([PairDirection.fromProvider]).keys,
+        unorderedEquals(['apple']));
+    expect(partial.interface.getPorts([PairDirection.fromConsumer]).keys,
+        unorderedEquals(['orange']));
+    expect(leaf.inputs.keys, unorderedEquals(['renamed_apple']));
+    expect(leaf.outputs.keys, unorderedEquals(['renamed_orange']));
+    expect(leaf.input('renamed_apple').width, 4);
+    expect(leaf.output('renamed_orange').width, 4);
+
+    top.input('apple').put(0xA);
+    leaf.output('renamed_orange').put(0x5);
+    expect(leaf.input('renamed_apple').value.toInt(), 0xA);
+    expect(top.output('orange').value.toInt(), 0x5);
   });
 
   test('connectUpTo with exceptPorts', () async {
