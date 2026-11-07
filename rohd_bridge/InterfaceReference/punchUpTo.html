@@ -54,12 +54,12 @@
 
     <section class="multi-line-signature">
       
-<span class="returntype"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.6.10/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span>
+<span class="returntype"><a href="../../rohd_bridge/InterfaceReference-class.html">InterfaceReference</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/rohd/0.7.0/rohd/PairInterface-class.html">PairInterface</a></span>&gt;</span></span>
 <span class="name ">punchUpTo</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="punchUpTo-param-newModule"><span class="type-annotation"><a href="../../rohd_bridge/BridgeModule-class.html">BridgeModule</a></span> <span class="parameter-name">newModule</span>, {</span></li>
-<li><span class="parameter" id="punchUpTo-param-newIntfName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newIntfName</span>, </span></li>
-<li><span class="parameter" id="punchUpTo-param-allowNameUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowNameUniquification</span> = <span class="default-value">false</span>, </span></li>
-<li><span class="parameter" id="punchUpTo-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">exceptPorts</span>, </span></li>
-<li><span class="parameter" id="punchUpTo-param-portUniquify"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">portUniquify</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-logical"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a></span> <span class="parameter-name">logical</span></span></li>
+<li><span class="parameter" id="punchUpTo-param-newIntfName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newIntfName</span>, </span></li>
+<li><span class="parameter" id="punchUpTo-param-allowNameUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowNameUniquification</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="punchUpTo-param-exceptPorts"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/Set-class.html">Set</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.dart.dev/stable/3.13.7/dart-core/String-class.html">String</a></span>&gt;</span>?</span> <span class="parameter-name">exceptPorts</span>, </span></li>
+<li><span class="parameter" id="punchUpTo-param-portUniquify"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/String-class.html">String</a></span> <span class="parameter-name">portUniquify</span>(<ol class="parameter-list single-line"> <li><span class="parameter" id="param-logical"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/String-class.html">String</a></span> <span class="parameter-name">logical</span></span></li>
 </ol>)?, </span></li>
 </ol>})
 
@@ -81,7 +81,7 @@ uniquification</li>
 <li><code>exceptPorts</code>: Set of port names to exclude from the new interface</li>
 <li><code>portUniquify</code>: Function to generate unique port names</li>
 </ul>
-<p>If <code>exceptPorts</code> is provided, the resulting interface will exclude those
+<p>If <code>exceptPorts</code> is nonempty, the resulting interface will exclude those
 ports (and thus not be of the same type). Otherwise, the new interface
 will be of the same type as this one.</p>
 </section>
@@ -142,7 +142,7 @@ will be of the same type as this one.</p>
 <footer>
   <span class="no-break">
     rohd_bridge
-      0.2.4
+      0.3.0
   </span>
   
 </footer>

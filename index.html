@@ -58,6 +58,8 @@
 <li>Build large, highly configurable designs that can be delivered in a portable, reusable way.</li>
 </ul>
 <p>It is built upon the <a href="https://intel.github.io/rohd-website">Rapid Open Hardware Development (ROHD) framework</a>, which is a fast, flexible, and extensible generator framework for hardware design and verification.  Because it is built on ROHD, it can instantiate SystemVerilog <code>module</code>s and generate SystemVerilog for the entire design.</p>
+<p>ROHD Bridge 0.3.0 requires ROHD 0.7.x and Dart 3.6 through 3.x. For interface
+port naming, use <code>portUniquify</code> instead of the removed <code>PairInterface.modify</code>.</p>
 <h2 id="why">Why?</h2>
 <h3 id="it-makes-connectivity-and-assembly-easy">It makes connectivity and assembly easy</h3>
 <p>Generating connectivity for large designs can be difficult and tedious. Many tools and methodologies exist to try to automate, but they can add their own complexity while limiting flexibility.  ROHD Bridge makes it easy to generate connectivity in a very flexible way with minimal overhead.</p>
@@ -313,7 +315,7 @@ SPDX-License-Identifier: BSD-3-Clause</p>
 <footer>
   <span class="no-break">
     rohd_bridge
-      0.2.4
+      0.3.0
   </span>
   
 </footer>

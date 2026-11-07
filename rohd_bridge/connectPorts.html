@@ -57,13 +57,13 @@
 <span class="returntype">void</span>
 <span class="name ">connectPorts</span>(<wbr><ol class="parameter-list"> <li><span class="parameter" id="connectPorts-param-driver"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">driver</span>, </span></li>
 <li><span class="parameter" id="connectPorts-param-receiver"><span class="type-annotation"><a href="../rohd_bridge/PortReference-class.html">PortReference</a></span> <span class="parameter-name">receiver</span>, {</span></li>
-<li><span class="parameter" id="connectPorts-param-driverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">driverPathNewPortName</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-receiverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">receiverPathNewPortName</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-allowDriverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowDriverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-allowReceiverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowReceiverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-driverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">driverPathNewPortName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-receiverPathNewPortName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">receiverPathNewPortName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-allowDriverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowDriverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-allowReceiverPathUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowReceiverPathUniquification</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="connectPorts-param-sameModuleConnectionType"><span class="type-annotation"><a href="../rohd_bridge/SameModuleConnectionType.html">SameModuleConnectionType</a>?</span> <span class="parameter-name">sameModuleConnectionType</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-intermediateSignalName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intermediateSignalName</span>, </span></li>
-<li><span class="parameter" id="connectPorts-param-allowIntermediateSignalNameUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.3/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntermediateSignalNameUniquification</span> = <span class="default-value">true</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-intermediateSignalName"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">intermediateSignalName</span>, </span></li>
+<li><span class="parameter" id="connectPorts-param-allowIntermediateSignalNameUniquification"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.13.7/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">allowIntermediateSignalNameUniquification</span> = <span class="default-value">true</span>, </span></li>
 </ol>})
 
         
@@ -99,7 +99,7 @@ shape and naming policy, an existing intermediate is reused. Names may be
 uniquified on collision. Only Bridge-created intermediates are tracked for
 reuse; manually connected signals are not adopted by name. Whole arrays and
 structures preserve type and shape with the requested name. Custom
-aggregates use their <a href="https://pub.dev/documentation/rohd/0.6.10/rohd/Logic/clone.html">Logic.clone</a> contract. Regular array selections retain
+aggregates use their <a href="https://pub.dev/documentation/rohd/0.7.0/rohd/Logic/clone.html">Logic.clone</a> contract. Regular array selections retain
 their dimensions and packed/unpacked layout; bit selections use packed
 intermediates. Structure names appear
 through their emitted field names. These intermediates do not change the
@@ -380,7 +380,7 @@ may already have been created by that point.</p>
 <footer>
   <span class="no-break">
     rohd_bridge
-      0.2.4
+      0.3.0
   </span>
   
 </footer>
