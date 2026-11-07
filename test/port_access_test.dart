@@ -93,7 +93,7 @@ class PortExample {
         LogicValue.ofString(undriven * (like.width - valWidth - startIndex)),
         LogicValue.ofString('1' * valWidth),
         LogicValue.ofString(undriven * startIndex),
-      ].swizzle();
+      ].concat();
 }
 
 void main() {

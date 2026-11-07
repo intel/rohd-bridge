@@ -130,7 +130,7 @@ void main() {
         equals(int.parse('12AB', radix: 16)));
 
     await top.build();
-    final sv = top.generateSynth();
+    final sv = top.dumpSystemVerilog();
     expect(sv, contains('logic [15:0] struct_input')); // may have _subset
     expect(sv, contains('logic [15:0] struct_output')); // may have _subset
   });

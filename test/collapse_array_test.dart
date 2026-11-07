@@ -59,7 +59,7 @@ void main() {
         LogicArray([3, 3], 1), LogicArray([3, 3], 1));
     await mod.build();
 
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
     expect(sv,
         contains('net_connect #(.WIDTH(9)) net_connect (intermediate, a);'));
     expect(sv,
@@ -78,7 +78,7 @@ void main() {
         LogicArray([3, 3], 1, numUnpackedDimensions: 2));
     await mod.build();
 
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
     expect(sv,
         contains('net_connect #(.WIDTH(9)) net_connect (intermediate, a);'));
     expect(sv,
@@ -95,7 +95,7 @@ void main() {
     final mod = ArrayModule(LogicArray([4, 4], 1));
     await mod.build();
 
-    final sv = mod.generateSynth();
+    final sv = mod.dumpSystemVerilog();
 
     expect(sv, contains('assign d = c[0];'));
     expect(sv, contains('assign b = a;'));

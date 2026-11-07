@@ -79,7 +79,7 @@ void main() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
     await top.build();
-    top.generateSynth();
+    top.dumpSystemVerilog();
   });
 
   ///test for naming unification with subsets

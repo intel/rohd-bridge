@@ -28,12 +28,12 @@ void main() {
     connectPorts(east.port('myOutput'), west.port('myInput'));
 
     await top.build();
-    final sv = top.generateSynth();
+    final sv = top.dumpSystemVerilog();
 
     expect(sv, contains('''
-logic [3:0] myInput;
-east  east(.clk(clk),.myOutput(myInput));
-west  west(.myInput(myInput));
+logic [3:0] myOutput;
+east  east(.clk(clk),.myOutput(myOutput));
+west  west(.myInput(myOutput));
 '''));
   });
 
@@ -51,12 +51,12 @@ west  west(.myInput(myInput));
     connectPorts(east.port('myOutput'), west.port('myInput'));
 
     await top.build();
-    final sv = top.generateSynth();
+    final sv = top.dumpSystemVerilog();
 
     expect(sv, contains('''
-logic [3:0] myInput;
-east  east(.clk(clk),.myOutput(myInput));
-west  west(.myInput(myInput));'''));
+logic [3:0] myOutput;
+east  east(.clk(clk),.myOutput(myOutput));
+west  west(.myInput(myOutput));'''));
   });
 
   test('multiple single ports to one bus', () async {
@@ -81,7 +81,7 @@ west  west(.myInput(myInput));'''));
     }
 
     await top.build();
-    final sv = top.generateSynth();
+    final sv = top.dumpSystemVerilog();
 
     expect(sv, contains('''
 aggregator  aggregator(.merged_bits(({
@@ -103,7 +103,7 @@ out_bit_2  /* 0 */
 
     await top.build();
 
-    final sv = top.generateSynth();
+    final sv = top.dumpSystemVerilog();
 
     expect(sv, contains('modA(.in_port(modA_in_port),.out_port());'));
   });

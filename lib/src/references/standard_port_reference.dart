@@ -90,7 +90,7 @@ class StandardPortReference extends PortReference {
             receiver.dimensions.first == otherDriver.length) {
           receiver.assignSubset(otherDriver);
         } else {
-          receiver <= otherDriver.rswizzle();
+          receiver <= otherDriver.rconcat();
         }
       } else {
         throw RohdBridgeException('Invalid driver type $otherDriver');

@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Breaking: Require ROHD `^0.7.0` and Dart `^3.6.0`; ROHD 0.6.x is no longer supported.
+- Migrate interface cloning, connection extraction, and concatenation to ROHD 0.7.0 APIs. Use `portUniquify` for interface port naming instead of the removed `PairInterface.modify`.
+
 ## 0.2.4
 
 - Added `allowIntermediateSignalNameUniquification` to `connectPorts` and port-reference connections, defaulting to `true`. Setting it to `false` reserves the resolved intermediate name. Stricter requests can create separate aliases for new fan-out receivers and bidirectional nets while preserving existing connections; unsupported custom clones and rewiring already-connected non-net receivers are rejected (<https://github.com/intel/rohd-bridge/pull/68>).
