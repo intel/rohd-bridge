@@ -276,7 +276,7 @@ class InterfaceReference<InterfaceType extends PairInterface>
   /// - [exceptPorts]: Set of port names to exclude from the new interface
   /// - [portUniquify]: Function to generate unique port names
   ///
-  /// If [exceptPorts] is provided, the resulting interface will exclude those
+  /// If [exceptPorts] is nonempty, the resulting interface will exclude those
   /// ports (and thus not be of the same type). Otherwise, the new interface
   /// will be of the same type as this one.
   InterfaceReference punchUpTo(
@@ -785,11 +785,6 @@ extension _ExceptPairInterfaceExtensions on PairInterface {
       commonInOutPorts: _getMatchPortsExcept(PairDirection.commonInOuts,
               exceptPorts: exceptPorts)
           .toList(),
-
-      // since we're not actually cloning, just clone all we can, including
-      // deprecated APIs.
-      // ignore: deprecated_member_use
-      modify: modify,
     );
   }
 

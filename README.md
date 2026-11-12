@@ -17,6 +17,9 @@ ROHD Bridge is an extremely fast [ROHD](https://intel.github.io/rohd-website)-ba
 
 It is built upon the [Rapid Open Hardware Development (ROHD) framework](https://intel.github.io/rohd-website), which is a fast, flexible, and extensible generator framework for hardware design and verification.  Because it is built on ROHD, it can instantiate SystemVerilog `module`s and generate SystemVerilog for the entire design.
 
+ROHD Bridge 0.3.0 requires ROHD 0.7.x and Dart 3.6 through 3.x. For interface
+port naming, use `portUniquify` instead of the removed `PairInterface.modify`.
+
 ## Why?
 
 ### It makes connectivity and assembly easy

@@ -294,7 +294,7 @@ void main() {
 
       await top.build();
 
-      final sv = top.generateSynth();
+      final sv = top.dumpSystemVerilog();
 
       expect(
           sv,
@@ -333,7 +333,7 @@ void main() {
     intf2.port('myConsumerPort').port.put(0x34);
     expect(intf1.port('myConsumerPort').port.value.toInt(), 0x34);
 
-    final sv = top.generateSynth();
+    final sv = top.dumpSystemVerilog();
 
     // ensure no logic at all is inside the leaf
     expect(sv, contains('''

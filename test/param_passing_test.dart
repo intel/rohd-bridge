@@ -59,7 +59,7 @@ void main() {
 
     await top.build();
 
-    final sv = top.generateSynth();
+    final sv = top.dumpSystemVerilog();
     expect(
         'par #(.A(A),.B(B),.C(C),.CC(CC),.D(D),.paramY(paramY)) '
         'par(.leaf2_x(leaf2_x));',
@@ -100,6 +100,6 @@ void main() {
 
     await parentMod.build();
 
-    expect(parentMod.generateSynth, throwsA(isA<Exception>()));
+    expect(parentMod.dumpSystemVerilog, throwsA(isA<Exception>()));
   });
 }
