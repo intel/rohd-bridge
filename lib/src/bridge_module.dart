@@ -9,6 +9,7 @@
 //    Shankar Sharma <shankar.sharma@intel.com>
 //    Suhas Virmani <suhas.virmani@intel.com>
 //    Max Korbel <max.korbel@intel.com>
+//    KayanoLiam <Kayano04@outlook.jp>
 
 import 'dart:collection';
 import 'dart:io';
@@ -207,6 +208,73 @@ class BridgeModule extends Module with SystemVerilog {
   /// which support the enhanced connectivity and hierarchy features.
   Iterable<BridgeModule> get subBridgeModules =>
       subModules.whereType<BridgeModule>();
+
+  /// Returns a pretty-printed [String] of the bridge hierarchy from this
+  /// [BridgeModule] down.
+  ///
+  /// Each line is an instance [name]. If [definitionName] differs from [name],
+  /// it is shown in parentheses. Only [subBridgeModules] are included so the
+  /// constructed design is shown both before and after [build]. Ordinary
+  /// implementation modules are omitted; use [hierarchyString] to view the
+  /// complete elaborated hierarchy after building.
+  ///
+  /// ```dart
+  /// final top = BridgeModule('top')
+  ///   ..addSubModule(
+  ///     BridgeModule('east')..addSubModule(BridgeModule('leaf')),
+  ///   )
+  ///   ..addSubModule(BridgeModule('west'));
+  /// print(top.hierarchyTree());
+  /// ```
+  ///
+  /// The example above produces:
+  ///
+  /// ```text
+  /// top
+  /// ├── east
+  /// │   └── leaf
+  /// └── west
+  /// ```
+  String hierarchyTree() {
+    final buffer = StringBuffer(_hierarchyTreeLabel);
+    final children = subBridgeModules.toList(growable: false);
+    for (var i = 0; i < children.length; i++) {
+      buffer.writeln();
+      children[i]._writeHierarchyTree(
+        buffer,
+        prefix: '',
+        isLast: i == children.length - 1,
+      );
+    }
+    return buffer.toString();
+  }
+
+  /// Instance label for [hierarchyTree], with [definitionName] when it differs.
+  String get _hierarchyTreeLabel =>
+      name == definitionName ? name : '$name ($definitionName)';
+
+  /// Writes this module as a tree node under [prefix] into [buffer].
+  void _writeHierarchyTree(
+    StringBuffer buffer, {
+    required String prefix,
+    required bool isLast,
+  }) {
+    buffer
+      ..write(prefix)
+      ..write(isLast ? '└── ' : '├── ')
+      ..write(_hierarchyTreeLabel);
+
+    final children = subBridgeModules.toList(growable: false);
+    final childPrefix = '$prefix${isLast ? '    ' : '│   '}';
+    for (var i = 0; i < children.length; i++) {
+      buffer.writeln();
+      children[i]._writeHierarchyTree(
+        buffer,
+        prefix: childPrefix,
+        isLast: i == children.length - 1,
+      );
+    }
+  }
 
   /// Internal collection of submodules added via [addSubModule].
   final Set<BridgeModule> _rbSubModules = {};

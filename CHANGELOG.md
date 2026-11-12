@@ -1,3 +1,7 @@
+## Next release
+
+- Added `BridgeModule.hierarchyTree` to pretty-print the constructed bridge hierarchy from a given bridge module down (<https://github.com/intel/rohd-bridge/pull/69>).
+
 ## 0.3.0
 
 - Breaking: Require ROHD `^0.7.0` and Dart `^3.6.0`; ROHD 0.6.x is no longer supported.

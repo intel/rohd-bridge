@@ -177,7 +177,12 @@ myTop.findSubModules(RegExp('myUpperMid/.*/?myLeaf$'));
 
 // Find one matching module, with an exception if more than 1 matches.
 myTop.findSubModule('myLeaf');
+
+// Pretty-print the constructed bridge hierarchy from a BridgeModule down
+print(myTop.hierarchyTree());
 ```
+
+`BridgeModule.hierarchyTree()` includes only bridge submodules, both before and after build. Ordinary implementation modules, such as gates inside a bridge leaf, are omitted. Use ROHD's `hierarchyString()` after build to inspect the complete elaborated hierarchy.
 
 #### Port and Interface References
 
